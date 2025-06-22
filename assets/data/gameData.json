@@ -1,0 +1,27 @@
+{
+    "initialState": {
+        "currentLocation": "living_room",
+        "progress": {
+            "humanComingHome": 0,
+            "hungry": 10,
+            "needPoop": 5
+        },
+        "flags": {
+            "door_to_hall_open": true,
+            "door_to_balcony_open": false,
+            "room_a_locked": true,
+            "room_b_locked": true,
+            "room_c_locked": true
+        },
+        "inventory": [],
+        "actionLog": [],
+        "history": [],
+        "achievements": {}
+    },
+    "itemsFile": "assets/data/items.json",
+    "scenes": {
+        "living_room": "assets/data/scenes/living_room.json",
+        "hallway": "assets/data/scenes/hallway.json",
+        "balcony": "assets/data/scenes/balcony.json"
+    }
+} 

@@ -1,0 +1,37 @@
+{
+    "background": "placeholder_1280x720_3.png",
+    "name": "阳台",
+    "objects": {
+        "cat_back": {
+            "x": 640,
+            "y": 980,
+            "image": "placeholder_cat_back_100x100.png",
+            "interactive": false
+        },
+        "to_living_room_from_balcony": {
+            "x": 100,
+            "y": 600,
+            "image": "placeholder_arrow_left_64x64.png",
+            "name": "客厅",
+            "look": "回客厅。",
+            "navTo": "living_room"
+        },
+        "balcony_view": {
+            "x": 900,
+            "y": 400,
+            "image": "placeholder_80x80.png",
+            "name": "阳台栏杆",
+            "look": "外面的世界真大。",
+            "actions": [
+                {
+                    "id": "patrol_balcony",
+                    "text": "巡视",
+                    "log": "巡视阳台，确认没有入侵者。",
+                    "effects": {
+                        "progress": { "humanComingHome": -2, "hungry": 2 }
+                    }
+                }
+            ]
+        }
+    }
+} 

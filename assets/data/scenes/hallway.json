@@ -1,0 +1,79 @@
+{
+    "background": "placeholder_1280x720_2.png",
+    "name": "过道",
+    "objects": {
+        "cat_back": {
+            "x": 640,
+            "y": 980,
+            "image": "placeholder_80x80.png",
+            "interactive": false
+        },
+        "to_living_room": {
+            "x": 960,
+            "y": 100,
+            "image": "placeholder_arrow_up_64x64.png",
+            "name": "客厅",
+            "look": "回到客厅。",
+            "navTo": "living_room"
+        },
+        "door_a": {
+            "x": 200,
+            "y": 400,
+            "image": "placeholder_door_80x160.png",
+            "name": "房间A的门",
+            "look": "门关着。",
+            "actions": [
+                {
+                    "id": "open_a",
+                    "text": "开门",
+                    "log": "门锁着，打不开。",
+                    "effects": {
+                        "progress": { "humanComingHome": 1 }
+                    }
+                }
+            ]
+        },
+        "door_b": {
+            "x": 960,
+            "y": 400,
+            "image": "placeholder_door_80x160.png",
+            "name": "房间B的门",
+            "look": "门关着。",
+            "actions": [
+                {
+                    "id": "open_b",
+                    "text": "开门",
+                    "log": "门锁着，打不开。",
+                    "effects": {
+                        "progress": { "humanComingHome": 1 }
+                    }
+                }
+            ]
+        },
+        "door_c": {
+            "x": 1700,
+            "y": 400,
+            "image": "placeholder_door_80x160.png",
+            "name": "房间C的门",
+            "look": "门关着。",
+            "actions": [
+                {
+                    "id": "open_c",
+                    "text": "开门",
+                    "log": "门锁着，打不开。",
+                    "effects": {
+                        "progress": { "humanComingHome": 1 }
+                    }
+                }
+            ]
+        },
+        "to_balcony": {
+            "x": 1820,
+            "y": 600,
+            "image": "placeholder_arrow_right_64x64.png",
+            "name": "阳台",
+            "look": "去阳台看看。",
+            "navTo": "balcony"
+        }
+    }
+} 
