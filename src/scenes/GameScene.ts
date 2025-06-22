@@ -8,6 +8,7 @@ export default class GameScene extends Phaser.Scene {
     gameData!: GameData;
     sceneObjects: Record<string, Phaser.GameObjects.Image> = {};
     currentSceneId?: string;
+    hoverText: Phaser.GameObjects.Text | null = null;
 
     constructor() {
         super('GameScene');
@@ -15,22 +16,28 @@ export default class GameScene extends Phaser.Scene {
 
     create(): void {
         // 初始化游戏状态（如果不存在）
-        if (!this.game.gameState) {
-            this.game.gameState = {
+        if (!(this.game as any).gameState) {
+            (this.game as any).gameState = {
                 currentLocation: 'living_room',
                 inventory: [],
                 actionLog: [],
                 progress: {
                     energy: 50,
                     happiness: 50,
-                    mischief: 0
+                    mischief: 0,
+                    humanComingHome: 0,
+                    hungry: 10,
+                    needPoop: 5
                 },
                 achievements: {},
                 achievementCounters: {
                     knockOverCount: 0,
                     scratchCount: 0,
                     sleepCount: 0,
-                    fishPickupCount: 0
+                    fishPickupCount: 0,
+                    drinkCount: 0,
+                    patrolCount: 0,
+                    areaVisitCount: 0
                 },
                 addToInventory: function(itemId: string) {
                     if (!this.inventory.includes(itemId)) this.inventory.push(itemId);
@@ -46,24 +53,27 @@ export default class GameScene extends Phaser.Scene {
             } as GameState;
         }
         // 确保currentLocation存在
-        if (!this.game.gameState.currentLocation) {
-            this.game.gameState.currentLocation = 'living_room';
+        if (!(this.game as any).gameState.currentLocation) {
+            (this.game as any).gameState.currentLocation = 'living_room';
         }
         // 确保achievements对象存在
-        if (!this.game.gameState.achievements) {
-            this.game.gameState.achievements = {};
+        if (!(this.game as any).gameState.achievements) {
+            (this.game as any).gameState.achievements = {};
         }
         // 确保achievementCounters对象存在
-        if (!this.game.gameState.achievementCounters) {
-            this.game.gameState.achievementCounters = {
+        if (!(this.game as any).gameState.achievementCounters) {
+            (this.game as any).gameState.achievementCounters = {
                 knockOverCount: 0,
                 scratchCount: 0,
                 sleepCount: 0,
-                fishPickupCount: 0
+                fishPickupCount: 0,
+                drinkCount: 0,
+                patrolCount: 0,
+                areaVisitCount: 0
             };
         }
-        this.gameState = this.game.gameState as GameState;
-        this.gameData = this.game.gameData as GameData;
+        this.gameState = (this.game as any).gameState as GameState;
+        this.gameData = (this.game as any).gameData as GameData;
         if (!this.gameData) {
             console.error('GameData not loaded yet!');
             return;
@@ -157,7 +167,7 @@ export default class GameScene extends Phaser.Scene {
     handleAction(action: Action, targetObject: ObjectData): void {
         this.saveState();
         this.actionSystem?.handleAction(action, targetObject);
-        this.scene.get('UIScene').hideActionMenu();
+        (this.scene.get('UIScene') as any).hideActionMenu();
     }
 
     undoAction(): void {
@@ -178,24 +188,156 @@ export default class GameScene extends Phaser.Scene {
         sprite.on('pointerover', () => {
             sprite.setTint(0xffff00);
             if (objectData.look) {
-                this.scene.get('UIScene').showHoverInteraction(objectData.look, sprite.x, sprite.y);
+                (this.scene.get('UIScene') as any).showHoverInteraction(objectData.look, sprite.x, sprite.y);
             }
         });
         sprite.on('pointerout', () => {
             sprite.clearTint();
-            this.scene.get('UIScene').hideHoverInteraction();
+            (this.scene.get('UIScene') as any).hideHoverInteraction();
         });
         sprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-            pointer.stopPropagation();
             if (objectData.navTo) {
                 this.changeScene(objectData.navTo);
             } else if (objectData.actions && objectData.actions.length > 0) {
-                this.scene.get('UIScene').showActionMenu(objectData, pointer);
+                (this.scene.get('UIScene') as any).showActionMenu(objectData, pointer);
             } else if (objectData.look) {
                 this.gameState.log(objectData.look);
                 this.game.events.emit('gameStateChanged');
             }
         });
         return sprite;
+    }
+
+    // 添加物品与场景交互的处理方法
+    handleItemDrop(itemId: string, x: number, y: number): void {
+        console.log(`物品 ${itemId} 被拖拽到场景位置 (${x}, ${y})`);
+        
+        // 检查是否拖拽到可交互对象上
+        const targetObject = this.findObjectAtPosition(x, y);
+        if (targetObject) {
+            this.handleItemObjectInteraction(itemId, targetObject);
+        } else {
+            // 拖拽到空地上，创建物品在场景中
+            this.dropItemInScene(itemId, x, y);
+        }
+    }
+
+    findObjectAtPosition(x: number, y: number): any {
+        // 查找指定位置的对象
+        for (const [objectId, object] of Object.entries(this.sceneObjects)) {
+            if (object && object.getBounds) {
+                const bounds = object.getBounds();
+                if (bounds.contains(x, y)) {
+                    return { id: objectId, object: object, data: this.sceneObjects[objectId].getData('data') };
+                }
+            }
+        }
+        return null;
+    }
+
+    handleItemObjectInteraction(itemId: string, target: any): void {
+        const itemData = this.gameData.items[itemId];
+        const targetData = target.data;
+        
+        console.log(`物品 ${itemData?.name} 与 ${targetData?.name} 交互`);
+        
+        // 根据物品和目标的组合执行不同操作
+        const interactionKey = `${itemId}_${target.id}`;
+        
+        switch (interactionKey) {
+            case 'fish_item_sofa':
+                this.gameState.log('你把小鱼干藏在沙发下面了！');
+                this.gameState.removeFromInventory(itemId);
+                this.gameState.progress.humanComingHome = Math.min(100, (this.gameState.progress.humanComingHome || 0) + 5);
+                break;
+                
+            case 'fish_item_cat_villa':
+                this.gameState.log('你把小鱼干藏在猫别墅里了！');
+                this.gameState.removeFromInventory(itemId);
+                this.gameState.progress.humanComingHome = Math.min(100, (this.gameState.progress.humanComingHome || 0) + 3);
+                break;
+                
+            case 'fish_item_cat_nest':
+                this.gameState.log('你把小鱼干藏在猫窝里了！');
+                this.gameState.removeFromInventory(itemId);
+                this.gameState.progress.humanComingHome = Math.min(100, (this.gameState.progress.humanComingHome || 0) + 2);
+                break;
+                
+            default:
+                // 通用交互
+                if (itemData && targetData) {
+                    this.gameState.log(`你把 ${itemData.name} 放在了 ${targetData.name} 上`);
+                    this.gameState.removeFromInventory(itemId);
+                    this.gameState.progress.humanComingHome = Math.min(100, (this.gameState.progress.humanComingHome || 0) + 1);
+                }
+        }
+        
+        // 刷新UI
+        this.game.events.emit('gameStateChanged');
+    }
+
+    dropItemInScene(itemId: string, x: number, y: number): void {
+        const itemData = this.gameData.items[itemId];
+        if (!itemData) return;
+        
+        // 创建场景中的物品对象
+        const sceneItem = this.add.image(x, y, itemData.image).setDisplaySize(60, 60);
+        sceneItem.setInteractive({ useHandCursor: true });
+        
+        // 设置物品属性
+        sceneItem.setData('itemId', itemId);
+        sceneItem.setData('isSceneItem', true);
+        
+        // 点击拾取
+        sceneItem.on('pointerdown', () => {
+            this.pickupSceneItem(sceneItem, itemId);
+        });
+        
+        // 悬停提示
+        sceneItem.on('pointerover', () => {
+            this.showHoverText(`${itemData.name} - 点击拾取`, x, y);
+        });
+        
+        sceneItem.on('pointerout', () => {
+            this.hideHoverText();
+        });
+        
+        this.gameState.log(`你把 ${itemData.name} 放在了地上`);
+        this.gameState.removeFromInventory(itemId);
+        
+        // 刷新UI
+        this.game.events.emit('gameStateChanged');
+    }
+
+    pickupSceneItem(sceneItem: any, itemId: string): void {
+        const itemData = this.gameData.items[itemId];
+        if (!itemData) return;
+        
+        this.gameState.addToInventory(itemId);
+        this.gameState.log(`你捡起了 ${itemData.name}`);
+        sceneItem.destroy();
+        
+        // 刷新UI
+        this.game.events.emit('gameStateChanged');
+    }
+
+    showHoverText(text: string, x: number, y: number): void {
+        this.hideHoverText();
+        
+        this.hoverText = this.add.text(x, y - 50, text, {
+            fontFamily: '"Noto Sans SC", sans-serif',
+            fontSize: '16px',
+            color: '#fff',
+            backgroundColor: '#000',
+            padding: { x: 8, y: 4 }
+        }).setOrigin(0.5);
+        this.hoverText.setDepth(15);
+    }
+
+    hideHoverText(): void {
+        if (this.hoverText) {
+            this.hoverText.destroy();
+            this.hoverText = null;
+        }
     }
 } 

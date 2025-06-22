@@ -17,6 +17,9 @@ export interface GameState {
         scratchCount: number;
         sleepCount: number;
         fishPickupCount: number;
+        drinkCount: number;
+        patrolCount: number;
+        areaVisitCount: number;
     };
     flags?: Record<string, boolean>;
     history?: GameState[];
@@ -41,6 +44,11 @@ export interface ActionEffect {
         item: string;
     };
     updateTarget?: Record<string, any>;
+    special?: {
+        unlockArea?: string;
+        changeSceneState?: Record<string, any>;
+        triggerEvent?: string;
+    };
 }
 
 // 动作类型
@@ -54,6 +62,7 @@ export interface Action {
 
 // 对象数据类型
 export interface ObjectData {
+    id?: string;
     x: number;
     y: number;
     image: string;
