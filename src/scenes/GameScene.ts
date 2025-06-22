@@ -1,9 +1,11 @@
 import Phaser from 'phaser';
 import ActionSystem from '../systems/ActionSystem';
+import AchievementSystem from '../systems/AchievementSystem';
 import { GameData, GameState, SceneData, ObjectData, Action } from '../types/index';
 
 export default class GameScene extends Phaser.Scene {
     actionSystem: ActionSystem | null = null;
+    achievementSystem: AchievementSystem | null = null;
     gameState!: GameState;
     gameData!: GameData;
     sceneObjects: Record<string, Phaser.GameObjects.Image> = {};
@@ -98,6 +100,9 @@ export default class GameScene extends Phaser.Scene {
         }
         this.gameState = (this.game as any).gameState as GameState;
         this.gameData = (this.game as any).gameData as GameData;
+        
+        // 获取成就系统实例
+        this.achievementSystem = (this.game as any).achievementSystem as AchievementSystem;
         
         // 检查gameData是否已加载
         if (!this.gameData) {
@@ -225,8 +230,14 @@ export default class GameScene extends Phaser.Scene {
     }
 
     handleAction(actionId: string, targetObject: ObjectData): void {
-        this.saveState();
-        this.actionSystem?.handleAction(actionId, targetObject);
+        if (this.actionSystem) {
+            this.actionSystem.handleAction(actionId, targetObject);
+            
+            // 动作执行后检查成就
+            if (this.achievementSystem) {
+                this.achievementSystem.checkAchievements();
+            }
+        }
         (this.scene.get('UIScene') as any).hideActionMenu();
     }
 

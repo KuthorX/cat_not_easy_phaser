@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import { GameData, GameState } from '../types/index';
 import { AssetLoader } from '../utils/AssetLoader';
+import { AchievementLoader } from '../utils/AchievementLoader';
+import AchievementSystem from '../systems/AchievementSystem';
 
 export default class BootScene extends Phaser.Scene {
     constructor() {
@@ -63,6 +65,16 @@ export default class BootScene extends Phaser.Scene {
         } as GameState;
         (this.game as any).gameState = gameState;
         this.registry.set('gameState', gameState);
+        
+        // 6. 加载成就配置并初始化成就系统
+        try {
+            await AchievementLoader.loadAchievementConfig();
+            const achievementSystem = new AchievementSystem(gameState, fullGameData);
+            (this.game as any).achievementSystem = achievementSystem;
+            console.log('✅ 成就系统初始化成功');
+        } catch (error) {
+            console.error('❌ 成就系统初始化失败:', error);
+        }
         
         // 启动标题场景
         this.scene.start('TitleScene');

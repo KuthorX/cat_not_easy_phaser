@@ -1,5 +1,4 @@
 import Phaser from 'phaser';
-import { SaveSystem } from '../systems/SaveSystem';
 import { GameState, Action, ObjectData, GameData, Achievement } from '../types/index';
 
 const FONT_STYLE = {
@@ -16,7 +15,6 @@ export default class UIScene extends Phaser.Scene {
     actionMenu: Phaser.GameObjects.Container | null = null;
     inventoryPanel: Phaser.GameObjects.Container | null = null;
     logPanel: Phaser.GameObjects.Container | null = null;
-    settingsPanel: Phaser.GameObjects.Container | null = null;
     progressBarConfig: any[] = [];
     progressBarBg!: Phaser.GameObjects.Container;
     progressBarFg!: Phaser.GameObjects.Container;
@@ -27,7 +25,6 @@ export default class UIScene extends Phaser.Scene {
     logBtn!: Phaser.GameObjects.Rectangle;
     achieveBtn!: Phaser.GameObjects.Rectangle;
     achievePanel: Phaser.GameObjects.Container | null = null;
-    saveSystem: SaveSystem;
     itemUseMenu: Phaser.GameObjects.Container | null = null;
     hoverContainer: Phaser.GameObjects.Container | null = null;
     private actionButtons: Phaser.GameObjects.Container[] = [];
@@ -35,10 +32,10 @@ export default class UIScene extends Phaser.Scene {
     private inventoryText!: Phaser.GameObjects.Text;
     private achievementPopup?: Phaser.GameObjects.Container;
     private achievementList?: Phaser.GameObjects.Container;
+    private wheelListener?: Function;
 
     constructor() {
         super({ key: 'UIScene', active: false });
-        this.saveSystem = new SaveSystem('http://localhost:3000');
     }
 
     create(): void {
@@ -53,7 +50,6 @@ export default class UIScene extends Phaser.Scene {
         this.game.events.on('locationChanged', this.updateLocationDisplay, this);
         this.game.events.on('achievementUnlocked', this.showAchievementPopup, this);
         this.game.events.on('gameEnd', this.showGameEnd, this);
-        this.createTopRightIcons();
         this.createTopBar();
         this.createBottomBar();
         this.createInventoryPanel();
@@ -177,21 +173,19 @@ export default class UIScene extends Phaser.Scene {
     }
 
     createBottomBar(): void {
-        this.locationText = this.add.text(30, 1050, '', { ...FONT_STYLE, fontSize: '32px' }).setOrigin(0, 0.5);
+        this.locationText = this.add.text(30, 1025, '', { ...FONT_STYLE, fontSize: '32px' }).setOrigin(0, 0.5);
         const btnY = 1020;
         const btnSize = 70;
-        this.logBtn = this.add.rectangle(1820, btnY, btnSize, btnSize, 0x222222, 0.85).setInteractive({ useHandCursor: true });
-        this.add.text(1820, btnY, '📖', { fontSize: '44px' }).setOrigin(0.5);
-        this.logBtn.on('pointerdown', () => this.showLogPanel());
-        this.achieveBtn = this.add.rectangle(1920-btnSize/2-20, btnY, btnSize, btnSize, 0x222222, 0.85).setInteractive({ useHandCursor: true });
-        this.add.text(1920-btnSize/2-20, btnY, '🏆', { fontSize: '44px' }).setOrigin(0.5);
-        this.achieveBtn.on('pointerdown', () => this.showAchievementPanel());
-        const saveBtn = this.add.rectangle(1700, btnY, btnSize, btnSize, 0x228822, 0.85).setInteractive({ useHandCursor: true });
-        this.add.text(1700, btnY, '💾', { fontSize: '38px' }).setOrigin(0.5);
-        saveBtn.on('pointerdown', () => this.saveGame());
-        const loadBtn = this.add.rectangle(1600, btnY, btnSize, btnSize, 0x2266cc, 0.85).setInteractive({ useHandCursor: true });
-        this.add.text(1600, btnY, '📂', { fontSize: '38px' }).setOrigin(0.5);
-        loadBtn.on('pointerdown', () => this.loadGame());
+        const btnStart = 1720;
+        const btnGap = 100; // 增加按钮间隔
+        
+        this.logBtn = this.add.rectangle(btnStart, btnY, btnSize, btnSize, 0x222222, 0.85).setInteractive({ useHandCursor: true });
+        this.add.text(btnStart, btnY, '📖', { fontSize: '44px' }).setOrigin(0.5);
+        this.logBtn.on('pointerdown', () => this.showLogScene());
+        
+        this.achieveBtn = this.add.rectangle(btnStart + btnGap, btnY, btnSize, btnSize, 0x222222, 0.85).setInteractive({ useHandCursor: true });
+        this.add.text(btnStart + btnGap, btnY, '🏆', { fontSize: '44px' }).setOrigin(0.5);
+        this.achieveBtn.on('pointerdown', () => this.showAchievementScene());
     }
 
     updateLocationDisplay(): void {
@@ -366,15 +360,42 @@ export default class UIScene extends Phaser.Scene {
         this.hideItemUseMenu();
         console.log(`使用物品: ${itemId}`);
         
-        // 根据物品类型执行不同操作
-        switch (itemId) {
-            case 'fish_item':
-                this.gameState.removeFromInventory(itemId);
-                this.gameState.progress.hungry = Math.max(0, (this.gameState.progress.hungry || 0) - 30);
-                this.gameState.log('你吃掉了小鱼干，感觉饱了！');
-                break;
-            default:
-                this.gameState.log(`你使用了 ${this.gameData.items[itemId]?.name || itemId}`);
+        // 获取物品数据
+        const itemData = this.gameData.items[itemId];
+        if (!itemData) {
+            console.error(`物品数据不存在: ${itemId}`);
+            return;
+        }
+        
+        // 检查是否有物品动作配置
+        const itemActions = this.gameData.actions.item_actions[itemId];
+        if (itemActions && itemActions.eat) {
+            // 使用ActionSystem处理动作
+            const gameScene = this.scene.get('GameScene') as any;
+            if (gameScene && gameScene.actionSystem) {
+                // 创建一个虚拟的目标对象用于动作处理
+                const virtualTarget: ObjectData = {
+                    id: 'inventory_item',
+                    name: itemData.name,
+                    x: 0,
+                    y: 0,
+                    image: itemData.image,
+                    actions: []
+                };
+                // 使用item_actions中定义的动作ID
+                gameScene.actionSystem.handleAction(itemActions.eat.id, virtualTarget);
+            }
+        } else {
+            // 默认处理逻辑
+            switch (itemId) {
+                case 'fish_item':
+                    this.gameState.removeFromInventory(itemId);
+                    this.gameState.progress.hungry = Math.max(0, (this.gameState.progress.hungry || 0) - 30);
+                    this.gameState.log('你吃掉了小鱼干，感觉饱了！');
+                    break;
+                default:
+                    this.gameState.log(`你使用了 ${itemData.name}`);
+            }
         }
         
         this.refreshUI();
@@ -453,36 +474,6 @@ export default class UIScene extends Phaser.Scene {
         if (gameScene && gameScene.handleItemDrop) {
             gameScene.handleItemDrop(itemId, x, y);
         }
-    }
-
-    async saveGame() {
-        const result = await this.saveSystem.saveGame(this.gameState);
-        this.showInteractionDialog(result.success ? '游戏已保存！' : '保存失败：' + result.message, 'log');
-    }
-
-    async loadGame() {
-        const result = await this.saveSystem.loadGame();
-        if (result.success && result.data) {
-            Object.assign(this.gameState, result.data);
-            this.game.events.emit('loadScene', this.gameState.currentLocation);
-            this.refreshUI();
-            this.showInteractionDialog('存档读取成功！', 'log');
-        } else {
-            this.showInteractionDialog('读取失败：' + result.message, 'log');
-        }
-    }
-
-    createTopRightIcons(): void {
-        // 创建右上角图标
-        const iconX = 1880;
-        const iconY = 40;
-        const iconSize = 60;
-        
-        // 设置按钮
-        const settingsBtn = this.add.rectangle(iconX, iconY, iconSize, iconSize, 0x222222, 0.85)
-            .setInteractive({ useHandCursor: true });
-        this.add.text(iconX, iconY, '⚙️', { fontSize: '32px' }).setOrigin(0.5);
-        settingsBtn.on('pointerdown', () => this.showSettingsPanel());
     }
 
     showActionMenu(objectData: ObjectData, pointer: Phaser.Input.Pointer): void {
@@ -687,243 +678,14 @@ export default class UIScene extends Phaser.Scene {
         console.log(`🎉 成就解锁: ${achievement.name} - ${achievement.description}`);
     }
 
-    showAchievementPanel(): void {
-        if (this.achievePanel) {
-            this.achievePanel.destroy();
-        }
-        
-        this.achievePanel = this.add.container(960, 540);
-        this.achievePanel.setDepth(20);
-        
-        // 背景
-        const bg = this.add.graphics();
-        bg.fillStyle(0x000000, 0.9);
-        bg.fillRoundedRect(-400, -300, 800, 600, 20);
-        bg.lineStyle(3, 0x444444, 1);
-        bg.strokeRoundedRect(-400, -300, 800, 600, 20);
-        this.achievePanel.add(bg);
-        
-        // 标题
-        const title = this.add.text(0, -250, '🏆 成就系统', { 
-            ...FONT_STYLE, 
-            fontSize: '32px', 
-            color: '#ffd700',
-            fontStyle: 'bold'
-        }).setOrigin(0.5);
-        this.achievePanel.add(title);
-        
-        // 关闭按钮
-        const closeBtn = this.add.rectangle(350, -250, 60, 60, 0xff4444, 0.8)
-            .setInteractive({ useHandCursor: true });
-        this.add.text(350, -250, '✕', { fontSize: '24px', color: '#fff' }).setOrigin(0.5);
-        closeBtn.on('pointerdown', () => this.hideAchievementPanel());
-        this.achievePanel.add(closeBtn);
-        
-        // 成就分类
-        const categories = [
-            { name: '日常行为', achievements: ['waterMess', 'sleepyCat', 'fishCollector', 'waterLover'] },
-            { name: '破坏王', achievements: ['destructiveCat', 'sofaDestroyer', 'scratchMaster', 'destructiveMaster'] },
-            { name: '乖猫咪', achievements: ['goodCat', 'sleepMaster'] },
-            { name: '探险家', achievements: ['explorer', 'patrolMaster', 'adventurer'] }
-        ];
-        
-        let yOffset = -180;
-        categories.forEach(category => {
-            // 分类标题
-            const catTitle = this.add.text(-350, yOffset, category.name, { 
-                ...FONT_STYLE, 
-                fontSize: '24px', 
-                color: '#ffaa00',
-                fontStyle: 'bold'
-            }).setOrigin(0, 0.5);
-            this.achievePanel?.add(catTitle);
-            yOffset += 40;
-            
-            // 分类下的成就
-            category.achievements.forEach(achievementId => {
-                const achievement = this.gameState.achievements[achievementId];
-                const isUnlocked = !!achievement;
-                
-                const achievementBg = this.add.graphics();
-                achievementBg.fillStyle(isUnlocked ? 0x333333 : 0x222222, 0.8);
-                achievementBg.fillRoundedRect(-350, yOffset - 15, 700, 30, 8);
-                if (isUnlocked) {
-                    achievementBg.lineStyle(2, 0xffd700, 1);
-                    achievementBg.strokeRoundedRect(-350, yOffset - 15, 700, 30, 8);
-                }
-                this.achievePanel?.add(achievementBg);
-                
-                const icon = this.add.text(-330, yOffset, isUnlocked ? '✅' : '🔒', { 
-                    fontSize: '20px' 
-                }).setOrigin(0, 0.5);
-                this.achievePanel?.add(icon);
-                
-                const name = this.add.text(-300, yOffset, 
-                    isUnlocked && achievement ? achievement.name : '???', { 
-                    ...FONT_STYLE, 
-                    fontSize: '18px', 
-                    color: isUnlocked ? '#fff' : '#666'
-                }).setOrigin(0, 0.5);
-                this.achievePanel?.add(name);
-                
-                if (isUnlocked && achievement) {
-                    const desc = this.add.text(0, yOffset, achievement.description, { 
-                        ...FONT_STYLE, 
-                        fontSize: '14px', 
-                        color: '#aaa'
-                    }).setOrigin(0.5, 0.5);
-                    this.achievePanel?.add(desc);
-                    
-                    const date = this.add.text(300, yOffset, 
-                        new Date(achievement.unlockedAt).toLocaleDateString(), { 
-                        ...FONT_STYLE, 
-                        fontSize: '12px', 
-                        color: '#666'
-                    }).setOrigin(1, 0.5);
-                    this.achievePanel?.add(date);
-                }
-                
-                yOffset += 40;
-            });
-            
-            yOffset += 20;
-        });
-        
-        // 成就统计
-        const totalAchievements = Object.keys(this.gameState.achievements).length;
-        const totalPossible = 15; // 总成就数
-        const stats = this.add.text(0, 250, 
-            `已解锁: ${totalAchievements}/${totalPossible}`, { 
-            ...FONT_STYLE, 
-            fontSize: '20px', 
-            color: '#ffd700'
-        }).setOrigin(0.5);
-        this.achievePanel?.add(stats);
+    showAchievementScene(): void {
+        this.scene.pause();
+        this.scene.launch('AchievementScene');
     }
 
-    hideAchievementPanel(): void {
-        if (this.achievePanel) {
-            this.achievePanel.destroy();
-            this.achievePanel = null;
-        }
-    }
-
-    showSettingsPanel(): void {
-        // 实现设置面板显示逻辑
-        console.log('显示设置面板');
-    }
-
-    showLogPanel(): void {
-        if (this.logPanel) {
-            this.logPanel.destroy();
-        }
-        
-        this.logPanel = this.add.container(960, 540);
-        this.logPanel.setDepth(20);
-        
-        // 背景
-        const bg = this.add.graphics();
-        bg.fillStyle(0x000000, 0.9);
-        bg.fillRoundedRect(-400, -300, 800, 600, 20);
-        bg.lineStyle(3, 0x444444, 1);
-        bg.strokeRoundedRect(-400, -300, 800, 600, 20);
-        this.logPanel.add(bg);
-        
-        // 标题
-        const title = this.add.text(0, -250, '📖 游戏日志', { 
-            ...FONT_STYLE, 
-            fontSize: '32px', 
-            color: '#66ccff',
-            fontStyle: 'bold'
-        }).setOrigin(0.5);
-        this.logPanel.add(title);
-        
-        // 关闭按钮
-        const closeBtn = this.add.rectangle(350, -250, 60, 60, 0xff4444, 0.8)
-            .setInteractive({ useHandCursor: true });
-        this.add.text(350, -250, '✕', { fontSize: '24px', color: '#fff' }).setOrigin(0.5);
-        closeBtn.on('pointerdown', () => this.hideLogPanel());
-        this.logPanel.add(closeBtn);
-        
-        // 清空按钮
-        const clearBtn = this.add.rectangle(-350, -250, 80, 40, 0xff6666, 0.8)
-            .setInteractive({ useHandCursor: true });
-        this.add.text(-350, -250, '清空', { 
-            ...FONT_STYLE, 
-            fontSize: '16px', 
-            color: '#fff' 
-        }).setOrigin(0.5);
-        clearBtn.on('pointerdown', () => this.clearLog());
-        this.logPanel.add(clearBtn);
-        
-        // 日志内容区域
-        const logContainer = this.add.container(0, 0);
-        this.logPanel.add(logContainer);
-        
-        // 滚动区域
-        const scrollArea = this.add.graphics();
-        scrollArea.fillStyle(0x222222, 0.5);
-        scrollArea.fillRoundedRect(-380, -200, 760, 400, 10);
-        this.logPanel.add(scrollArea);
-        
-        // 日志条目
-        const logs = this.gameState.actionLog || [];
-        if (logs.length === 0) {
-            const emptyText = this.add.text(0, 0, '暂无日志记录', { 
-                ...FONT_STYLE, 
-                fontSize: '20px', 
-                color: '#666'
-            }).setOrigin(0.5);
-            logContainer.add(emptyText);
-        } else {
-            let yOffset = -180;
-            logs.slice(-20).reverse().forEach((log, index) => {
-                const logBg = this.add.graphics();
-                logBg.fillStyle(index % 2 === 0 ? 0x333333 : 0x2a2a2a, 0.8);
-                logBg.fillRoundedRect(-370, yOffset - 15, 740, 30, 5);
-                logContainer.add(logBg);
-                
-                const logText = this.add.text(-360, yOffset, log, { 
-                    ...FONT_STYLE, 
-                    fontSize: '16px', 
-                    color: '#fff',
-                    wordWrap: { width: 720 }
-                }).setOrigin(0, 0.5);
-                logContainer.add(logText);
-                
-                const timeText = this.add.text(350, yOffset, 
-                    new Date().toLocaleTimeString(), { 
-                    ...FONT_STYLE, 
-                    fontSize: '12px', 
-                    color: '#666'
-                }).setOrigin(1, 0.5);
-                logContainer.add(timeText);
-                
-                yOffset += 35;
-            });
-        }
-        
-        // 统计信息
-        const stats = this.add.text(0, 250, 
-            `共 ${logs.length} 条记录`, { 
-            ...FONT_STYLE, 
-            fontSize: '18px', 
-            color: '#66ccff'
-        }).setOrigin(0.5);
-        this.logPanel.add(stats);
-    }
-
-    hideLogPanel(): void {
-        if (this.logPanel) {
-            this.logPanel.destroy();
-            this.logPanel = null;
-        }
-    }
-
-    clearLog(): void {
-        this.gameState.actionLog = [];
-        this.hideLogPanel();
-        this.showLogPanel();
+    showLogScene(): void {
+        this.scene.pause();
+        this.scene.launch('LogScene');
     }
 
     showGameEnd(endData: any): void {
@@ -969,5 +731,11 @@ export default class UIScene extends Phaser.Scene {
         });
         
         endContainer.add([background, title, message, restartButton, restartText]);
+
+        // 游戏结束时结算"智人首席奴才"成就
+        const achievementSystem = (this.game as any).achievementSystem;
+        if (achievementSystem && typeof achievementSystem.checkChiefServantAchievement === 'function') {
+            achievementSystem.checkChiefServantAchievement();
+        }
     }
-} 
+}

@@ -9,7 +9,7 @@
             "interactive": false
         },
         "to_living_room_from_balcony": {
-            "x": 520,
+            "x": 325,
             "y": 600,
             "image": "placeholder_arrow_left_64x64",
             "name": "客厅",

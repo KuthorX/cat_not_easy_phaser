@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(express.static('.')); // 服务静态文件
 
 // 存档文件路径
-const SAVE_DIR = './saves';
+const SAVE_DIR = './temp/saves';
 const SAVE_FILE = path.join(SAVE_DIR, 'game_save.json');
 
 // 确保存档目录存在
