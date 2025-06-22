@@ -197,6 +197,31 @@ class ActionSystem {
             case 'defend_invasion':
                 this.gameState.achievementCounters.invasionDefendCount++;
                 break;
+            case 'visit_balcony':
+                // 设置阳台访问标志
+                if (!this.gameState.flags) this.gameState.flags = {};
+                this.gameState.flags.balcony_visited = true;
+                break;
+            case 'unlock_room_c':
+                // 设置房间C解锁标志
+                if (!this.gameState.flags) this.gameState.flags = {};
+                this.gameState.flags.room_c_unlocked = true;
+                break;
+            case 'escape_outside':
+                // 设置离家出走标志
+                if (!this.gameState.flags) this.gameState.flags = {};
+                this.gameState.flags.outside_escaped = true;
+                break;
+            case 'set_alarm':
+                // 设置警报标志
+                if (!this.gameState.flags) this.gameState.flags = {};
+                this.gameState.flags.alarm_set = true;
+                break;
+            case 'configure_traps':
+                // 设置陷阱配置标志
+                if (!this.gameState.flags) this.gameState.flags = {};
+                this.gameState.flags.traps_configured = true;
+                break;
         }
 
         // 检查特殊成就

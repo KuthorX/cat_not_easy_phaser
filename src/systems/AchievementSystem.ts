@@ -102,6 +102,22 @@ export default class AchievementSystem {
                 // 这个条件通常用于主成就，在checkAchievementPathCondition中处理
                 return false;
 
+            case 'obedient_achievement':
+                // 检查是否没有进行破坏活动
+                if (condition.noDestruction) {
+                    const destructionCounters = [
+                        'waterBowlKnockOverCount',
+                        'tableItemPushCount',
+                        'scratchCount',
+                        'toiletPaperDestroyCount'
+                    ];
+                    const hasDestruction = destructionCounters.some(counter => 
+                        this.getCounterValue(counter) > 0
+                    );
+                    return !hasDestruction;
+                }
+                return true;
+
             case 'human_coming_home_low':
                 if (condition.humanComingHomeThreshold !== undefined) {
                     const humanProgress = this.gameState.progress.humanComingHome || 0;
@@ -132,6 +148,18 @@ export default class AchievementSystem {
                 return path.subAchievements.every(achievementId => 
                     this.gameState.achievements[achievementId]
                 );
+
+            case 'obedient_achievement':
+                // 检查所有子成就是否都已解锁
+                const obedientSubAchievementsUnlocked = path.subAchievements.every(achievementId => 
+                    this.gameState.achievements[achievementId]
+                );
+                
+                // 检查是否没有进行破坏活动
+                const obedientNoDestruction = condition.noDestruction ? 
+                    !this.hasDestructionAchievements() : true;
+                
+                return obedientSubAchievementsUnlocked && obedientNoDestruction;
 
             case 'human_coming_home_low':
                 if (condition.humanComingHomeThreshold !== undefined) {
@@ -356,6 +384,21 @@ export default class AchievementSystem {
         if (this.checkAchievementPathCondition(path)) {
             this.unlockAchievement(mainAchievementData);
         }
+    }
+
+    /**
+     * 检查是否有破坏类成就
+     */
+    private hasDestructionAchievements(): boolean {
+        const destructionCounters = [
+            'waterBowlKnockOverCount',
+            'tableItemPushCount',
+            'scratchCount',
+            'toiletPaperDestroyCount'
+        ];
+        return destructionCounters.some(counter => 
+            this.getCounterValue(counter) > 0
+        );
     }
 }
 

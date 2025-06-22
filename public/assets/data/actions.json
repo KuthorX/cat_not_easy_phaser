@@ -210,6 +210,32 @@
                 "progress": { "humanComingHome": -5 }
             },
             "triggerAchievement": "king_contempt"
+        },
+        "visit_balcony": {
+            "id": "visit_balcony",
+            "text": "访问阳台",
+            "log": "你来到了阳台！",
+            "effects": {
+                "progress": { "humanComingHome": 1 }
+            },
+            "triggerAchievement": "balcony_patrol"
+        },
+        "unlock_room_c": {
+            "id": "unlock_room_c",
+            "text": "解锁房间C",
+            "log": "房间C的门打开了！",
+            "effects": {
+                "progress": { "humanComingHome": 3 }
+            },
+            "triggerAchievement": "door_secret"
+        },
+        "configure_traps": {
+            "id": "configure_traps",
+            "text": "配置陷阱",
+            "log": "你配置了所有陷阱！",
+            "effects": {
+                "progress": { "humanComingHome": 5 }
+            }
         }
     },
     "item_actions": {
