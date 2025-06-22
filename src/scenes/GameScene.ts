@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
-import ActionSystem from '../systems/ActionSystem.js';
-import { GameData, GameState, SceneData, ObjectData, Action } from '../types/index.js';
+import ActionSystem from '../systems/ActionSystem';
+import { GameData, GameState, SceneData, ObjectData, Action } from '../types/index';
 
 export default class GameScene extends Phaser.Scene {
     actionSystem: ActionSystem | null = null;
@@ -37,7 +37,19 @@ export default class GameScene extends Phaser.Scene {
                     fishPickupCount: 0,
                     drinkCount: 0,
                     patrolCount: 0,
-                    areaVisitCount: 0
+                    areaVisitCount: 0,
+                    waterBowlKnockOverCount: 0,
+                    tableItemPushCount: 0,
+                    toiletPaperDestroyCount: 0,
+                    meowCount: 0,
+                    sleepLocationCount: 0,
+                    litterBoxCount: 0,
+                    toyInteractionCount: 0,
+                    keyFindCount: 0,
+                    roomUnlockCount: 0,
+                    fishHideCount: 0,
+                    trapSetCount: 0,
+                    invasionDefendCount: 0
                 },
                 addToInventory: function(itemId: string) {
                     if (!this.inventory.includes(itemId)) this.inventory.push(itemId);
@@ -69,25 +81,60 @@ export default class GameScene extends Phaser.Scene {
                 fishPickupCount: 0,
                 drinkCount: 0,
                 patrolCount: 0,
-                areaVisitCount: 0
+                areaVisitCount: 0,
+                waterBowlKnockOverCount: 0,
+                tableItemPushCount: 0,
+                toiletPaperDestroyCount: 0,
+                meowCount: 0,
+                sleepLocationCount: 0,
+                litterBoxCount: 0,
+                toyInteractionCount: 0,
+                keyFindCount: 0,
+                roomUnlockCount: 0,
+                fishHideCount: 0,
+                trapSetCount: 0,
+                invasionDefendCount: 0
             };
         }
         this.gameState = (this.game as any).gameState as GameState;
         this.gameData = (this.game as any).gameData as GameData;
+        
+        // 检查gameData是否已加载
         if (!this.gameData) {
-            console.error('GameData not loaded yet!');
+            console.warn('GameData not loaded yet! Waiting for data to be ready...');
+            // 等待一帧后重试
+            this.time.delayedCall(100, () => {
+                this.gameData = (this.game as any).gameData as GameData;
+                if (this.gameData) {
+                    console.log('GameData loaded successfully!');
+                    this.initializeScene();
+                } else {
+                    console.error('GameData still not available after retry!');
+                    // 如果还是失败，尝试重新加载
+                    this.scene.start('BootScene');
+                }
+            });
             return;
         }
+        
+        this.initializeScene();
+    }
+
+    private initializeScene(): void {
         this.actionSystem = new ActionSystem(this);
         // Centralized event handling
         this.game.events.on('performAction', this.handleAction, this);
         this.game.events.on('changeScene', this.changeScene, this);
         this.game.events.on('undoAction', this.undoAction, this);
         this.events.on('objectRemoved', (objectId: string) => {
+            console.log(`objectRemoved event received for: ${objectId}`);
             const objectSprite = this.sceneObjects[objectId];
             if (objectSprite) {
+                console.log(`Destroying sprite for object: ${objectId}`);
                 objectSprite.destroy();
                 delete this.sceneObjects[objectId];
+            } else {
+                console.log(`No sprite found for object: ${objectId}`);
             }
         });
         // When this scene shuts down, clean up listeners
@@ -116,7 +163,7 @@ export default class GameScene extends Phaser.Scene {
         // Set background
         this.add.image(960, 540, sceneData.background).setOrigin(0.5);
         // Create cat back indicator (使用存在的图片)
-        this.add.image(960, 1030, 'placeholder_80x80.png')
+        this.add.image(960, 1030, 'placeholder_80x80')
             .setOrigin(0.5, 1)
             .setScale(1.2)
             .setAlpha(0.9);
@@ -129,14 +176,27 @@ export default class GameScene extends Phaser.Scene {
                     return;
                 }
                 // Check if item should be hidden (already in inventory)
-                if (objectData.actions && objectData.actions.some(action => 
-                    action.effects && action.effects.inventory && action.effects.inventory.action === 'add'
-                )) {
-                    const itemId = objectData.actions.find(action => 
-                        action.effects && action.effects.inventory && action.effects.inventory.action === 'add'
-                    )!.effects!.inventory!.item;
-                    if (this.gameState.inventory.includes(itemId)) {
-                        return; // Don't create item if it's already in inventory
+                if (objectData.actions && objectData.actions.length > 0) {
+                    // 检查是否有拾取动作
+                    const hasPickupAction = objectData.actions.some(actionId => {
+                        const action = this.actionSystem?.getAction(actionId);
+                        return action?.effects?.inventory?.action === 'add';
+                    });
+                    
+                    if (hasPickupAction) {
+                        // 找到对应的物品ID
+                        const pickupAction = objectData.actions.find(actionId => {
+                            const action = this.actionSystem?.getAction(actionId);
+                            return action?.effects?.inventory?.action === 'add';
+                        });
+                        
+                        if (pickupAction) {
+                            const action = this.actionSystem?.getAction(pickupAction);
+                            const itemId = action?.effects?.inventory?.item;
+                            if (itemId && this.gameState.inventory.includes(itemId)) {
+                                return; // Don't create item if it's already in inventory
+                            }
+                        }
                     }
                 }
                 this.createInteractable(id, objectData);
@@ -164,9 +224,9 @@ export default class GameScene extends Phaser.Scene {
         this.gameState.history.push(historyState);
     }
 
-    handleAction(action: Action, targetObject: ObjectData): void {
+    handleAction(actionId: string, targetObject: ObjectData): void {
         this.saveState();
-        this.actionSystem?.handleAction(action, targetObject);
+        this.actionSystem?.handleAction(actionId, targetObject);
         (this.scene.get('UIScene') as any).hideActionMenu();
     }
 
@@ -181,9 +241,12 @@ export default class GameScene extends Phaser.Scene {
     }
 
     createInteractable(id: string, objectData: ObjectData): Phaser.GameObjects.Image {
+        // 确保对象数据包含id
+        const dataWithId = { ...objectData, id };
+        
         const sprite = this.add.image(objectData.x, objectData.y, objectData.image).setInteractive({ useHandCursor: true });
         sprite.setData('id', id);
-        sprite.setData('data', objectData);
+        sprite.setData('data', dataWithId);
         this.sceneObjects[id] = sprite;
         sprite.on('pointerover', () => {
             sprite.setTint(0xffff00);
@@ -199,7 +262,7 @@ export default class GameScene extends Phaser.Scene {
             if (objectData.navTo) {
                 this.changeScene(objectData.navTo);
             } else if (objectData.actions && objectData.actions.length > 0) {
-                (this.scene.get('UIScene') as any).showActionMenu(objectData, pointer);
+                (this.scene.get('UIScene') as any).showActionMenu(dataWithId, pointer);
             } else if (objectData.look) {
                 this.gameState.log(objectData.look);
                 this.game.events.emit('gameStateChanged');

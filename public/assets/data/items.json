@@ -1,0 +1,26 @@
+{
+    "fish_item": {
+        "id": "fish_item",
+        "name": "小鱼干",
+        "description": "美味的小鱼干，可以吃或藏起来",
+        "image": "placeholder_fish_60x30"
+    },
+    "key_item": {
+        "id": "key_item",
+        "name": "钥匙",
+        "description": "一把神秘的钥匙，可以打开某些门",
+        "image": "placeholder_80x80"
+    },
+    "toy_mouse": {
+        "id": "toy_mouse",
+        "name": "玩具老鼠",
+        "description": "一个可爱的玩具老鼠",
+        "image": "placeholder_80x80"
+    },
+    "cat_toy": {
+        "id": "cat_toy",
+        "name": "猫玩具",
+        "description": "一个有趣的猫玩具",
+        "image": "placeholder_80x80"
+    }
+} 

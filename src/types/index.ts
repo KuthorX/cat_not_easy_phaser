@@ -20,6 +20,18 @@ export interface GameState {
         drinkCount: number;
         patrolCount: number;
         areaVisitCount: number;
+        waterBowlKnockOverCount: number;
+        tableItemPushCount: number;
+        toiletPaperDestroyCount: number;
+        meowCount: number;
+        sleepLocationCount: number;
+        litterBoxCount: number;
+        toyInteractionCount: number;
+        keyFindCount: number;
+        roomUnlockCount: number;
+        fishHideCount: number;
+        trapSetCount: number;
+        invasionDefendCount: number;
     };
     flags?: Record<string, boolean>;
     history?: GameState[];
@@ -34,6 +46,18 @@ export interface Achievement {
     name: string;
     description: string;
     unlockedAt: string;
+    category?: 'destruction' | 'obedient' | 'explorer' | 'strategist';
+    isMainAchievement?: boolean;
+}
+
+// 成就线路类型
+export interface AchievementPath {
+    id: string;
+    name: string;
+    description: string;
+    mainAchievement: string;
+    subAchievements: string[];
+    endCondition: (gameState: GameState) => boolean;
 }
 
 // 动作效果类型
@@ -43,21 +67,40 @@ export interface ActionEffect {
         action: 'add' | 'remove';
         item: string;
     };
+    object?: {
+        action: 'hide' | 'show' | 'change';
+        property?: string;
+        value?: any;
+    };
+    scene?: {
+        action: 'spawn_item' | 'remove_item' | 'change_state';
+        item?: string;
+        position?: string;
+        state?: any;
+    };
     updateTarget?: Record<string, any>;
     special?: {
         unlockArea?: string;
         changeSceneState?: Record<string, any>;
         triggerEvent?: string;
     };
+    triggerAchievement?: string;
 }
 
 // 动作类型
 export interface Action {
     id: string;
-    name: string;
-    description: string;
+    text: string;
+    log: string;
     effects?: ActionEffect;
-    log?: string;
+    triggerAchievement?: string;
+}
+
+// 动作配置类型
+export interface ActionConfig {
+    actions: Record<string, Action>;
+    item_actions: Record<string, Record<string, Action>>;
+    interactions: Record<string, Action>;
 }
 
 // 对象数据类型
@@ -70,7 +113,7 @@ export interface ObjectData {
     look?: string;
     navTo?: string;
     interactive?: boolean;
-    actions?: Action[];
+    actions?: string[]; // 改为动作ID数组
 }
 
 // 场景数据类型
@@ -92,6 +135,7 @@ export interface Item {
 export interface GameData {
     initialState: Partial<GameState>;
     items: Record<string, Item>;
+    actions: ActionConfig;
     scenes: Record<string, SceneData>;
 }
 

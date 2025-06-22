@@ -1,0 +1,305 @@
+{
+    "actions": {
+        "pickup_fish": {
+            "id": "pickup_fish",
+            "text": "叼走",
+            "log": "我把小鱼干叼走了，找个地方藏起来！",
+            "effects": {
+                "progress": { "humanComingHome": 2, "hungry": -10 },
+                "inventory": {
+                    "action": "add",
+                    "item": "fish_item"
+                },
+                "object": {
+                    "action": "hide"
+                }
+            },
+            "triggerAchievement": "fish_pickup"
+        },
+        "eat_fish": {
+            "id": "eat_fish",
+            "text": "吃掉",
+            "log": "小鱼干真好吃！",
+            "effects": {
+                "progress": { "hungry": -20, "humanComingHome": 5 },
+                "inventory": {
+                    "action": "remove",
+                    "item": "fish_item"
+                }
+            }
+        },
+        "scratch_sofa": {
+            "id": "scratch_sofa",
+            "text": "磨爪",
+            "log": "用这个沙发磨爪子真是太爽了！",
+            "effects": {
+                "progress": { "humanComingHome": 15, "hungry": 2, "needPoop": 2 }
+            },
+            "triggerAchievement": "sofa_destroyer"
+        },
+        "sleep_on_sofa": {
+            "id": "sleep_on_sofa",
+            "text": "睡觉",
+            "log": "沙发软软的，睡一觉先。",
+            "effects": {
+                "progress": { "humanComingHome": 5, "hungry": 10, "needPoop": 5 }
+            },
+            "triggerAchievement": "afternoon_nap"
+        },
+        "drink": {
+            "id": "drink",
+            "text": "喝水",
+            "log": "你喝了一点水，没那么渴了。",
+            "effects": {
+                "progress": { "hungry": -8, "needPoop": 2, "humanComingHome": 1 }
+            }
+        },
+        "knock_over": {
+            "id": "knock_over",
+            "text": "打翻",
+            "log": "你把碗打翻了，水洒了一地。真有趣！",
+            "effects": {
+                "progress": { "humanComingHome": 12 }
+            },
+            "triggerAchievement": "water_overflow"
+        },
+        "sleep_villa": {
+            "id": "sleep_villa",
+            "text": "睡觉",
+            "log": "在别墅里睡觉就是爽。",
+            "effects": {
+                "progress": { "humanComingHome": 3, "hungry": 8, "needPoop": 4 }
+            },
+            "triggerAchievement": "afternoon_nap"
+        },
+        "sleep_nest": {
+            "id": "sleep_nest",
+            "text": "睡觉",
+            "log": "窝里最安全。",
+            "effects": {
+                "progress": { "humanComingHome": 2, "hungry": 6, "needPoop": 3 }
+            },
+            "triggerAchievement": "afternoon_nap"
+        },
+        "patrol_balcony": {
+            "id": "patrol_balcony",
+            "text": "巡视",
+            "log": "巡视阳台，确认没有入侵者。",
+            "effects": {
+                "progress": { "humanComingHome": -2, "hungry": 2 }
+            },
+            "triggerAchievement": "balcony_patrol"
+        },
+        "open_door": {
+            "id": "open_door",
+            "text": "开门",
+            "log": "门锁着，打不开。",
+            "effects": {
+                "progress": { "humanComingHome": 1 }
+            }
+        },
+        "meow": {
+            "id": "meow",
+            "text": "喵喵叫",
+            "log": "喵~ 喵~ 喵~",
+            "effects": {
+                "progress": { "humanComingHome": -1, "hungry": -5 }
+            },
+            "triggerAchievement": "food_beggar"
+        },
+        "push_table_item": {
+            "id": "push_table_item",
+            "text": "推下去",
+            "log": "你把桌子上的东西推下去了！",
+            "effects": {
+                "progress": { "humanComingHome": 20 }
+            },
+            "triggerAchievement": "table_justice"
+        },
+        "destroy_toilet_paper": {
+            "id": "destroy_toilet_paper",
+            "text": "撕碎",
+            "log": "厕纸被撕得粉碎！",
+            "effects": {
+                "progress": { "humanComingHome": 25 }
+            },
+            "triggerAchievement": "toilet_paper_terminator"
+        },
+        "use_litter_box": {
+            "id": "use_litter_box",
+            "text": "如厕",
+            "log": "在猫砂盆里解决了生理需求。",
+            "effects": {
+                "progress": { "needPoop": -50, "humanComingHome": -3 }
+            },
+            "triggerAchievement": "clean_champion"
+        },
+        "play_with_toy": {
+            "id": "play_with_toy",
+            "text": "玩耍",
+            "log": "和玩具玩得很开心！",
+            "effects": {
+                "progress": { "humanComingHome": -5, "hungry": 3 }
+            },
+            "triggerAchievement": "toy_lover"
+        },
+        "find_key": {
+            "id": "find_key",
+            "text": "找到钥匙",
+            "log": "你找到了一把钥匙！",
+            "effects": {
+                "inventory": {
+                    "action": "add",
+                    "item": "key_item"
+                },
+                "object": {
+                    "action": "hide"
+                }
+            },
+            "triggerAchievement": "key_hunter"
+        },
+        "unlock_room": {
+            "id": "unlock_room",
+            "text": "解锁房间",
+            "log": "房间门打开了！",
+            "effects": {
+                "inventory": {
+                    "action": "remove",
+                    "item": "key_item"
+                },
+                "special": {
+                    "unlockArea": "room_c"
+                }
+            },
+            "triggerAchievement": "door_secret"
+        },
+        "escape_outside": {
+            "id": "escape_outside",
+            "text": "离家出走",
+            "log": "你成功逃出了家门！",
+            "effects": {
+                "special": {
+                    "unlockArea": "outside"
+                }
+            },
+            "triggerAchievement": "escape_master"
+        },
+        "set_trap": {
+            "id": "set_trap",
+            "text": "设置陷阱",
+            "log": "你设置了一个陷阱！",
+            "effects": {
+                "progress": { "humanComingHome": 8 }
+            },
+            "triggerAchievement": "high_ground_defense"
+        },
+        "set_alarm": {
+            "id": "set_alarm",
+            "text": "设置警报",
+            "log": "你在门口设置了警报器！",
+            "effects": {
+                "progress": { "humanComingHome": 10 }
+            },
+            "triggerAchievement": "invasion_alarm"
+        },
+        "defend_invasion": {
+            "id": "defend_invasion",
+            "text": "防御入侵",
+            "log": "你成功用陷阱吓走了隔壁的猫！",
+            "effects": {
+                "progress": { "humanComingHome": -5 }
+            },
+            "triggerAchievement": "king_contempt"
+        }
+    },
+    "item_actions": {
+        "fish_item": {
+            "eat": {
+                "id": "eat_fish",
+                "text": "吃掉",
+                "log": "小鱼干真好吃！",
+                "effects": {
+                    "progress": { "hungry": -20, "humanComingHome": 5 },
+                    "inventory": {
+                        "action": "remove",
+                        "item": "fish_item"
+                    }
+                }
+            },
+            "drop": {
+                "id": "drop_fish",
+                "text": "放下",
+                "log": "你把小鱼干放在了地上。",
+                "effects": {
+                    "inventory": {
+                        "action": "remove",
+                        "item": "fish_item"
+                    },
+                    "scene": {
+                        "action": "spawn_item",
+                        "item": "fish_item",
+                        "position": "drop_position"
+                    }
+                }
+            }
+        },
+        "key_item": {
+            "use": {
+                "id": "unlock_room",
+                "text": "使用钥匙",
+                "log": "你用钥匙打开了门。",
+                "effects": {
+                    "inventory": {
+                        "action": "remove",
+                        "item": "key_item"
+                    },
+                    "special": {
+                        "unlockArea": "room_c"
+                    }
+                },
+                "triggerAchievement": "door_secret"
+            }
+        }
+    },
+    "interactions": {
+        "fish_item_sofa": {
+            "id": "hide_fish_sofa",
+            "text": "藏在沙发下",
+            "log": "你把小鱼干藏在沙发下面了！",
+            "effects": {
+                "progress": { "humanComingHome": 5 },
+                "inventory": {
+                    "action": "remove",
+                    "item": "fish_item"
+                }
+            },
+            "triggerAchievement": "strategic_reserve"
+        },
+        "fish_item_cat_villa": {
+            "id": "hide_fish_villa",
+            "text": "藏在别墅里",
+            "log": "你把小鱼干藏在猫别墅里了！",
+            "effects": {
+                "progress": { "humanComingHome": 3 },
+                "inventory": {
+                    "action": "remove",
+                    "item": "fish_item"
+                }
+            },
+            "triggerAchievement": "strategic_reserve"
+        },
+        "fish_item_cat_nest": {
+            "id": "hide_fish_nest",
+            "text": "藏在猫窝里",
+            "log": "你把小鱼干藏在猫窝里了！",
+            "effects": {
+                "progress": { "humanComingHome": 2 },
+                "inventory": {
+                    "action": "remove",
+                    "item": "fish_item"
+                }
+            },
+            "triggerAchievement": "strategic_reserve"
+        }
+    }
+} 

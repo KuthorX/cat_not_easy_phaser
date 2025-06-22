@@ -1,0 +1,76 @@
+{
+    "background": "placeholder_1280x720_2",
+    "name": "过道",
+    "objects": {
+        "cat_back": {
+            "x": 640,
+            "y": 980,
+            "image": "placeholder_80x80",
+            "interactive": false
+        },
+        "to_living_room": {
+            "x": 960,
+            "y": 180,
+            "image": "placeholder_arrow_up_64x64",
+            "name": "客厅",
+            "look": "回到客厅。",
+            "navTo": "living_room"
+        },
+        "door_a": {
+            "x": 500,
+            "y": 450,
+            "image": "placeholder_door_80x160",
+            "name": "房间A的门",
+            "look": "门关着。",
+            "actions": ["open_door"]
+        },
+        "door_b": {
+            "x": 800,
+            "y": 450,
+            "image": "placeholder_door_80x160",
+            "name": "房间B的门",
+            "look": "门关着。",
+            "actions": ["open_door"]
+        },
+        "door_c": {
+            "x": 1100,
+            "y": 450,
+            "image": "placeholder_door_80x160",
+            "name": "房间C的门",
+            "look": "门关着。",
+            "actions": ["open_door"]
+        },
+        "toilet_paper": {
+            "x": 600,
+            "y": 550,
+            "image": "placeholder_80x80",
+            "name": "厕纸",
+            "look": "一卷厕纸，看起来很好玩。",
+            "actions": ["destroy_toilet_paper"]
+        },
+        "trap_location": {
+            "x": 750,
+            "y": 550,
+            "image": "placeholder_80x80",
+            "name": "陷阱位置",
+            "look": "这里可以设置陷阱。",
+            "actions": ["set_trap"]
+        },
+        "alarm_location": {
+            "x": 900,
+            "y": 550,
+            "image": "placeholder_80x80",
+            "name": "警报位置",
+            "look": "这里可以设置警报器。",
+            "actions": ["set_alarm"]
+        },
+        "to_balcony": {
+            "x": 1600,
+            "y": 600,
+            "image": "placeholder_arrow_right_64x64",
+            "name": "阳台",
+            "look": "去阳台看看。",
+            "navTo": "balcony"
+        }
+    }
+} 

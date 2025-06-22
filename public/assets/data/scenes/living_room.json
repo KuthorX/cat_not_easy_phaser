@@ -1,0 +1,107 @@
+{
+    "background": "placeholder_1280x720",
+    "name": "客厅",
+    "objects": {
+        "cat_back": {
+            "x": 640,
+            "y": 980,
+            "image": "placeholder_80x80",
+            "interactive": false
+        },
+        "fish_1": {
+            "x": 700,
+            "y": 500,
+            "image": "placeholder_fish_60x30",
+            "name": "小鱼干",
+            "look": "一根小鱼干，闻起来好香！",
+            "actions": ["pickup_fish"]
+        },
+        "sofa": {
+            "x": 500,
+            "y": 450,
+            "image": "placeholder_sofa_250x120",
+            "name": "沙发",
+            "look": "一个巨大而柔软的物体，看起来很适合磨爪子和睡觉。",
+            "actions": ["scratch_sofa", "sleep_on_sofa"]
+        },
+        "cat_bowl": {
+            "x": 800,
+            "y": 550,
+            "image": "placeholder_80x80",
+            "name": "水盆和食盆",
+            "look": "看起来是食盆和水碗...",
+            "actions": ["drink", "knock_over"]
+        },
+        "tv": {
+            "x": 900,
+            "y": 400,
+            "image": "placeholder_tv_150x120",
+            "name": "电视",
+            "look": "一个黑色的大方块，搞不懂。"
+        },
+        "cat_villa": {
+            "x": 600,
+            "y": 600,
+            "image": "placeholder_villa_150x200",
+            "name": "猫别墅",
+            "look": "我的豪华大别野！",
+            "actions": ["sleep_villa"]
+        },
+        "cat_nest": {
+            "x": 400,
+            "y": 600,
+            "image": "placeholder_nest_120x80",
+            "name": "猫窝",
+            "look": "我的小窝，很舒服。",
+            "actions": ["sleep_nest"]
+        },
+        "table": {
+            "x": 750,
+            "y": 450,
+            "image": "placeholder_80x80",
+            "name": "桌子",
+            "look": "桌子上放着一些东西。",
+            "actions": ["push_table_item"]
+        },
+        "toy_mouse": {
+            "x": 850,
+            "y": 500,
+            "image": "placeholder_80x80",
+            "name": "玩具老鼠",
+            "look": "一个可爱的玩具老鼠。",
+            "actions": ["play_with_toy"]
+        },
+        "cat_toy": {
+            "x": 550,
+            "y": 500,
+            "image": "placeholder_80x80",
+            "name": "猫玩具",
+            "look": "一个有趣的猫玩具。",
+            "actions": ["play_with_toy"]
+        },
+        "litter_box": {
+            "x": 950,
+            "y": 600,
+            "image": "placeholder_80x80",
+            "name": "猫砂盆",
+            "look": "我的专用厕所。",
+            "actions": ["use_litter_box"]
+        },
+        "hidden_key": {
+            "x": 650,
+            "y": 400,
+            "image": "placeholder_80x80",
+            "name": "隐藏的钥匙",
+            "look": "咦，这里有一把钥匙！",
+            "actions": ["find_key"]
+        },
+        "to_hallway": {
+            "x": 960,
+            "y": 900,
+            "image": "placeholder_arrow_down_64x64",
+            "name": "过道",
+            "look": "那边是过道。",
+            "navTo": "hallway"
+        }
+    }
+} 

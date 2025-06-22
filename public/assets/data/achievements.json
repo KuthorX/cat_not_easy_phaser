@@ -1,0 +1,265 @@
+{
+    "achievements": {
+        "water_overflow": {
+            "id": "water_overflow",
+            "name": "水漫金山",
+            "description": "打翻所有水碗",
+            "category": "destruction",
+            "isMainAchievement": false,
+            "condition": {
+                "type": "counter",
+                "counter": "waterBowlKnockOverCount",
+                "value": 3
+            }
+        },
+        "table_justice": {
+            "id": "table_justice",
+            "name": "天降正义",
+            "description": "将桌子上的特定物品推到地上",
+            "category": "destruction",
+            "isMainAchievement": false,
+            "condition": {
+                "type": "counter",
+                "counter": "tableItemPushCount",
+                "value": 2
+            }
+        },
+        "sofa_destroyer": {
+            "id": "sofa_destroyer",
+            "name": "沙发毁灭者",
+            "description": "对沙发执行磨爪达到一定次数",
+            "category": "destruction",
+            "isMainAchievement": false,
+            "condition": {
+                "type": "counter",
+                "counter": "scratchCount",
+                "value": 5
+            }
+        },
+        "toilet_paper_terminator": {
+            "id": "toilet_paper_terminator",
+            "name": "厕纸终结者",
+            "description": "毁掉卷纸",
+            "category": "destruction",
+            "isMainAchievement": false,
+            "condition": {
+                "type": "counter",
+                "counter": "toiletPaperDestroyCount",
+                "value": 1
+            }
+        },
+        "food_beggar": {
+            "id": "food_beggar",
+            "name": "饭来张口",
+            "description": "通过喵喵叫等互动从智人处获得食物",
+            "category": "obedient",
+            "isMainAchievement": false,
+            "condition": {
+                "type": "counter",
+                "counter": "meowCount",
+                "value": 3
+            }
+        },
+        "afternoon_nap": {
+            "id": "afternoon_nap",
+            "name": "午后小憩",
+            "description": "在所有指定的地点都睡过觉",
+            "category": "obedient",
+            "isMainAchievement": false,
+            "condition": {
+                "type": "counter",
+                "counter": "sleepLocationCount",
+                "value": 3
+            }
+        },
+        "clean_champion": {
+            "id": "clean_champion",
+            "name": "清洁标兵",
+            "description": "在猫砂盆里完成所有如厕需求",
+            "category": "obedient",
+            "isMainAchievement": false,
+            "condition": {
+                "type": "counter",
+                "counter": "litterBoxCount",
+                "value": 5
+            }
+        },
+        "toy_lover": {
+            "id": "toy_lover",
+            "name": "玩具爱好者",
+            "description": "与所有玩具类物品进行过互动",
+            "category": "obedient",
+            "isMainAchievement": false,
+            "condition": {
+                "type": "counter",
+                "counter": "toyInteractionCount",
+                "value": 3
+            }
+        },
+        "balcony_patrol": {
+            "id": "balcony_patrol",
+            "name": "阳台巡视者",
+            "description": "成功到达阳台",
+            "category": "explorer",
+            "isMainAchievement": false,
+            "condition": {
+                "type": "flag",
+                "flag": "balcony_visited"
+            }
+        },
+        "key_hunter": {
+            "id": "key_hunter",
+            "name": "钥匙猎人",
+            "description": "找到并获取所有关键钥匙",
+            "category": "explorer",
+            "isMainAchievement": false,
+            "condition": {
+                "type": "counter",
+                "counter": "keyFindCount",
+                "value": 3
+            }
+        },
+        "door_secret": {
+            "id": "door_secret",
+            "name": "门缝里的大秘密",
+            "description": "解开并进入房间C",
+            "category": "explorer",
+            "isMainAchievement": false,
+            "condition": {
+                "type": "flag",
+                "flag": "room_c_unlocked"
+            }
+        },
+        "escape_master": {
+            "id": "escape_master",
+            "name": "越狱大师",
+            "description": "找到打开外门的方法并成功离家出走",
+            "category": "explorer",
+            "isMainAchievement": false,
+            "condition": {
+                "type": "flag",
+                "flag": "outside_escaped"
+            }
+        },
+        "strategic_reserve": {
+            "id": "strategic_reserve",
+            "name": "战略储备",
+            "description": "将所有小鱼干藏到指定地点",
+            "category": "strategist",
+            "isMainAchievement": false,
+            "condition": {
+                "type": "counter",
+                "counter": "fishHideCount",
+                "value": 5
+            }
+        },
+        "high_ground_defense": {
+            "id": "high_ground_defense",
+            "name": "高地防御",
+            "description": "将特定物品布置在高处，作为防御工事",
+            "category": "strategist",
+            "isMainAchievement": false,
+            "condition": {
+                "type": "counter",
+                "counter": "trapSetCount",
+                "value": 3
+            }
+        },
+        "invasion_alarm": {
+            "id": "invasion_alarm",
+            "name": "入侵者警报",
+            "description": "在门口设置一个能发出声响的警报器",
+            "category": "strategist",
+            "isMainAchievement": false,
+            "condition": {
+                "type": "flag",
+                "flag": "alarm_set"
+            }
+        },
+        "king_contempt": {
+            "id": "king_contempt",
+            "name": "王之蔑视",
+            "description": "成功触发隔壁的猫入侵事件，并用陷阱将其吓走",
+            "category": "strategist",
+            "isMainAchievement": false,
+            "condition": {
+                "type": "counter",
+                "counter": "invasionDefendCount",
+                "value": 1
+            }
+        },
+        "best_destroyer": {
+            "id": "best_destroyer",
+            "name": "今日最佳破坏王",
+            "description": "在两脚兽回家前，达成所有破坏系列子成就",
+            "category": "destruction",
+            "isMainAchievement": true
+        },
+        "chief_servant": {
+            "id": "chief_servant",
+            "name": "智人首席奴才",
+            "description": "在一天结束时，两脚兽回家进度条低于阈值，且未进行任何破坏活动",
+            "category": "obedient",
+            "isMainAchievement": true
+        },
+        "home_master": {
+            "id": "home_master",
+            "name": "这个家我说了算",
+            "description": "成功进入所有上锁的房间",
+            "category": "explorer",
+            "isMainAchievement": true
+        },
+        "security_advisor": {
+            "id": "security_advisor",
+            "name": "家庭安全顾问",
+            "description": "成功布置好所有陷阱，并抵御隔壁的猫入侵事件",
+            "category": "strategist",
+            "isMainAchievement": true
+        }
+    },
+    "achievementPaths": {
+        "destruction": {
+            "id": "destruction",
+            "name": "完美拆家王",
+            "description": "作为一个精力旺盛的猫，把制造混乱作为首要目标",
+            "mainAchievement": "best_destroyer",
+            "subAchievements": ["water_overflow", "table_justice", "sofa_destroyer", "toilet_paper_terminator"],
+            "endCondition": {
+                "type": "all_sub_achievements",
+                "humanComingHomeThreshold": 100
+            }
+        },
+        "obedient": {
+            "id": "obedient",
+            "name": "温顺的乖猫",
+            "description": "讨好两脚兽，做一个安静、可爱的陪伴者",
+            "mainAchievement": "chief_servant",
+            "subAchievements": ["food_beggar", "afternoon_nap", "clean_champion", "toy_lover"],
+            "endCondition": {
+                "type": "human_coming_home_low",
+                "humanComingHomeThreshold": 30,
+                "noDestruction": true
+            }
+        },
+        "explorer": {
+            "id": "explorer",
+            "name": "大冒险家",
+            "description": "对外界充满好奇，探索所有未知的领域",
+            "mainAchievement": "home_master",
+            "subAchievements": ["balcony_patrol", "key_hunter", "door_secret", "escape_master"],
+            "endCondition": {
+                "type": "all_rooms_unlocked"
+            }
+        },
+        "strategist": {
+            "id": "strategist",
+            "name": "阴谋家",
+            "description": "充满警惕与智慧，为潜在的威胁做好准备",
+            "mainAchievement": "security_advisor",
+            "subAchievements": ["strategic_reserve", "high_ground_defense", "invasion_alarm", "king_contempt"],
+            "endCondition": {
+                "type": "all_traps_set_and_defend"
+            }
+        }
+    }
+} 

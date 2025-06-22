@@ -4,26 +4,37 @@
   "description": "猫咪主题休闲剧情游戏",
   "main": "server/index.ts",
   "scripts": {
-    "dev": "tsx watch server/index.ts",
-    "build": "tsc",
+    "dev": "vite",
+    "dev:server": "tsx watch server/index.ts",
+    "dev:full": "concurrently \"npm run dev\" \"npm run dev:server\"",
+    "dev:quick": "bun run quick_dev.js",
+    "build": "vite build",
+    "build:server": "tsc server/index.ts --outDir dist-server",
+    "preview": "vite preview",
     "start": "tsx server/index.ts",
     "type-check": "tsc --noEmit",
     "server": "tsx server/index.ts",
-    "client": "python -m http.server 8000"
+    "client": "python -m http.server 8000",
+    "quick-start": "bun run run_it/quick_start.js",
+    "generate-assets": "node generate_placeholders.js"
   },
   "dependencies": {
     "phaser": "^3.60.0",
     "express": "^4.18.2",
-    "cors": "^2.8.5"
+    "cors": "^2.8.5",
+    "open": "^9.1.0",
+    "canvas": "^2.11.2"
   },
   "devDependencies": {
-    "@types/express": "^4.17.17",
     "@types/cors": "^2.8.13",
-    "@types/node": "^20.0.0",
-    "typescript": "^5.0.0",
-    "tsx": "^4.0.0"
+    "@types/express": "^4.17.17",
+    "@types/node": "^20.19.1",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5",
+    "tsx": "^4.19.2",
+    "concurrently": "^8.2.2"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.10.0"
   }
-} 
+}

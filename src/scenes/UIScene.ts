@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
-import { GameData, GameState, ObjectData, Action, Achievement } from '../types/index.js';
-import { SaveSystem } from '../systems/SaveSystem.js';
+import { SaveSystem } from '../systems/SaveSystem';
+import { GameState, Action, ObjectData, GameData, Achievement } from '../types/index';
 
 const FONT_STYLE = {
     fontFamily: '"Noto Sans SC", sans-serif',
@@ -29,6 +29,12 @@ export default class UIScene extends Phaser.Scene {
     achievePanel: Phaser.GameObjects.Container | null = null;
     saveSystem: SaveSystem;
     itemUseMenu: Phaser.GameObjects.Container | null = null;
+    hoverContainer: Phaser.GameObjects.Container | null = null;
+    private actionButtons: Phaser.GameObjects.Container[] = [];
+    private logText!: Phaser.GameObjects.Text;
+    private inventoryText!: Phaser.GameObjects.Text;
+    private achievementPopup?: Phaser.GameObjects.Container;
+    private achievementList?: Phaser.GameObjects.Container;
 
     constructor() {
         super({ key: 'UIScene', active: false });
@@ -45,7 +51,8 @@ export default class UIScene extends Phaser.Scene {
         this.game.events.on('showInteraction', this.showInteractionDialog, this);
         this.game.events.on('hideHoverInteraction', this.hideHoverInteraction, this);
         this.game.events.on('locationChanged', this.updateLocationDisplay, this);
-        this.game.events.on('achievementUnlocked', this.showAchievementUnlocked, this);
+        this.game.events.on('achievementUnlocked', this.showAchievementPopup, this);
+        this.game.events.on('gameEnd', this.showGameEnd, this);
         this.createTopRightIcons();
         this.createTopBar();
         this.createBottomBar();
@@ -66,9 +73,9 @@ export default class UIScene extends Phaser.Scene {
             { key: 'needPoop', label: '我要拉屎了', color: 0x66ccff, icon: '🚽' }
         ];
         this.progressBars = {};
-        const barX = 40;
+        const barX = 60;
         let barY = 40;
-        const barWidth = 340;
+        const barWidth = 320;
         const barHeight = 32;
         const barGap = 42;
         
@@ -107,7 +114,7 @@ export default class UIScene extends Phaser.Scene {
             // 标签文字
             const label = this.add.text(barX + barWidth + 18, barY + barHeight/2, bar.label, { 
                 ...FONT_STYLE, 
-                fontSize: '22px', 
+                fontSize: '20px',
                 color: '#fff',
                 fontStyle: 'bold'
             }).setOrigin(0, 0.5);
@@ -127,9 +134,9 @@ export default class UIScene extends Phaser.Scene {
 
     updateProgressBars(): void {
         const progress = this.gameState.progress;
-        const barX = 40;
+        const barX = 60;
         let barY = 40;
-        const barWidth = 340;
+        const barWidth = 320;
         const barHeight = 32;
         const barGap = 42;
         
@@ -204,7 +211,7 @@ export default class UIScene extends Phaser.Scene {
         graphics.fillStyle(0x000000, 0.7);
         graphics.fillRoundedRect(-panelWidth / 2, -panelHeight / 2, panelWidth, panelHeight, 15);
         this.inventoryContainer.add(graphics);
-        const title = this.add.text(0, -panelHeight/2 + 30, '猫后脑勺', { ...FONT_STYLE, fontSize: '28px' }).setOrigin(0.5);
+        const title = this.add.text(0, -panelHeight/2 + 30, '背包', { ...FONT_STYLE, fontSize: '28px' }).setOrigin(0.5);
         this.inventoryContainer.add(title);
         const maskShape = this.make.graphics();
         maskShape.fillStyle(0xffffff);
@@ -478,10 +485,72 @@ export default class UIScene extends Phaser.Scene {
         settingsBtn.on('pointerdown', () => this.showSettingsPanel());
     }
 
-    showActionMenu(x: number, y: number, actions: Action[]): void {
+    showActionMenu(objectData: ObjectData, pointer: Phaser.Input.Pointer): void {
         this.hideActionMenu();
+        
+        if (!objectData.actions || objectData.actions.length === 0) {
+            return;
+        }
+
+        const x = pointer.x;
+        const y = pointer.y;
+        
         this.actionMenu = this.add.container(x, y);
-        // 实现动作菜单显示逻辑
+        this.actionMenu.setDepth(20);
+        
+        // 背景
+        const bg = this.add.graphics();
+        bg.fillStyle(0x000000, 0.9);
+        bg.fillRoundedRect(-10, -10, 20, 20, 5);
+        bg.lineStyle(2, 0xffffff, 1);
+        bg.strokeRoundedRect(-10, -10, 20, 20, 5);
+        this.actionMenu.add(bg);
+        
+        let buttonY = 0;
+        const buttonHeight = 40;
+        const buttonGap = 5;
+        
+        // 为每个动作创建按钮
+        objectData.actions.forEach((actionId, index) => {
+            const action = this.gameData.actions.actions[actionId];
+            if (!action || !this.actionMenu) return;
+            
+            const button = this.add.rectangle(0, buttonY, 120, buttonHeight, 0x444444, 0.9)
+                .setInteractive({ useHandCursor: true });
+            this.actionMenu.add(button);
+            
+            const buttonText = this.add.text(0, buttonY, action.text, { 
+                ...FONT_STYLE, 
+                fontSize: '16px', 
+                color: '#fff'
+            }).setOrigin(0.5);
+            this.actionMenu.add(buttonText);
+            
+            button.on('pointerdown', () => {
+                this.game.events.emit('performAction', actionId, objectData);
+            });
+            
+            buttonY += buttonHeight + buttonGap;
+        });
+        
+        // 调整背景大小
+        const totalHeight = buttonY - buttonGap;
+        bg.clear();
+        bg.fillStyle(0x000000, 0.9);
+        bg.fillRoundedRect(-70, -10, 140, totalHeight + 20, 10);
+        bg.lineStyle(2, 0xffffff, 1);
+        bg.strokeRoundedRect(-70, -10, 140, totalHeight + 20, 10);
+        
+        // 确保菜单不超出屏幕边界
+        if (this.actionMenu) {
+            const menuBounds = this.actionMenu.getBounds();
+            if (menuBounds.right > 1920) {
+                this.actionMenu.setX(x - menuBounds.width);
+            }
+            if (menuBounds.bottom > 1080) {
+                this.actionMenu.setY(y - menuBounds.height);
+            }
+        }
     }
 
     hideActionMenu(): void {
@@ -489,6 +558,8 @@ export default class UIScene extends Phaser.Scene {
             this.actionMenu.destroy();
             this.actionMenu = null;
         }
+        // 确保UI刷新
+        this.refreshUI();
     }
 
     showInteractionDialog(text: string, type: string = 'normal'): void {
@@ -496,14 +567,57 @@ export default class UIScene extends Phaser.Scene {
         console.log(`显示对话框: ${text} (类型: ${type})`);
     }
 
-    hideHoverInteraction(): void {
-        // 实现隐藏悬停交互逻辑
+    showHoverInteraction(text: string, x: number, y: number): void {
+        // 隐藏之前的悬停文本
+        this.hideHoverInteraction();
+        
+        // 创建悬停提示框
+        const hoverContainer = this.add.container(x, y - 50);
+        hoverContainer.setDepth(15);
+        
+        // 文本
+        const textObj = this.add.text(0, 0, text, { 
+            ...FONT_STYLE, 
+            fontSize: '16px', 
+            color: '#fff'
+        }).setOrigin(0.5);
+        hoverContainer.add(textObj);
+        
+        // 获取文本的本地边界
+        const textWidth = textObj.width;
+        const textHeight = textObj.height;
+        
+        // 背景 - 使用相对于容器的坐标
+        const bg = this.add.graphics();
+        bg.fillStyle(0x000000, 0.9);
+        bg.fillRoundedRect(-textWidth/2 - 5, -textHeight/2 - 5, textWidth + 10, textHeight + 10, 5);
+        bg.lineStyle(2, 0xffffff, 1);
+        bg.strokeRoundedRect(-textWidth/2 - 5, -textHeight/2 - 5, textWidth + 10, textHeight + 10, 5);
+        hoverContainer.add(bg);
+        
+        // 确保背景在文字后面
+        hoverContainer.sendToBack(bg);
+        
+        // 存储引用以便后续隐藏
+        this.hoverContainer = hoverContainer;
     }
 
-    showAchievementUnlocked(achievement: any): void {
-        // 创建成就解锁弹窗
-        const popup = this.add.container(960, 200);
-        popup.setDepth(30);
+    hideHoverInteraction(): void {
+        if (this.hoverContainer) {
+            this.hoverContainer.destroy();
+            this.hoverContainer = null;
+        }
+    }
+
+    showAchievementPopup(achievement: any): void {
+        // 移除之前的弹窗
+        if (this.achievementPopup) {
+            this.achievementPopup.destroy();
+        }
+
+        // 创建成就弹窗
+        this.achievementPopup = this.add.container(960, 200);
+        this.achievementPopup.setDepth(30);
         
         // 背景
         const bg = this.add.graphics();
@@ -511,11 +625,9 @@ export default class UIScene extends Phaser.Scene {
         bg.fillRoundedRect(-200, -80, 400, 160, 20);
         bg.lineStyle(4, 0xffd700, 1);
         bg.strokeRoundedRect(-200, -80, 400, 160, 20);
-        popup.add(bg);
         
         // 成就图标
         const icon = this.add.text(0, -40, '🏆', { fontSize: '48px' }).setOrigin(0.5);
-        popup.add(icon);
         
         // 成就标题
         const title = this.add.text(0, -10, '成就解锁！', { 
@@ -524,7 +636,6 @@ export default class UIScene extends Phaser.Scene {
             color: '#ffd700',
             fontStyle: 'bold'
         }).setOrigin(0.5);
-        popup.add(title);
         
         // 成就名称
         const name = this.add.text(0, 15, achievement.name, { 
@@ -532,7 +643,6 @@ export default class UIScene extends Phaser.Scene {
             fontSize: '20px', 
             color: '#fff'
         }).setOrigin(0.5);
-        popup.add(name);
         
         // 成就描述
         const desc = this.add.text(0, 40, achievement.description, { 
@@ -540,171 +650,41 @@ export default class UIScene extends Phaser.Scene {
             fontSize: '16px', 
             color: '#aaa'
         }).setOrigin(0.5);
-        popup.add(desc);
+        
+        this.achievementPopup.add([bg, icon, title, name, desc]);
         
         // 初始状态：隐藏
-        popup.setAlpha(0);
-        popup.setScale(0.5);
+        this.achievementPopup.setAlpha(0);
+        this.achievementPopup.setScale(0.5);
         
         // 动画：淡入和缩放
         this.tweens.add({
-            targets: popup,
+            targets: this.achievementPopup,
             alpha: 1,
             scaleX: 1,
             scaleY: 1,
             duration: 500,
             ease: 'Back.easeOut',
             onComplete: () => {
-                // 添加粒子效果
-                this.createAchievementParticles(960, 200);
-                
                 // 3秒后淡出
                 this.tweens.add({
-                    targets: popup,
+                    targets: this.achievementPopup,
                     alpha: 0,
                     y: 100,
                     duration: 1000,
                     delay: 2000,
                     ease: 'Power2',
                     onComplete: () => {
-                        popup.destroy();
+                        if (this.achievementPopup) {
+                            this.achievementPopup.destroy();
+                            this.achievementPopup = undefined;
+                        }
                     }
                 });
             }
         });
         
-        // 播放音效（如果有的话）
         console.log(`🎉 成就解锁: ${achievement.name} - ${achievement.description}`);
-    }
-
-    createAchievementParticles(x: number, y: number): void {
-        // 创建粒子效果
-        const particles = this.add.particles(x, y, 'particle', {
-            speed: { min: 100, max: 200 },
-            scale: { start: 0.5, end: 0 },
-            lifespan: 1000,
-            quantity: 20,
-            blendMode: 'ADD',
-            tint: [0xffd700, 0xffaa00, 0xffff00]
-        });
-        
-        // 1秒后销毁粒子
-        this.time.delayedCall(1000, () => {
-            particles.destroy();
-        });
-    }
-
-    showLogPanel(): void {
-        if (this.logPanel) {
-            this.logPanel.destroy();
-        }
-        
-        this.logPanel = this.add.container(960, 540);
-        this.logPanel.setDepth(20);
-        
-        // 背景
-        const bg = this.add.graphics();
-        bg.fillStyle(0x000000, 0.9);
-        bg.fillRoundedRect(-400, -300, 800, 600, 20);
-        bg.lineStyle(3, 0x444444, 1);
-        bg.strokeRoundedRect(-400, -300, 800, 600, 20);
-        this.logPanel.add(bg);
-        
-        // 标题
-        const title = this.add.text(0, -250, '📖 游戏日志', { 
-            ...FONT_STYLE, 
-            fontSize: '32px', 
-            color: '#66ccff',
-            fontStyle: 'bold'
-        }).setOrigin(0.5);
-        this.logPanel.add(title);
-        
-        // 关闭按钮
-        const closeBtn = this.add.rectangle(350, -250, 60, 60, 0xff4444, 0.8)
-            .setInteractive({ useHandCursor: true });
-        this.add.text(350, -250, '✕', { fontSize: '24px', color: '#fff' }).setOrigin(0.5);
-        closeBtn.on('pointerdown', () => this.hideLogPanel());
-        this.logPanel.add(closeBtn);
-        
-        // 清空按钮
-        const clearBtn = this.add.rectangle(-350, -250, 80, 40, 0xff6666, 0.8)
-            .setInteractive({ useHandCursor: true });
-        this.add.text(-350, -250, '清空', { 
-            ...FONT_STYLE, 
-            fontSize: '16px', 
-            color: '#fff' 
-        }).setOrigin(0.5);
-        clearBtn.on('pointerdown', () => this.clearLog());
-        this.logPanel.add(clearBtn);
-        
-        // 日志内容区域
-        const logContainer = this.add.container(0, 0);
-        this.logPanel.add(logContainer);
-        
-        // 滚动区域
-        const scrollArea = this.add.graphics();
-        scrollArea.fillStyle(0x222222, 0.5);
-        scrollArea.fillRoundedRect(-380, -200, 760, 400, 10);
-        this.logPanel.add(scrollArea);
-        
-        // 日志条目
-        const logs = this.gameState.actionLog || [];
-        if (logs.length === 0) {
-            const emptyText = this.add.text(0, 0, '暂无日志记录', { 
-                ...FONT_STYLE, 
-                fontSize: '20px', 
-                color: '#666'
-            }).setOrigin(0.5);
-            logContainer.add(emptyText);
-        } else {
-            let yOffset = -180;
-            logs.slice(-20).reverse().forEach((log, index) => {
-                const logBg = this.add.graphics();
-                logBg.fillStyle(index % 2 === 0 ? 0x333333 : 0x2a2a2a, 0.8);
-                logBg.fillRoundedRect(-370, yOffset - 15, 740, 30, 5);
-                logContainer.add(logBg);
-                
-                const logText = this.add.text(-360, yOffset, log, { 
-                    ...FONT_STYLE, 
-                    fontSize: '16px', 
-                    color: '#fff',
-                    wordWrap: { width: 720 }
-                }).setOrigin(0, 0.5);
-                logContainer.add(logText);
-                
-                const timeText = this.add.text(350, yOffset, 
-                    new Date().toLocaleTimeString(), { 
-                    ...FONT_STYLE, 
-                    fontSize: '12px', 
-                    color: '#666'
-                }).setOrigin(1, 0.5);
-                logContainer.add(timeText);
-                
-                yOffset += 35;
-            });
-        }
-        
-        // 统计信息
-        const stats = this.add.text(0, 250, 
-            `共 ${logs.length} 条记录`, { 
-            ...FONT_STYLE, 
-            fontSize: '18px', 
-            color: '#66ccff'
-        }).setOrigin(0.5);
-        this.logPanel.add(stats);
-    }
-
-    hideLogPanel(): void {
-        if (this.logPanel) {
-            this.logPanel.destroy();
-            this.logPanel = null;
-        }
-    }
-
-    clearLog(): void {
-        this.gameState.actionLog = [];
-        this.hideLogPanel();
-        this.showLogPanel();
     }
 
     showAchievementPanel(): void {
@@ -831,5 +811,163 @@ export default class UIScene extends Phaser.Scene {
     showSettingsPanel(): void {
         // 实现设置面板显示逻辑
         console.log('显示设置面板');
+    }
+
+    showLogPanel(): void {
+        if (this.logPanel) {
+            this.logPanel.destroy();
+        }
+        
+        this.logPanel = this.add.container(960, 540);
+        this.logPanel.setDepth(20);
+        
+        // 背景
+        const bg = this.add.graphics();
+        bg.fillStyle(0x000000, 0.9);
+        bg.fillRoundedRect(-400, -300, 800, 600, 20);
+        bg.lineStyle(3, 0x444444, 1);
+        bg.strokeRoundedRect(-400, -300, 800, 600, 20);
+        this.logPanel.add(bg);
+        
+        // 标题
+        const title = this.add.text(0, -250, '📖 游戏日志', { 
+            ...FONT_STYLE, 
+            fontSize: '32px', 
+            color: '#66ccff',
+            fontStyle: 'bold'
+        }).setOrigin(0.5);
+        this.logPanel.add(title);
+        
+        // 关闭按钮
+        const closeBtn = this.add.rectangle(350, -250, 60, 60, 0xff4444, 0.8)
+            .setInteractive({ useHandCursor: true });
+        this.add.text(350, -250, '✕', { fontSize: '24px', color: '#fff' }).setOrigin(0.5);
+        closeBtn.on('pointerdown', () => this.hideLogPanel());
+        this.logPanel.add(closeBtn);
+        
+        // 清空按钮
+        const clearBtn = this.add.rectangle(-350, -250, 80, 40, 0xff6666, 0.8)
+            .setInteractive({ useHandCursor: true });
+        this.add.text(-350, -250, '清空', { 
+            ...FONT_STYLE, 
+            fontSize: '16px', 
+            color: '#fff' 
+        }).setOrigin(0.5);
+        clearBtn.on('pointerdown', () => this.clearLog());
+        this.logPanel.add(clearBtn);
+        
+        // 日志内容区域
+        const logContainer = this.add.container(0, 0);
+        this.logPanel.add(logContainer);
+        
+        // 滚动区域
+        const scrollArea = this.add.graphics();
+        scrollArea.fillStyle(0x222222, 0.5);
+        scrollArea.fillRoundedRect(-380, -200, 760, 400, 10);
+        this.logPanel.add(scrollArea);
+        
+        // 日志条目
+        const logs = this.gameState.actionLog || [];
+        if (logs.length === 0) {
+            const emptyText = this.add.text(0, 0, '暂无日志记录', { 
+                ...FONT_STYLE, 
+                fontSize: '20px', 
+                color: '#666'
+            }).setOrigin(0.5);
+            logContainer.add(emptyText);
+        } else {
+            let yOffset = -180;
+            logs.slice(-20).reverse().forEach((log, index) => {
+                const logBg = this.add.graphics();
+                logBg.fillStyle(index % 2 === 0 ? 0x333333 : 0x2a2a2a, 0.8);
+                logBg.fillRoundedRect(-370, yOffset - 15, 740, 30, 5);
+                logContainer.add(logBg);
+                
+                const logText = this.add.text(-360, yOffset, log, { 
+                    ...FONT_STYLE, 
+                    fontSize: '16px', 
+                    color: '#fff',
+                    wordWrap: { width: 720 }
+                }).setOrigin(0, 0.5);
+                logContainer.add(logText);
+                
+                const timeText = this.add.text(350, yOffset, 
+                    new Date().toLocaleTimeString(), { 
+                    ...FONT_STYLE, 
+                    fontSize: '12px', 
+                    color: '#666'
+                }).setOrigin(1, 0.5);
+                logContainer.add(timeText);
+                
+                yOffset += 35;
+            });
+        }
+        
+        // 统计信息
+        const stats = this.add.text(0, 250, 
+            `共 ${logs.length} 条记录`, { 
+            ...FONT_STYLE, 
+            fontSize: '18px', 
+            color: '#66ccff'
+        }).setOrigin(0.5);
+        this.logPanel.add(stats);
+    }
+
+    hideLogPanel(): void {
+        if (this.logPanel) {
+            this.logPanel.destroy();
+            this.logPanel = null;
+        }
+    }
+
+    clearLog(): void {
+        this.gameState.actionLog = [];
+        this.hideLogPanel();
+        this.showLogPanel();
+    }
+
+    showGameEnd(endData: any): void {
+        // 创建游戏结束界面
+        const endContainer = this.add.container(960, 540);
+        endContainer.setDepth(50);
+        
+        // 背景
+        const background = this.add.graphics();
+        background.fillStyle(0x000000, 0.9);
+        background.fillRoundedRect(-400, -300, 800, 600, 20);
+        background.lineStyle(3, 0xffff00);
+        background.strokeRoundedRect(-400, -300, 800, 600, 20);
+        
+        // 标题
+        const title = this.add.text(0, -200, endData.title, {
+            ...FONT_STYLE,
+            fontSize: '36px',
+            color: '#ffff00',
+            fontStyle: 'bold'
+        }).setOrigin(0.5);
+        
+        // 消息
+        const message = this.add.text(0, -100, endData.message, {
+            ...FONT_STYLE,
+            fontSize: '24px',
+            color: '#ffffff',
+            wordWrap: { width: 700 }
+        }).setOrigin(0.5);
+        
+        // 重新开始按钮
+        const restartButton = this.add.rectangle(0, 100, 200, 60, 0x333333, 0.8)
+            .setInteractive({ useHandCursor: true });
+        const restartText = this.add.text(0, 100, '重新开始', {
+            ...FONT_STYLE,
+            fontSize: '24px',
+            color: '#ffffff'
+        }).setOrigin(0.5);
+        
+        restartButton.on('pointerdown', () => {
+            this.scene.restart();
+            this.scene.get('GameScene').scene.restart();
+        });
+        
+        endContainer.add([background, title, message, restartButton, restartText]);
     }
 } 
