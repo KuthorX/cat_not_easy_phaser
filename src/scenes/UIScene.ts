@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { GameState, Action, ObjectData, GameData, Achievement } from '../types/index';
+import AchievementHint from '../components/AchievementHint';
 
 const FONT_STYLE = {
     fontFamily: '"Noto Sans SC", sans-serif',
@@ -33,6 +34,9 @@ export default class UIScene extends Phaser.Scene {
     private achievementPopup?: Phaser.GameObjects.Container;
     private achievementList?: Phaser.GameObjects.Container;
     private wheelListener?: Function;
+    private interactionMode: boolean = false; // 是否处于交互模式
+    private interactionHint: Phaser.GameObjects.Text | null = null; // 交互提示文本
+    private achievementHint!: AchievementHint; // 成就提示组件
 
     constructor() {
         super({ key: 'UIScene', active: false });
@@ -41,6 +45,7 @@ export default class UIScene extends Phaser.Scene {
     create(): void {
         this.gameState = (this.game as any).gameState as GameState;
         this.gameData = (this.game as any).gameData as GameData;
+        
         // --- Event Listeners from GameScene ---
         this.game.events.on('gameStateChanged', this.refreshUI, this);
         this.game.events.on('showActionMenu', this.showActionMenu, this);
@@ -48,11 +53,21 @@ export default class UIScene extends Phaser.Scene {
         this.game.events.on('showInteraction', this.showInteractionDialog, this);
         this.game.events.on('hideHoverInteraction', this.hideHoverInteraction, this);
         this.game.events.on('locationChanged', this.updateLocationDisplay, this);
-        this.game.events.on('achievementUnlocked', this.showAchievementPopup, this);
+        this.game.events.on('achievementUnlocked', this.showAchievementHint, this);
         this.game.events.on('gameEnd', this.showGameEnd, this);
+        
         this.createTopBar();
         this.createBottomBar();
         this.createInventoryPanel();
+        
+        // 创建成就提示组件
+        this.achievementHint = new AchievementHint(this);
+        
+        // 暴露调试函数到全局
+        (window as any).debugAddFish = () => this.debugAddFish();
+        (window as any).debugClearInventory = () => this.debugClearInventory();
+        (window as any).debugShowAchievement = () => this.debugShowAchievement();
+        
         this.refreshUI();
     }
 
@@ -62,9 +77,36 @@ export default class UIScene extends Phaser.Scene {
         this.updateProgressBars();
     }
 
+    // 调试函数 - 在console中调用
+    debugAddFish(): void {
+        this.gameState.addToInventory('fish_item');
+        this.gameState.log('调试：添加小鱼干到背包');
+        this.refreshUI();
+        console.log('🐟 已添加小鱼干到背包');
+    }
+
+    debugClearInventory(): void {
+        this.gameState.inventory = [];
+        this.gameState.log('调试：清空背包');
+        this.refreshUI();
+        console.log('🗑️ 已清空背包');
+    }
+
+    debugShowAchievement(): void {
+        console.log(`🎯 调试：准备显示成就提示`);
+        console.log(`🎯 achievementHint存在: ${!!this.achievementHint}`);
+        
+        if (this.achievementHint) {
+            this.achievementHint.show('测试成就');
+            console.log('🏆 显示测试成就提示');
+        } else {
+            console.error('❌ achievementHint不存在');
+        }
+    }
+
     createTopBar(): void {
         this.progressBarConfig = [
-            { key: 'humanComingHome', label: '两脚兽回家', color: 0xffd700, icon: '🏠' },
+            { key: 'humanComingHome', label: '两脚兽好像要回来了', color: 0xffd700, icon: '🏠' },
             { key: 'hungry', label: '我饿了', color: 0xff6666, icon: '🍽️' },
             { key: 'needPoop', label: '我要拉屎了', color: 0x66ccff, icon: '🚽' }
         ];
@@ -223,13 +265,30 @@ export default class UIScene extends Phaser.Scene {
         this.inventoryItemsContainer.removeAll(true);
         const inventory = this.gameState.inventory;
         const itemsData = this.gameData.items;
+        const itemInteractionsData = this.gameData.itemInteractions;
         const itemSize = 100;
         const padding = 20;
         const startY = -220;
         
-        inventory.forEach((itemId, index) => {
+        console.log(`更新背包显示，物品数量: ${inventory.length}`, inventory);
+        
+        // 统计物品数量
+        const itemCounts: Record<string, number> = {};
+        inventory.forEach(itemId => {
+            itemCounts[itemId] = (itemCounts[itemId] || 0) + 1;
+        });
+        
+        // 显示唯一的物品（带数量）
+        const uniqueItems = Object.keys(itemCounts);
+        uniqueItems.forEach((itemId, index) => {
             const itemData = itemsData[itemId];
-            if (!itemData) return;
+            if (!itemData) {
+                console.error(`物品数据不存在: ${itemId}`);
+                return;
+            }
+            
+            const count = itemCounts[itemId];
+            console.log(`创建物品显示: ${itemId} - ${itemData.name} x${count}`);
             
             const y = startY + index * (itemSize + padding);
             const itemGroup = this.add.container(0, y);
@@ -248,33 +307,62 @@ export default class UIScene extends Phaser.Scene {
             const itemSprite = this.add.image(0, 0, itemData.image).setDisplaySize(itemSize*0.8, itemSize*0.8);
             itemGroup.add(itemSprite);
             
-            // 物品名称
-            const itemName = this.add.text(0, itemSize/2 + 15, itemData.name, { 
+            // 物品名称（带数量）
+            const itemName = this.add.text(0, itemSize/2 + 15, `${itemData.name} x${count}`, { 
                 ...FONT_STYLE, 
                 fontSize: '14px', 
                 color: '#fff'
             }).setOrigin(0.5);
             itemGroup.add(itemName);
             
-            // 设置交互区域
+            // 设置交互区域 - 使用更简单的交互设置
             itemGroup.setSize(itemSize, itemSize + 30);
-            itemGroup.setInteractive(new Phaser.Geom.Rectangle(-itemSize/2, -itemSize/2, itemSize, itemSize + 30), Phaser.Geom.Rectangle.Contains);
+            itemGroup.setInteractive();
             
-            // 左键点击：选择物品
-            itemGroup.on('pointerdown', (pointer: any) => {
-                if (pointer.leftButtonDown()) {
-                    if (this.selectedItemId === itemId) {
-                        this.selectedItemId = null;
-                    } else {
-                        this.selectedItemId = itemId;
-                    }
-                    this.updateInventoryDisplay();
-                }
+            console.log(`设置物品交互: ${itemId}, 位置: (0, ${y}), 大小: ${itemSize}x${itemSize + 30}`);
+            
+            // 获取猫咪视角的描述
+            const catDescription = itemInteractionsData[itemId]?.description || itemData.description;
+            
+            // 鼠标悬停效果 - 显示猫咪视角的描述
+            itemGroup.on('pointerover', () => {
+                console.log(`鼠标悬停物品: ${itemId}`);
+                itemGroup.setScale(1.05);
+                
+                // 显示猫咪视角的描述
+                this.showCatDescription(catDescription, itemGroup.x + 150, itemGroup.y);
             });
             
-            // 右键点击：显示使用菜单
+            itemGroup.on('pointerout', () => {
+                console.log(`鼠标离开物品: ${itemId}`);
+                itemGroup.setScale(1.0);
+                this.hideCatDescription();
+            });
+            
+            // 左键点击：选择物品进入交互模式
             itemGroup.on('pointerdown', (pointer: any) => {
-                if (pointer.rightButtonDown()) {
+                console.log(`点击物品: ${itemId}, 左键: ${pointer.leftButtonDown()}, 右键: ${pointer.rightButtonDown()}, 坐标: (${pointer.x}, ${pointer.y})`);
+                
+                if (pointer.leftButtonDown()) {
+                    // 左键：选择/取消选择物品
+                    console.log(`左键点击物品: ${itemId}`);
+                    if (this.selectedItemId === itemId) {
+                        // 取消选择，退出交互模式
+                        this.selectedItemId = null;
+                        this.interactionMode = false;
+                        console.log(`取消选择物品: ${itemId}, 退出交互模式`);
+                        this.hideInteractionHint();
+                    } else {
+                        // 选择物品，进入交互模式
+                        this.selectedItemId = itemId;
+                        this.interactionMode = true;
+                        console.log(`选择物品: ${itemId}, 进入交互模式`);
+                        this.showInteractionHint(itemData.name);
+                    }
+                    this.updateInventoryDisplay();
+                } else if (pointer.rightButtonDown()) {
+                    // 右键：显示使用菜单
+                    console.log(`右键点击物品: ${itemId}, 显示使用菜单`);
                     this.showItemUseMenu(itemId, itemData, pointer.x, pointer.y);
                 }
             });
@@ -282,6 +370,7 @@ export default class UIScene extends Phaser.Scene {
             // 拖拽功能
             itemGroup.setInteractive({ draggable: true });
             itemGroup.on('dragstart', (pointer: any, dragX: number, dragY: number) => {
+                console.log(`开始拖拽物品: ${itemId}`);
                 this.startItemDrag(itemId, itemData, dragX, dragY);
             });
             
@@ -290,12 +379,16 @@ export default class UIScene extends Phaser.Scene {
     }
 
     showItemUseMenu(itemId: string, itemData: any, x: number, y: number): void {
+        console.log(`显示物品使用菜单: ${itemId} at (${x}, ${y})`);
+        
         // 隐藏之前的菜单
         this.hideItemUseMenu();
         
         // 创建使用菜单
         const menu = this.add.container(x, y);
         menu.setDepth(25);
+        
+        console.log(`创建菜单容器，深度: ${menu.depth}`);
         
         // 菜单背景
         const bg = this.add.graphics();
@@ -313,7 +406,10 @@ export default class UIScene extends Phaser.Scene {
             fontSize: '16px', 
             color: '#fff' 
         }).setOrigin(0.5);
-        useBtn.on('pointerdown', () => this.useItem(itemId));
+        useBtn.on('pointerdown', () => {
+            console.log(`点击使用按钮: ${itemId}`);
+            this.useItem(itemId);
+        });
         menu.add(useBtn);
         menu.add(useText);
         
@@ -325,7 +421,10 @@ export default class UIScene extends Phaser.Scene {
             fontSize: '16px', 
             color: '#fff' 
         }).setOrigin(0.5);
-        dropBtn.on('pointerdown', () => this.dropItem(itemId));
+        dropBtn.on('pointerdown', () => {
+            console.log(`点击丢弃按钮: ${itemId}`);
+            this.dropItem(itemId);
+        });
         menu.add(dropBtn);
         menu.add(dropText);
         
@@ -337,12 +436,18 @@ export default class UIScene extends Phaser.Scene {
             fontSize: '16px', 
             color: '#fff' 
         }).setOrigin(0.5);
-        infoBtn.on('pointerdown', () => this.showItemInfo(itemId, itemData));
+        infoBtn.on('pointerdown', () => {
+            console.log(`点击查看按钮: ${itemId}`);
+            this.showItemInfo(itemId, itemData);
+        });
         menu.add(infoBtn);
         menu.add(infoText);
         
+        console.log(`菜单创建完成，包含 ${menu.length} 个元素`);
+        
         // 3秒后自动隐藏
         this.time.delayedCall(3000, () => {
+            console.log(`自动隐藏菜单: ${itemId}`);
             this.hideItemUseMenu();
         });
         
@@ -370,6 +475,7 @@ export default class UIScene extends Phaser.Scene {
         // 检查是否有物品动作配置
         const itemActions = this.gameData.actions.item_actions[itemId];
         if (itemActions && itemActions.eat) {
+            console.log(`找到物品动作配置: ${itemId}`);
             // 使用ActionSystem处理动作
             const gameScene = this.scene.get('GameScene') as any;
             if (gameScene && gameScene.actionSystem) {
@@ -384,21 +490,34 @@ export default class UIScene extends Phaser.Scene {
                 };
                 // 使用item_actions中定义的动作ID
                 gameScene.actionSystem.handleAction(itemActions.eat.id, virtualTarget);
+            } else {
+                console.error('GameScene或ActionSystem不可用');
+                // 备用处理逻辑
+                this.handleItemUseFallback(itemId, itemActions.eat);
             }
         } else {
+            console.log(`未找到物品动作配置，使用默认处理: ${itemId}`);
             // 默认处理逻辑
-            switch (itemId) {
-                case 'fish_item':
-                    this.gameState.removeFromInventory(itemId);
-                    this.gameState.progress.hungry = Math.max(0, (this.gameState.progress.hungry || 0) - 30);
-                    this.gameState.log('你吃掉了小鱼干，感觉饱了！');
-                    break;
-                default:
-                    this.gameState.log(`你使用了 ${itemData.name}`);
-            }
+            this.handleItemUseFallback(itemId);
         }
         
         this.refreshUI();
+    }
+
+    private handleItemUseFallback(itemId: string, actionData?: any): void {
+        switch (itemId) {
+            case 'fish_item':
+                this.gameState.removeFromInventory(itemId);
+                this.gameState.progress.hungry = Math.max(0, (this.gameState.progress.hungry || 0) - 20);
+                this.gameState.progress.humanComingHome = Math.min(100, (this.gameState.progress.humanComingHome || 0) + 5);
+                this.gameState.log('你吃掉了小鱼干，感觉饱了！');
+                break;
+            case 'key_item':
+                this.gameState.log(`你使用了 ${this.gameData.items[itemId]?.name || itemId}`);
+                break;
+            default:
+                this.gameState.log(`你使用了 ${this.gameData.items[itemId]?.name || itemId}`);
+        }
     }
 
     dropItem(itemId: string): void {
@@ -600,82 +719,14 @@ export default class UIScene extends Phaser.Scene {
         }
     }
 
-    showAchievementPopup(achievement: any): void {
-        // 移除之前的弹窗
-        if (this.achievementPopup) {
-            this.achievementPopup.destroy();
-        }
-
-        // 创建成就弹窗
-        this.achievementPopup = this.add.container(960, 200);
-        this.achievementPopup.setDepth(30);
+    showAchievementHint(achievement: any): void {
+        console.log(`🎯 UIScene收到成就事件: ${achievement.name}`);
+        console.log(`🎯 achievementHint存在: ${!!this.achievementHint}`);
         
-        // 背景
-        const bg = this.add.graphics();
-        bg.fillStyle(0x000000, 0.95);
-        bg.fillRoundedRect(-200, -80, 400, 160, 20);
-        bg.lineStyle(4, 0xffd700, 1);
-        bg.strokeRoundedRect(-200, -80, 400, 160, 20);
+        // 创建成就提示
+        this.achievementHint.show(achievement.name);
         
-        // 成就图标
-        const icon = this.add.text(0, -40, '🏆', { fontSize: '48px' }).setOrigin(0.5);
-        
-        // 成就标题
-        const title = this.add.text(0, -10, '成就解锁！', { 
-            ...FONT_STYLE, 
-            fontSize: '24px', 
-            color: '#ffd700',
-            fontStyle: 'bold'
-        }).setOrigin(0.5);
-        
-        // 成就名称
-        const name = this.add.text(0, 15, achievement.name, { 
-            ...FONT_STYLE, 
-            fontSize: '20px', 
-            color: '#fff'
-        }).setOrigin(0.5);
-        
-        // 成就描述
-        const desc = this.add.text(0, 40, achievement.description, { 
-            ...FONT_STYLE, 
-            fontSize: '16px', 
-            color: '#aaa'
-        }).setOrigin(0.5);
-        
-        this.achievementPopup.add([bg, icon, title, name, desc]);
-        
-        // 初始状态：隐藏
-        this.achievementPopup.setAlpha(0);
-        this.achievementPopup.setScale(0.5);
-        
-        // 动画：淡入和缩放
-        this.tweens.add({
-            targets: this.achievementPopup,
-            alpha: 1,
-            scaleX: 1,
-            scaleY: 1,
-            duration: 500,
-            ease: 'Back.easeOut',
-            onComplete: () => {
-                // 3秒后淡出
-                this.tweens.add({
-                    targets: this.achievementPopup,
-                    alpha: 0,
-                    y: 100,
-                    duration: 1000,
-                    delay: 2000,
-                    ease: 'Power2',
-                    onComplete: () => {
-                        if (this.achievementPopup) {
-                            this.achievementPopup.destroy();
-                            this.achievementPopup = undefined;
-                        }
-                    }
-                });
-            }
-        });
-        
-        console.log(`🎉 成就解锁: ${achievement.name} - ${achievement.description}`);
+        console.log(`✅ 成就提示已显示: ${achievement.name}`);
     }
 
     showAchievementScene(): void {
@@ -737,5 +788,69 @@ export default class UIScene extends Phaser.Scene {
         if (achievementSystem && typeof achievementSystem.checkChiefServantAchievement === 'function') {
             achievementSystem.checkChiefServantAchievement();
         }
+    }
+
+    // 显示猫咪视角的描述
+    showCatDescription(description: string, x: number, y: number): void {
+        this.hideCatDescription();
+        
+        this.hoverContainer = this.add.container(x, y);
+        this.hoverContainer.setDepth(20);
+        
+        // 背景
+        const bg = this.add.graphics();
+        bg.fillStyle(0x000000, 0.9);
+        bg.fillRoundedRect(0, 0, 300, 80, 10);
+        bg.lineStyle(2, 0xffff00, 1);
+        bg.strokeRoundedRect(0, 0, 300, 80, 10);
+        this.hoverContainer.add(bg);
+        
+        // 猫咪图标
+        const catIcon = this.add.text(10, 10, '🐱', { fontSize: '20px' });
+        this.hoverContainer.add(catIcon);
+        
+        // 描述文本
+        const descText = this.add.text(40, 10, description, { 
+            ...FONT_STYLE, 
+            fontSize: '14px', 
+            color: '#fff',
+            wordWrap: { width: 250 }
+        });
+        this.hoverContainer.add(descText);
+    }
+
+    // 隐藏猫咪视角的描述
+    hideCatDescription(): void {
+        if (this.hoverContainer) {
+            this.hoverContainer.destroy();
+            this.hoverContainer = null;
+        }
+    }
+
+    // 显示交互模式提示
+    showInteractionHint(itemName: string): void {
+        this.hideInteractionHint();
+        
+        this.interactionHint = this.add.text(960, 50, `🐱 我选择了 ${itemName}，现在可以和其他东西互动啦！`, {
+            ...FONT_STYLE,
+            fontSize: '18px',
+            color: '#ffff00',
+            fontStyle: 'bold'
+        }).setOrigin(0.5);
+        this.interactionHint.setDepth(15);
+    }
+
+    // 隐藏交互模式提示
+    hideInteractionHint(): void {
+        if (this.interactionHint) {
+            this.interactionHint.destroy();
+            this.interactionHint = null;
+        }
+    }
+
+    // 隐藏交互预览
+    hideInteractionPreview(): void {
+        // 这个方法会被GameScene调用，用于隐藏交互预览
+        // 实际的隐藏逻辑在GameScene的hideHoverText中处理
     }
 }

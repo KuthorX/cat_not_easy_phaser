@@ -131,11 +131,26 @@ export interface Item {
     image: string;
 }
 
+// 物品交互类型
+export interface ItemInteraction {
+    text: string;
+    log: string;
+    effects?: ActionEffect;
+    triggerAchievement?: string;
+}
+
+// 物品交互配置类型
+export interface ItemInteractionConfig {
+    description: string;
+    interactions: Record<string, ItemInteraction>;
+}
+
 // 游戏数据类型
 export interface GameData {
     initialState: Partial<GameState>;
     items: Record<string, Item>;
     actions: ActionConfig;
+    itemInteractions: Record<string, ItemInteractionConfig>;
     scenes: Record<string, SceneData>;
 }
 

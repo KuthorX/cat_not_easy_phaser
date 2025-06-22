@@ -150,7 +150,7 @@
             "condition": {
                 "type": "counter",
                 "counter": "fishHideCount",
-                "value": 5
+                "value": 3
             }
         },
         "high_ground_defense": {
@@ -193,28 +193,44 @@
             "name": "今日最佳破坏王",
             "description": "在两脚兽回家前，达成所有破坏系列子成就",
             "category": "destruction",
-            "isMainAchievement": true
+            "isMainAchievement": true,
+            "condition": {
+                "type": "path_completion",
+                "path": "destruction"
+            }
         },
         "chief_servant": {
             "id": "chief_servant",
             "name": "智人首席奴才",
-            "description": "在一天结束时，两脚兽回家进度条低于阈值，且未进行任何破坏活动",
+            "description": "完成所有温顺行为且未进行任何破坏活动",
             "category": "obedient",
-            "isMainAchievement": true
+            "isMainAchievement": true,
+            "condition": {
+                "type": "path_completion",
+                "path": "obedient"
+            }
         },
         "home_master": {
             "id": "home_master",
             "name": "这个家我说了算",
             "description": "成功进入所有上锁的房间",
             "category": "explorer",
-            "isMainAchievement": true
+            "isMainAchievement": true,
+            "condition": {
+                "type": "path_completion",
+                "path": "explorer"
+            }
         },
         "security_advisor": {
             "id": "security_advisor",
             "name": "家庭安全顾问",
             "description": "成功布置好所有陷阱，并抵御隔壁的猫入侵事件",
             "category": "strategist",
-            "isMainAchievement": true
+            "isMainAchievement": true,
+            "condition": {
+                "type": "path_completion",
+                "path": "strategist"
+            }
         }
     },
     "achievementPaths": {
@@ -236,8 +252,7 @@
             "mainAchievement": "chief_servant",
             "subAchievements": ["food_beggar", "afternoon_nap", "clean_champion", "toy_lover"],
             "endCondition": {
-                "type": "human_coming_home_low",
-                "humanComingHomeThreshold": 30,
+                "type": "obedient_achievement",
                 "noDestruction": true
             }
         },

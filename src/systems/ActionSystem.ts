@@ -287,15 +287,29 @@ class ActionSystem {
      */
     checkGameEndConditions(): void {
         const humanComingHome = this.gameState.progress.humanComingHome || 0;
+        const hungry = this.gameState.progress.hungry || 0;
+        const needPoop = this.gameState.progress.needPoop || 0;
         
         // 检查两脚兽回家
         if (humanComingHome >= 100) {
             this.endGame('human_coming_home');
             return;
         }
+        
+        // 检查饥饿
+        if (hungry >= 100) {
+            this.endGame('hungry');
+            return;
+        }
+        
+        // 检查拉屎需求
+        if (needPoop >= 100) {
+            this.endGame('need_poop');
+            return;
+        }
 
-        // 检查主要成就线路
-        this.checkMainAchievementPaths();
+        // 只有在游戏真正结束时才检查主要成就线路
+        // 这里不检查，因为游戏还没结束
     }
 
     /**
@@ -315,7 +329,8 @@ class ActionSystem {
             if (this.checkMainAchievementCondition(path)) {
                 const achievement = this.achievementsData[mainAchievementId];
                 this.unlockAchievement(mainAchievementId, achievement.name, achievement.description);
-                this.endGame(pathId);
+                // 不在这里调用endGame，因为endGame已经在调用这个方法
+                console.log(`主要成就解锁: ${achievement.name}`);
                 return;
             }
         }
@@ -334,12 +349,38 @@ class ActionSystem {
                     this.gameState.achievements[subId]
                 );
             
-            case 'human_coming_home_low':
-                const humanComingHome = this.gameState.progress.humanComingHome || 0;
-                const isLow = humanComingHome <= endCondition.humanComingHomeThreshold;
-                const noDestruction = endCondition.noDestruction ? 
+            case 'obedient_achievement':
+                // 检查所有子成就是否解锁
+                const obedientSubAchievementsUnlocked = path.subAchievements.every((subId: string) => 
+                    this.gameState.achievements[subId]
+                );
+                
+                // 检查是否有破坏活动
+                const obedientNoDestruction = endCondition.noDestruction ? 
                     !this.hasDestructionAchievements() : true;
-                return isLow && noDestruction;
+                
+                return obedientSubAchievementsUnlocked && obedientNoDestruction;
+            
+            case 'human_coming_home_low':
+                // 只有在两脚兽回家进度>=100%时才检查这个成就
+                const humanComingHome = this.gameState.progress.humanComingHome || 0;
+                if (humanComingHome < 100) {
+                    return false; // 游戏还没结束，不检查这个成就
+                }
+                
+                // 检查所有子成就是否解锁
+                const lowSubAchievementsUnlocked = path.subAchievements.every((subId: string) => 
+                    this.gameState.achievements[subId]
+                );
+                
+                // 检查两脚兽回家进度是否低于阈值
+                const isLow = humanComingHome <= endCondition.humanComingHomeThreshold;
+                
+                // 检查是否有破坏活动
+                const lowNoDestruction = endCondition.noDestruction ? 
+                    !this.hasDestructionAchievements() : true;
+                
+                return lowSubAchievementsUnlocked && isLow && lowNoDestruction;
             
             case 'all_rooms_unlocked':
                 return this.gameState.achievementCounters.roomUnlockCount >= 3;
@@ -367,6 +408,9 @@ class ActionSystem {
      * 游戏结束
      */
     endGame(endType: string): void {
+        // 在游戏结束时检查主要成就线路
+        this.checkMainAchievementPaths();
+        
         let endMessage = '';
         let endTitle = '';
 
@@ -374,6 +418,14 @@ class ActionSystem {
             case 'human_coming_home':
                 endTitle = '两脚兽回家了！';
                 endMessage = '你的一天结束了。';
+                break;
+            case 'hungry':
+                endTitle = '太饿了！';
+                endMessage = '你饿得不行了，需要找点吃的。';
+                break;
+            case 'need_poop':
+                endTitle = '憋不住了！';
+                endMessage = '你急需上厕所。';
                 break;
             case 'destruction':
                 endTitle = '今日最佳破坏王';

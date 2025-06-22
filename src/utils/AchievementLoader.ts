@@ -44,8 +44,13 @@ export class AchievementLoader {
 
         // 验证每个成就的格式
         Object.entries(config.achievements).forEach(([id, achievement]: [string, any]) => {
-            if (!achievement.name || !achievement.description || !achievement.condition) {
-                throw new Error(`Invalid achievement config for ${id}: missing required fields`);
+            if (!achievement.name || !achievement.description) {
+                throw new Error(`Invalid achievement config for ${id}: missing required fields (name, description)`);
+            }
+            
+            // 主要成就不需要condition字段，因为它们通过子成就解锁
+            if (!achievement.isMainAchievement && !achievement.condition) {
+                throw new Error(`Invalid achievement config for ${id}: non-main achievement missing condition field`);
             }
         });
 

@@ -20,6 +20,7 @@
     },
     "itemsFile": "assets/data/items.json",
     "actionsFile": "assets/data/actions.json",
+    "itemInteractionsFile": "assets/data/item_interactions.json",
     "scenes": {
         "living_room": "assets/data/scenes/living_room.json",
         "hallway": "assets/data/scenes/hallway.json",

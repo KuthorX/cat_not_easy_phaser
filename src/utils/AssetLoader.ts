@@ -27,5 +27,6 @@ export class AssetLoader {
     static preloadData(scene: Phaser.Scene): void {
         scene.load.json('gameData', 'assets/data/gameData.json');
         scene.load.json('achievements', 'assets/data/achievements.json');
+        scene.load.json('itemInteractions', 'assets/data/item_interactions.json');
     }
 } 

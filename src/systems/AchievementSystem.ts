@@ -1,12 +1,13 @@
 import { GameState, GameData, Achievement } from '../types/index';
 
 export interface AchievementCondition {
-    type: 'counter' | 'flag' | 'all_sub_achievements' | 'human_coming_home_low' | 'all_rooms_unlocked' | 'all_traps_set_and_defend';
+    type: 'counter' | 'flag' | 'all_sub_achievements' | 'human_coming_home_low' | 'all_rooms_unlocked' | 'all_traps_set_and_defend' | 'path_completion' | 'obedient_achievement';
     counter?: string;
     flag?: string;
     value?: number;
     humanComingHomeThreshold?: number;
     noDestruction?: boolean;
+    path?: string;
 }
 
 export interface AchievementData {
@@ -36,10 +37,12 @@ export default class AchievementSystem {
     private gameState: GameState;
     private gameData: GameData;
     private achievementConfig: AchievementConfig;
+    private game: Phaser.Game;
 
-    constructor(gameState: GameState, gameData: GameData) {
+    constructor(gameState: GameState, gameData: GameData, game: Phaser.Game) {
         this.gameState = gameState;
         this.gameData = gameData;
+        this.game = game;
         this.achievementConfig = this.loadAchievementConfig();
     }
 
@@ -76,22 +79,24 @@ export default class AchievementSystem {
     }
 
     /**
-     * 检查单个成就条件
+     * 检查成就条件
      */
     private checkAchievementCondition(condition: AchievementCondition): boolean {
         switch (condition.type) {
             case 'counter':
-                if (condition.counter && condition.value !== undefined) {
-                    const currentValue = this.getCounterValue(condition.counter);
-                    return currentValue >= condition.value;
-                }
-                break;
+                if (!condition.counter || condition.value === undefined) return false;
+                const counterValue = this.getCounterValue(condition.counter);
+                return counterValue >= condition.value;
 
             case 'flag':
-                if (condition.flag) {
-                    return this.gameState.flags?.[condition.flag] === true;
-                }
-                break;
+                if (!condition.flag) return false;
+                return this.gameState.flags?.[condition.flag] === true;
+
+            case 'path_completion':
+                if (!condition.path) return false;
+                const path = this.achievementConfig.achievementPaths[condition.path];
+                if (!path) return false;
+                return this.checkAchievementPathCondition(path);
 
             case 'all_sub_achievements':
                 // 这个条件通常用于主成就，在checkAchievementPathCondition中处理
@@ -226,9 +231,16 @@ export default class AchievementSystem {
         // 记录日志
         this.gameState.log(`🏆 成就解锁: ${achievementData.name}`);
         
-        // 发送成就解锁事件
-        if (window.game && window.game.events) {
-            window.game.events.emit('achievementUnlocked', achievement);
+        // 发送成就解锁事件 - 使用Phaser的事件系统
+        console.log(`🎯 准备发送成就事件: ${achievementData.name}`);
+        console.log(`🎯 game对象存在: ${!!this.game}`);
+        console.log(`🎯 game.events存在: ${!!this.game?.events}`);
+        
+        if (this.game && this.game.events) {
+            this.game.events.emit('achievementUnlocked', achievement);
+            console.log(`✅ 成就事件已发送: ${achievementData.name}`);
+        } else {
+            console.error(`❌ 无法发送成就事件: game或game.events不存在`);
         }
         
         console.log(`🎉 成就解锁: ${achievementData.name} - ${achievementData.description}`);
@@ -251,6 +263,16 @@ export default class AchievementSystem {
             this.gameState.flags = {};
         }
         this.gameState.flags[flagName] = value;
+        this.checkAchievements();
+    }
+
+    /**
+     * 触发成就解锁（公共方法）
+     */
+    public triggerAchievement(achievementId: string): void {
+        // 不要直接解锁成就，而是让checkAchievements方法来处理
+        // 这样可以确保成就条件被正确检查
+        console.log(`触发成就检查: ${achievementId}`);
         this.checkAchievements();
     }
 

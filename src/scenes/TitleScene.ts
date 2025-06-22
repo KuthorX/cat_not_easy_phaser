@@ -14,8 +14,8 @@ export default class TitleScene extends Phaser.Scene {
         const title = this.add.text(
             this.cameras.main.width / 2, 
             this.cameras.main.height / 3, 
-            '猫步语', 
-            { ...FONT_STYLE, fontSize: '96px', fill: '#fff' }
+            '猫不易', 
+            { ...FONT_STYLE, fontSize: '96px', color: '#fff' }
         );
         title.setOrigin(0.5, 0.5);
 
@@ -23,11 +23,11 @@ export default class TitleScene extends Phaser.Scene {
         const startButton = this.add.text(
             this.cameras.main.width / 2,
             this.cameras.main.height / 2 + 100,
-            '开始游戏',
+            '睡醒，看看四周',
             { 
                 ...FONT_STYLE,
                 fontSize: '48px', 
-                fill: '#fff', 
+                color: '#fff', 
                 backgroundColor: '#555',
                 padding: { left: 30, right: 30, top: 15, bottom: 15 }
             }

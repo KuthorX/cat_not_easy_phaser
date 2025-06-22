@@ -16,9 +16,49 @@
             "look": "一根小鱼干，闻起来好香！",
             "actions": ["pickup_fish"]
         },
+        "fish_2": {
+            "x": 1100,
+            "y": 450,
+            "image": "placeholder_fish_60x30",
+            "name": "小鱼干",
+            "look": "一根小鱼干，闻起来好香！",
+            "actions": ["pickup_fish"]
+        },
+        "fish_3": {
+            "x": 1200,
+            "y": 550,
+            "image": "placeholder_fish_60x30",
+            "name": "小鱼干",
+            "look": "一根小鱼干，闻起来好香！",
+            "actions": ["pickup_fish"]
+        },
+        "fish_4": {
+            "x": 1050,
+            "y": 650,
+            "image": "placeholder_fish_60x30",
+            "name": "小鱼干",
+            "look": "一根小鱼干，闻起来好香！",
+            "actions": ["pickup_fish"]
+        },
+        "fish_5": {
+            "x": 1150,
+            "y": 350,
+            "image": "placeholder_fish_60x30",
+            "name": "小鱼干",
+            "look": "一根小鱼干，闻起来好香！",
+            "actions": ["pickup_fish"]
+        },
+        "fish_6": {
+            "x": 1250,
+            "y": 250,
+            "image": "placeholder_fish_60x30",
+            "name": "小鱼干",
+            "look": "一根小鱼干，闻起来好香！",
+            "actions": ["pickup_fish"]
+        },
         "sofa": {
             "x": 500,
-            "y": 450,
+            "y": 250,
             "image": "placeholder_sofa_250x120",
             "name": "沙发",
             "look": "一个巨大而柔软的物体，看起来很适合磨爪子和睡觉。",
@@ -26,22 +66,22 @@
         },
         "cat_bowl": {
             "x": 800,
-            "y": 550,
+            "y": 750,
             "image": "placeholder_80x80",
             "name": "水盆和食盆",
             "look": "看起来是食盆和水碗...",
             "actions": ["drink", "knock_over"]
         },
         "tv": {
-            "x": 900,
-            "y": 400,
+            "x": 800,
+            "y": 300,
             "image": "placeholder_tv_150x120",
             "name": "电视",
             "look": "一个黑色的大方块，搞不懂。"
         },
         "cat_villa": {
             "x": 600,
-            "y": 600,
+            "y": 800,
             "image": "placeholder_villa_150x200",
             "name": "猫别墅",
             "look": "我的豪华大别野！",
@@ -80,8 +120,8 @@
             "actions": ["play_with_toy"]
         },
         "litter_box": {
-            "x": 950,
-            "y": 600,
+            "x": 380,
+            "y": 500,
             "image": "placeholder_80x80",
             "name": "猫砂盆",
             "look": "我的专用厕所。",

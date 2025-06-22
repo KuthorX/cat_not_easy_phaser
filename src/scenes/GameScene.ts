@@ -233,6 +233,50 @@ export default class GameScene extends Phaser.Scene {
         if (this.actionSystem) {
             this.actionSystem.handleAction(actionId, targetObject);
             
+            // 检查是否需要隐藏物品（拾取后）
+            const action = this.actionSystem.getAction(actionId);
+            if (action?.effects?.inventory?.action === 'add') {
+                const itemId = action.effects.inventory.item;
+                if (itemId && this.gameState.inventory.includes(itemId)) {
+                    // 需要找到被点击的那个特定物品
+                    // 由于targetObject可能没有id，我们需要通过位置或其他方式识别
+                    // 这里我们通过比较对象的位置和动作来找到正确的物品
+                    let targetFound = false;
+                    for (const [objectId, sprite] of Object.entries(this.sceneObjects)) {
+                        const objectData = sprite.getData('objectData') as ObjectData;
+                        if (objectData && 
+                            objectData.actions && 
+                            objectData.actions.includes(actionId) &&
+                            objectData.x === targetObject.x && 
+                            objectData.y === targetObject.y) {
+                            // 找到被点击的那个特定物品，隐藏它
+                            sprite.destroy();
+                            delete this.sceneObjects[objectId];
+                            console.log(`隐藏物品: ${itemId} (对象ID: ${objectId})`);
+                            targetFound = true;
+                            break;
+                        }
+                    }
+                    
+                    // 如果通过位置没找到，尝试通过名称匹配
+                    if (!targetFound) {
+                        for (const [objectId, sprite] of Object.entries(this.sceneObjects)) {
+                            const objectData = sprite.getData('objectData') as ObjectData;
+                            if (objectData && 
+                                objectData.actions && 
+                                objectData.actions.includes(actionId) &&
+                                objectData.name === targetObject.name) {
+                                // 通过名称匹配找到物品
+                                sprite.destroy();
+                                delete this.sceneObjects[objectId];
+                                console.log(`隐藏物品: ${itemId} (对象ID: ${objectId}, 通过名称匹配)`);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            
             // 动作执行后检查成就
             if (this.achievementSystem) {
                 this.achievementSystem.checkAchievements();
@@ -252,147 +296,189 @@ export default class GameScene extends Phaser.Scene {
     }
 
     createInteractable(id: string, objectData: ObjectData): Phaser.GameObjects.Image {
-        // 确保对象数据包含id
-        const dataWithId = { ...objectData, id };
+        const sprite = this.add.image(objectData.x, objectData.y, objectData.image);
+        sprite.setInteractive({ useHandCursor: true });
         
-        const sprite = this.add.image(objectData.x, objectData.y, objectData.image).setInteractive({ useHandCursor: true });
+        // 存储对象数据
+        sprite.setData('objectData', objectData);
         sprite.setData('id', id);
-        sprite.setData('data', dataWithId);
-        this.sceneObjects[id] = sprite;
+        
+        // 悬停显示对象信息
         sprite.on('pointerover', () => {
-            sprite.setTint(0xffff00);
-            if (objectData.look) {
-                (this.scene.get('UIScene') as any).showHoverInteraction(objectData.look, sprite.x, sprite.y);
+            const uiScene = this.scene.get('UIScene') as any;
+            if (uiScene && uiScene.interactionMode && uiScene.selectedItemId) {
+                // 交互模式：显示可能的交互
+                this.showInteractionPreview(uiScene.selectedItemId, id, objectData, sprite.x, sprite.y);
+            } else {
+                // 普通模式：显示对象描述
+                this.showHoverText(objectData.look || objectData.name, sprite.x, sprite.y);
             }
         });
+        
         sprite.on('pointerout', () => {
-            sprite.clearTint();
-            (this.scene.get('UIScene') as any).hideHoverInteraction();
+            this.hideHoverText();
+            const uiScene = this.scene.get('UIScene') as any;
+            if (uiScene) {
+                uiScene.hideInteractionPreview();
+            }
         });
-        sprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-            if (objectData.navTo) {
+        
+        // 点击处理
+        sprite.on('pointerdown', (pointer: any) => {
+            const uiScene = this.scene.get('UIScene') as any;
+            
+            if (uiScene && uiScene.interactionMode && uiScene.selectedItemId) {
+                // 交互模式：执行物品交互
+                this.handleItemObjectInteraction(uiScene.selectedItemId, id, objectData);
+                // 退出交互模式
+                uiScene.selectedItemId = null;
+                uiScene.interactionMode = false;
+                uiScene.hideInteractionHint();
+                uiScene.updateInventoryDisplay();
+            } else if (objectData.navTo) {
+                // 场景跳转：直接跳转到目标场景
+                console.log(`跳转到场景: ${objectData.navTo}`);
                 this.changeScene(objectData.navTo);
             } else if (objectData.actions && objectData.actions.length > 0) {
-                (this.scene.get('UIScene') as any).showActionMenu(dataWithId, pointer);
+                // 普通模式：显示动作菜单
+                this.game.events.emit('showActionMenu', objectData, pointer);
             } else if (objectData.look) {
+                // 只有描述的对象：显示描述
                 this.gameState.log(objectData.look);
                 this.game.events.emit('gameStateChanged');
             }
         });
+        
+        this.sceneObjects[id] = sprite;
         return sprite;
     }
 
-    // 添加物品与场景交互的处理方法
-    handleItemDrop(itemId: string, x: number, y: number): void {
-        console.log(`物品 ${itemId} 被拖拽到场景位置 (${x}, ${y})`);
-        
-        // 检查是否拖拽到可交互对象上
-        const targetObject = this.findObjectAtPosition(x, y);
-        if (targetObject) {
-            this.handleItemObjectInteraction(itemId, targetObject);
-        } else {
-            // 拖拽到空地上，创建物品在场景中
-            this.dropItemInScene(itemId, x, y);
+    // 显示交互预览
+    showInteractionPreview(selectedItemId: string, objectKey: string, targetObject: ObjectData, x: number, y: number): void {
+        const itemInteractions = this.gameData.itemInteractions[selectedItemId];
+        if (!itemInteractions) {
+            this.showHoverText('🐱 这个物品好像没什么用...', x, y);
+            return;
         }
-    }
-
-    findObjectAtPosition(x: number, y: number): any {
-        // 查找指定位置的对象
-        for (const [objectId, object] of Object.entries(this.sceneObjects)) {
-            if (object && object.getBounds) {
-                const bounds = object.getBounds();
-                if (bounds.contains(x, y)) {
-                    return { id: objectId, object: object, data: this.sceneObjects[objectId].getData('data') };
-                }
+        
+        const interaction = itemInteractions.interactions[objectKey];
+        if (!interaction) {
+            // 没有定义交互，显示更友好的提示
+            this.showHoverText('🐱 这个组合好像行不通...', x, y);
+            return;
+        }
+        
+        // 特殊处理：检查是否已经藏过鱼干
+        if (selectedItemId === 'fish_item' && interaction.triggerAchievement === 'strategic_reserve') {
+            const hideLocationKey = `${this.currentSceneId}_${targetObject.name}`;
+            if (this.gameState.flags && this.gameState.flags[hideLocationKey]) {
+                // 已经藏过鱼干，显示不同提示
+                this.showHoverText('🐱 这里已经藏过小鱼干了~', x, y);
+                return;
             }
         }
-        return null;
+        
+        // 显示交互预览
+        this.showHoverText(`🐱 ${interaction.text}`, x, y);
     }
 
-    handleItemObjectInteraction(itemId: string, target: any): void {
-        const itemData = this.gameData.items[itemId];
-        const targetData = target.data;
+    // 处理物品与对象的交互
+    handleItemObjectInteraction(selectedItemId: string, objectKey: string, targetObject: ObjectData): void {
+        console.log(`处理物品交互: ${selectedItemId} 与 ${objectKey} (${targetObject.name})`);
         
-        console.log(`物品 ${itemData?.name} 与 ${targetData?.name} 交互`);
+        const itemInteractions = this.gameData.itemInteractions[selectedItemId];
+        if (!itemInteractions) {
+            this.gameState.log('🐱 这个物品好像没什么用...');
+            return;
+        }
         
-        // 根据物品和目标的组合执行不同操作
-        const interactionKey = `${itemId}_${target.id}`;
+        const interaction = itemInteractions.interactions[objectKey];
+        if (!interaction) {
+            this.gameState.log('🐱 这个组合好像行不通...');
+            return;
+        }
         
-        switch (interactionKey) {
-            case 'fish_item_sofa':
-                this.gameState.log('你把小鱼干藏在沙发下面了！');
-                this.gameState.removeFromInventory(itemId);
-                this.gameState.progress.humanComingHome = Math.min(100, (this.gameState.progress.humanComingHome || 0) + 5);
-                break;
-                
-            case 'fish_item_cat_villa':
-                this.gameState.log('你把小鱼干藏在猫别墅里了！');
-                this.gameState.removeFromInventory(itemId);
-                this.gameState.progress.humanComingHome = Math.min(100, (this.gameState.progress.humanComingHome || 0) + 3);
-                break;
-                
-            case 'fish_item_cat_nest':
-                this.gameState.log('你把小鱼干藏在猫窝里了！');
-                this.gameState.removeFromInventory(itemId);
-                this.gameState.progress.humanComingHome = Math.min(100, (this.gameState.progress.humanComingHome || 0) + 2);
-                break;
-                
-            default:
-                // 通用交互
-                if (itemData && targetData) {
-                    this.gameState.log(`你把 ${itemData.name} 放在了 ${targetData.name} 上`);
-                    this.gameState.removeFromInventory(itemId);
-                    this.gameState.progress.humanComingHome = Math.min(100, (this.gameState.progress.humanComingHome || 0) + 1);
-                }
+        // 特殊处理：检查是否已经藏过鱼干
+        if (selectedItemId === 'fish_item' && interaction.triggerAchievement === 'strategic_reserve') {
+            const hideLocationKey = `${this.currentSceneId}_${targetObject.name}`;
+            if (this.gameState.flags && this.gameState.flags[hideLocationKey]) {
+                this.gameState.log('🐱 这里已经藏过小鱼干了，换个地方吧~');
+                return;
+            }
+        }
+        
+        // 执行交互效果
+        this.executeInteraction(interaction, selectedItemId, targetObject);
+    }
+
+    // 执行交互效果
+    executeInteraction(interaction: any, selectedItemId: string, targetObject: ObjectData): void {
+        // 记录交互日志
+        this.gameState.log(interaction.log);
+        
+        // 处理进度效果
+        if (interaction.effects?.progress) {
+            for (const [key, value] of Object.entries(interaction.effects.progress)) {
+                const currentValue = this.gameState.progress[key as keyof typeof this.gameState.progress] || 0;
+                this.gameState.progress[key as keyof typeof this.gameState.progress] = Math.max(0, Math.min(100, currentValue + (value as number)));
+            }
+        }
+        
+        // 处理物品效果
+        if (interaction.effects?.inventory) {
+            if (interaction.effects.inventory.action === 'remove') {
+                this.gameState.removeFromInventory(selectedItemId);
+            }
+        }
+        
+        // 特殊处理：小鱼干被藏起来时增加计数器
+        if (selectedItemId === 'fish_item' && interaction.effects?.inventory?.action === 'remove') {
+            // 检查是否已经在这个位置藏过鱼干
+            const hideLocationKey = `${this.currentSceneId}_${targetObject.name}`;
+            if (!this.gameState.flags) {
+                this.gameState.flags = {};
+            }
+            
+            if (this.gameState.flags[hideLocationKey]) {
+                // 已经在这个位置藏过鱼干，不允许重复
+                this.gameState.log('🐱 这里已经藏过小鱼干了，换个地方吧~');
+                // 把鱼干还回去
+                this.gameState.addToInventory(selectedItemId);
+                return;
+            }
+            
+            // 标记这个位置已经藏过鱼干
+            this.gameState.flags[hideLocationKey] = true;
+            
+            const achievementSystem = (this.game as any).achievementSystem;
+            if (achievementSystem) {
+                achievementSystem.incrementCounter('fishHideCount');
+            }
+        }
+        
+        // 处理特殊效果
+        if (interaction.effects?.special) {
+            this.handleSpecialEffects(interaction.effects.special, targetObject);
+        }
+        
+        // 触发成就
+        if (interaction.triggerAchievement) {
+            const achievementSystem = (this.game as any).achievementSystem;
+            if (achievementSystem) {
+                achievementSystem.triggerAchievement(interaction.triggerAchievement);
+            }
         }
         
         // 刷新UI
         this.game.events.emit('gameStateChanged');
     }
 
-    dropItemInScene(itemId: string, x: number, y: number): void {
-        const itemData = this.gameData.items[itemId];
-        if (!itemData) return;
-        
-        // 创建场景中的物品对象
-        const sceneItem = this.add.image(x, y, itemData.image).setDisplaySize(60, 60);
-        sceneItem.setInteractive({ useHandCursor: true });
-        
-        // 设置物品属性
-        sceneItem.setData('itemId', itemId);
-        sceneItem.setData('isSceneItem', true);
-        
-        // 点击拾取
-        sceneItem.on('pointerdown', () => {
-            this.pickupSceneItem(sceneItem, itemId);
-        });
-        
-        // 悬停提示
-        sceneItem.on('pointerover', () => {
-            this.showHoverText(`${itemData.name} - 点击拾取`, x, y);
-        });
-        
-        sceneItem.on('pointerout', () => {
-            this.hideHoverText();
-        });
-        
-        this.gameState.log(`你把 ${itemData.name} 放在了地上`);
-        this.gameState.removeFromInventory(itemId);
-        
-        // 刷新UI
-        this.game.events.emit('gameStateChanged');
-    }
-
-    pickupSceneItem(sceneItem: any, itemId: string): void {
-        const itemData = this.gameData.items[itemId];
-        if (!itemData) return;
-        
-        this.gameState.addToInventory(itemId);
-        this.gameState.log(`你捡起了 ${itemData.name}`);
-        sceneItem.destroy();
-        
-        // 刷新UI
-        this.game.events.emit('gameStateChanged');
+    // 处理特殊效果
+    handleSpecialEffects(specialEffects: any, targetObject: ObjectData): void {
+        if (specialEffects.unlockArea) {
+            console.log(`解锁区域: ${specialEffects.unlockArea}`);
+            // 这里可以添加解锁区域的逻辑
+        }
     }
 
     showHoverText(text: string, x: number, y: number): void {
