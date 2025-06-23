@@ -2,16 +2,16 @@
     "actions": {
         "pickup_fish": {
             "id": "pickup_fish",
-            "text": "叼走",
-            "log": "我把小鱼干叼走了，找个地方藏起来！",
+            "text": "叼走鱼",
+            "log": "我叼起了一条鱼！",
             "effects": {
-                "progress": { "humanComingHome": 2, "hungry": -10 },
                 "inventory": {
                     "action": "add",
                     "item": "fish_item"
                 },
-                "object": {
-                    "action": "hide"
+                "progress": {
+                    "hungry": -15,
+                    "happiness": 10
                 }
             },
             "triggerAchievement": "fish_pickup"
@@ -30,63 +30,83 @@
         },
         "scratch_sofa": {
             "id": "scratch_sofa",
-            "text": "磨爪",
-            "log": "用这个沙发磨爪子真是太爽了！",
+            "text": "抓沙发",
+            "log": "我在沙发上磨爪子，感觉很舒服！",
             "effects": {
-                "progress": { "humanComingHome": 15, "hungry": 2, "needPoop": 2 }
+                "progress": {
+                    "mischief": 8,
+                    "humanComingHome": 3
+                }
             },
             "triggerAchievement": "sofa_destroyer"
         },
         "sleep_on_sofa": {
             "id": "sleep_on_sofa",
-            "text": "睡觉",
-            "log": "沙发软软的，睡一觉先。",
+            "text": "在沙发上睡觉",
+            "log": "我在沙发上舒服地睡着了...",
             "effects": {
-                "progress": { "humanComingHome": 5, "hungry": 10, "needPoop": 5 }
+                "progress": {
+                    "energy": 20,
+                    "happiness": 10
+                }
             },
             "triggerAchievement": "afternoon_nap"
         },
         "drink": {
             "id": "drink",
             "text": "喝水",
-            "log": "你喝了一点水，没那么渴了。",
+            "log": "我喝了一些水。",
             "effects": {
-                "progress": { "hungry": -8, "needPoop": 2, "humanComingHome": 1 }
+                "progress": {
+                    "hungry": -5
+                }
             }
         },
         "knock_over": {
             "id": "knock_over",
-            "text": "打翻",
-            "log": "你把碗打翻了，水洒了一地。真有趣！",
+            "text": "推倒",
+            "log": "我把东西推倒了！",
             "effects": {
-                "progress": { "humanComingHome": 12 }
+                "progress": {
+                    "mischief": 5,
+                    "humanComingHome": 2
+                }
             },
             "triggerAchievement": "water_overflow"
         },
         "sleep_villa": {
             "id": "sleep_villa",
-            "text": "睡觉",
-            "log": "在别墅里睡觉就是爽。",
+            "text": "在猫别墅里睡觉",
+            "log": "我在自己的小别墅里安心地睡着了...",
             "effects": {
-                "progress": { "humanComingHome": 3, "hungry": 8, "needPoop": 4 }
+                "progress": {
+                    "energy": 25,
+                    "happiness": 15
+                }
             },
             "triggerAchievement": "afternoon_nap"
         },
         "sleep_nest": {
             "id": "sleep_nest",
-            "text": "睡觉",
-            "log": "窝里最安全。",
+            "text": "在猫窝里睡觉",
+            "log": "我在温暖的猫窝里睡着了...",
             "effects": {
-                "progress": { "humanComingHome": 2, "hungry": 6, "needPoop": 3 }
+                "progress": {
+                    "energy": 30,
+                    "happiness": 20
+                }
             },
             "triggerAchievement": "afternoon_nap"
         },
         "patrol_balcony": {
             "id": "patrol_balcony",
-            "text": "巡视",
-            "log": "巡视阳台，确认没有入侵者。",
+            "text": "巡逻阳台",
+            "log": "我在阳台上巡逻，观察外面的世界。",
             "effects": {
-                "progress": { "humanComingHome": -2, "hungry": 2 }
+                "progress": {
+                    "curiosity": 10,
+                    "territorial": 5
+                }
             },
             "triggerAchievement": "balcony_patrol"
         },
@@ -101,59 +121,74 @@
         "meow": {
             "id": "meow",
             "text": "喵喵叫",
-            "log": "喵~ 喵~ 喵~",
+            "log": "我发出了可爱的喵喵声！",
             "effects": {
-                "progress": { "humanComingHome": -1, "hungry": -5 }
+                "progress": {
+                    "social": 5,
+                    "humanComingHome": 1
+                }
             },
             "triggerAchievement": "food_beggar"
         },
         "push_table_item": {
             "id": "push_table_item",
-            "text": "推下去",
-            "log": "你把桌子上的东西推下去了！",
+            "text": "推桌子上的东西",
+            "log": "我把桌子上的东西推了下去！",
             "effects": {
-                "progress": { "humanComingHome": 20 }
+                "progress": {
+                    "mischief": 10,
+                    "humanComingHome": 5
+                }
             },
             "triggerAchievement": "table_justice"
         },
         "destroy_toilet_paper": {
             "id": "destroy_toilet_paper",
-            "text": "撕碎",
-            "log": "厕纸被撕得粉碎！",
+            "text": "撕卫生纸",
+            "log": "我把卫生纸撕得粉碎！",
             "effects": {
-                "progress": { "humanComingHome": 25 }
+                "progress": {
+                    "mischief": 15,
+                    "humanComingHome": 8
+                }
             },
             "triggerAchievement": "toilet_paper_terminator"
         },
         "use_litter_box": {
             "id": "use_litter_box",
-            "text": "如厕",
-            "log": "在猫砂盆里解决了生理需求。",
+            "text": "使用猫砂盆",
+            "log": "我使用了猫砂盆。",
             "effects": {
-                "progress": { "needPoop": -50, "humanComingHome": -3 }
+                "progress": {
+                    "needPoop": -50
+                }
             },
             "triggerAchievement": "clean_champion"
         },
         "play_with_toy": {
             "id": "play_with_toy",
-            "text": "玩耍",
-            "log": "和玩具玩得很开心！",
+            "text": "玩玩具",
+            "log": "我和玩具玩得很开心！",
             "effects": {
-                "progress": { "humanComingHome": -5, "hungry": 3 }
+                "progress": {
+                    "playfulness": 15,
+                    "happiness": 10,
+                    "energy": -5
+                }
             },
             "triggerAchievement": "toy_lover"
         },
         "find_key": {
             "id": "find_key",
             "text": "找到钥匙",
-            "log": "你找到了一把钥匙！",
+            "log": "我发现了一把钥匙！",
             "effects": {
                 "inventory": {
                     "action": "add",
-                    "item": "key_item"
+                    "item": "key"
                 },
-                "object": {
-                    "action": "hide"
+                "progress": {
+                    "curiosity": 10
                 }
             },
             "triggerAchievement": "key_hunter"
@@ -161,14 +196,14 @@
         "unlock_room": {
             "id": "unlock_room",
             "text": "解锁房间",
-            "log": "房间门打开了！",
+            "log": "我用钥匙解锁了一个房间！",
             "effects": {
                 "inventory": {
                     "action": "remove",
-                    "item": "key_item"
+                    "item": "key"
                 },
-                "special": {
-                    "unlockArea": "room_c"
+                "progress": {
+                    "curiosity": 15
                 }
             },
             "triggerAchievement": "door_secret"
@@ -176,7 +211,7 @@
         "escape_outside": {
             "id": "escape_outside",
             "text": "离家出走",
-            "log": "你成功逃出了家门！",
+            "log": "我成功逃出了家门！",
             "effects": {
                 "special": {
                     "unlockArea": "outside"
@@ -187,16 +222,18 @@
         "set_trap": {
             "id": "set_trap",
             "text": "设置陷阱",
-            "log": "你设置了一个陷阱！",
+            "log": "我设置了一个陷阱来保护领地！",
             "effects": {
-                "progress": { "humanComingHome": 8 }
+                "progress": {
+                    "territorial": 10
+                }
             },
             "triggerAchievement": "high_ground_defense"
         },
         "set_alarm": {
             "id": "set_alarm",
             "text": "设置警报",
-            "log": "你在门口设置了警报器！",
+            "log": "我在门口设置了警报器！",
             "effects": {
                 "progress": { "humanComingHome": 10 }
             },
@@ -205,16 +242,19 @@
         "defend_invasion": {
             "id": "defend_invasion",
             "text": "防御入侵",
-            "log": "你成功用陷阱吓走了隔壁的猫！",
+            "log": "我成功防御了入侵者！",
             "effects": {
-                "progress": { "humanComingHome": -5 }
+                "progress": {
+                    "territorial": 15,
+                    "happiness": 10
+                }
             },
             "triggerAchievement": "king_contempt"
         },
         "visit_balcony": {
             "id": "visit_balcony",
             "text": "访问阳台",
-            "log": "你来到了阳台！",
+            "log": "我来到了阳台！",
             "effects": {
                 "progress": { "humanComingHome": 1 }
             },
@@ -232,9 +272,175 @@
         "configure_traps": {
             "id": "configure_traps",
             "text": "配置陷阱",
-            "log": "你配置了所有陷阱！",
+            "log": "我配置了所有陷阱！",
             "effects": {
                 "progress": { "humanComingHome": 5 }
+            }
+        },
+        "groom_self": {
+            "id": "groom_self",
+            "text": "梳理毛发",
+            "log": "我仔细地梳理着自己的毛发。",
+            "effects": {
+                "progress": {
+                    "grooming": 10,
+                    "happiness": 5
+                }
+            }
+        },
+        "hunt_mouse": {
+            "id": "hunt_mouse",
+            "text": "捕猎老鼠",
+            "log": "我发现了一只老鼠，开始捕猎！",
+            "effects": {
+                "progress": {
+                    "hunting": 15,
+                    "hungry": -10,
+                    "energy": -10
+                }
+            }
+        },
+        "mark_territory": {
+            "id": "mark_territory",
+            "text": "标记领地",
+            "log": "我在标记自己的领地。",
+            "effects": {
+                "progress": {
+                    "territorial": 10,
+                    "humanComingHome": 3
+                }
+            }
+        },
+        "watch_window": {
+            "id": "watch_window",
+            "text": "看窗外",
+            "log": "我坐在窗边观察外面的世界。",
+            "effects": {
+                "progress": {
+                    "curiosity": 8,
+                    "happiness": 5
+                }
+            }
+        },
+        "play_with_plant": {
+            "id": "play_with_plant",
+            "text": "玩植物",
+            "log": "我和植物玩得很开心！",
+            "effects": {
+                "progress": {
+                    "playfulness": 10,
+                    "mischief": 5
+                }
+            }
+        },
+        "react_to_music": {
+            "id": "react_to_music",
+            "text": "对音乐反应",
+            "log": "我听到音乐，开始跟着节奏摇摆！",
+            "effects": {
+                "progress": {
+                    "social": 8,
+                    "happiness": 10
+                }
+            }
+        },
+        "chase_shadow": {
+            "id": "chase_shadow",
+            "text": "追影子",
+            "log": "我发现了有趣的影子，开始追逐！",
+            "effects": {
+                "progress": {
+                    "playfulness": 12,
+                    "energy": -8
+                }
+            }
+        },
+        "hide_in_box": {
+            "id": "hide_in_box",
+            "text": "躲在纸箱里",
+            "log": "我躲在纸箱里，感觉很安全！",
+            "effects": {
+                "progress": {
+                    "happiness": 8,
+                    "curiosity": 5
+                }
+            }
+        },
+        "climb_high": {
+            "id": "climb_high",
+            "text": "爬到高处",
+            "log": "我爬到了高处，俯视整个房间！",
+            "effects": {
+                "progress": {
+                    "territorial": 8,
+                    "curiosity": 5,
+                    "energy": -5
+                }
+            }
+        },
+        "socialize_with_human": {
+            "id": "socialize_with_human",
+            "text": "与人类互动",
+            "log": "我主动与人类互动，寻求关注！",
+            "effects": {
+                "progress": {
+                    "social": 15,
+                    "happiness": 10
+                }
+            }
+        },
+        "explore_new_area": {
+            "id": "explore_new_area",
+            "text": "探索新区域",
+            "log": "我发现了新的区域，开始探索！",
+            "effects": {
+                "progress": {
+                    "curiosity": 15,
+                    "energy": -10
+                }
+            }
+        },
+        "rest_in_sunlight": {
+            "id": "rest_in_sunlight",
+            "text": "在阳光下休息",
+            "log": "我在温暖的阳光下休息，感觉很舒服！",
+            "effects": {
+                "progress": {
+                    "happiness": 15,
+                    "energy": 10
+                }
+            }
+        },
+        "play_with_water": {
+            "id": "play_with_water",
+            "text": "玩水",
+            "log": "我开始玩水，虽然有些湿但很有趣！",
+            "effects": {
+                "progress": {
+                    "playfulness": 10,
+                    "mischief": 5
+                }
+            }
+        },
+        "investigate_sound": {
+            "id": "investigate_sound",
+            "text": "调查声音",
+            "log": "我听到了奇怪的声音，开始调查！",
+            "effects": {
+                "progress": {
+                    "curiosity": 12,
+                    "energy": -5
+                }
+            }
+        },
+        "claim_spot": {
+            "id": "claim_spot",
+            "text": "占领地盘",
+            "log": "我在这个地方留下了自己的气味，宣布这是我的地盘！",
+            "effects": {
+                "progress": {
+                    "territorial": 12
+                }
             }
         }
     },
@@ -255,7 +461,7 @@
             "drop": {
                 "id": "drop_fish",
                 "text": "放下",
-                "log": "你把小鱼干放在了地上。",
+                "log": "我把小鱼干放在了地上。",
                 "effects": {
                     "inventory": {
                         "action": "remove",
@@ -273,7 +479,7 @@
             "use": {
                 "id": "unlock_room",
                 "text": "使用钥匙",
-                "log": "你用钥匙打开了门。",
+                "log": "我用钥匙打开了门。",
                 "effects": {
                     "inventory": {
                         "action": "remove",
@@ -285,13 +491,97 @@
                 },
                 "triggerAchievement": "door_secret"
             }
+        },
+        "fish": {
+            "hide_fish": {
+                "id": "hide_fish",
+                "text": "藏鱼",
+                "log": "我把鱼藏了起来，准备以后享用！",
+                "effects": {
+                    "inventory": {
+                        "action": "remove",
+                        "item": "fish_item"
+                    },
+                    "progress": {
+                        "hunting": 5
+                    }
+                }
+            },
+            "eat_fish": {
+                "id": "eat_fish",
+                "text": "吃鱼",
+                "log": "我美美地享用了一条鱼！",
+                "effects": {
+                    "inventory": {
+                        "action": "remove",
+                        "item": "fish_item"
+                    },
+                    "progress": {
+                        "hungry": -30,
+                        "happiness": 15
+                    }
+                }
+            }
+        },
+        "key": {
+            "unlock_room_a": {
+                "id": "unlock_room_a",
+                "text": "解锁房间A",
+                "log": "我用钥匙解锁了房间A！",
+                "effects": {
+                    "inventory": {
+                        "action": "remove",
+                        "item": "key"
+                    },
+                    "special": {
+                        "unlockArea": "room_a"
+                    },
+                    "progress": {
+                        "curiosity": 15
+                    }
+                }
+            },
+            "unlock_room_b": {
+                "id": "unlock_room_b",
+                "text": "解锁房间B",
+                "log": "我用钥匙解锁了房间B！",
+                "effects": {
+                    "inventory": {
+                        "action": "remove",
+                        "item": "key"
+                    },
+                    "special": {
+                        "unlockArea": "room_b"
+                    },
+                    "progress": {
+                        "curiosity": 15
+                    }
+                }
+            },
+            "unlock_room_c": {
+                "id": "unlock_room_c",
+                "text": "解锁房间C",
+                "log": "我用钥匙解锁了房间C！",
+                "effects": {
+                    "inventory": {
+                        "action": "remove",
+                        "item": "key"
+                    },
+                    "special": {
+                        "unlockArea": "room_c"
+                    },
+                    "progress": {
+                        "curiosity": 15
+                    }
+                }
+            }
         }
     },
     "interactions": {
         "fish_item_sofa": {
             "id": "hide_fish_sofa",
             "text": "藏在沙发下",
-            "log": "你把小鱼干藏在沙发下面了！",
+            "log": "我把小鱼干藏在沙发下面了！",
             "effects": {
                 "progress": { "humanComingHome": 5 },
                 "inventory": {
@@ -304,7 +594,7 @@
         "fish_item_cat_villa": {
             "id": "hide_fish_villa",
             "text": "藏在别墅里",
-            "log": "你把小鱼干藏在猫别墅里了！",
+            "log": "我把小鱼干藏在猫别墅里了！",
             "effects": {
                 "progress": { "humanComingHome": 3 },
                 "inventory": {
@@ -317,7 +607,7 @@
         "fish_item_cat_nest": {
             "id": "hide_fish_nest",
             "text": "藏在猫窝里",
-            "log": "你把小鱼干藏在猫窝里了！",
+            "log": "我把小鱼干藏在猫窝里了！",
             "effects": {
                 "progress": { "humanComingHome": 2 },
                 "inventory": {
@@ -326,6 +616,126 @@
                 }
             },
             "triggerAchievement": "strategic_reserve"
+        },
+        "fish_sofa": {
+            "id": "fish_sofa",
+            "text": "把鱼藏在沙发下",
+            "log": "我把鱼藏在了沙发下面，这是我的秘密储藏点！",
+            "effects": {
+                "inventory": {
+                    "action": "remove",
+                    "item": "fish_item"
+                },
+                "progress": {
+                    "hunting": 8,
+                    "territorial": 5
+                }
+            }
+        },
+        "fish_cat_nest": {
+            "id": "fish_cat_nest",
+            "text": "把鱼藏在猫窝里",
+            "log": "我把鱼藏在了猫窝里，这是最安全的地方！",
+            "effects": {
+                "inventory": {
+                    "action": "remove",
+                    "item": "fish_item"
+                },
+                "progress": {
+                    "hunting": 8,
+                    "territorial": 5
+                }
+            }
+        },
+        "toy_play": {
+            "id": "toy_play",
+            "text": "用玩具玩耍",
+            "log": "我用玩具玩得很开心！",
+            "effects": {
+                "progress": {
+                    "playfulness": 15,
+                    "happiness": 10,
+                    "energy": -8
+                }
+            }
+        },
+        "plant_knock": {
+            "id": "plant_knock",
+            "text": "推倒植物",
+            "log": "我把植物推倒了，泥土撒了一地！",
+            "effects": {
+                "progress": {
+                    "mischief": 12,
+                    "humanComingHome": 6
+                }
+            }
+        },
+        "window_sit": {
+            "id": "window_sit",
+            "text": "坐在窗台上",
+            "log": "我坐在窗台上，观察外面的世界。",
+            "effects": {
+                "progress": {
+                    "curiosity": 10,
+                    "happiness": 8
+                }
+            }
+        },
+        "music_dance": {
+            "id": "music_dance",
+            "text": "跟着音乐跳舞",
+            "log": "我听到音乐，开始跟着节奏摇摆！",
+            "effects": {
+                "progress": {
+                    "social": 10,
+                    "happiness": 12,
+                    "energy": -5
+                }
+            }
+        },
+        "box_hide": {
+            "id": "box_hide",
+            "text": "躲在纸箱里",
+            "log": "我躲在纸箱里，感觉很安全！",
+            "effects": {
+                "progress": {
+                    "happiness": 8,
+                    "curiosity": 5
+                }
+            }
+        },
+        "high_place_sit": {
+            "id": "high_place_sit",
+            "text": "坐在高处",
+            "log": "我坐在高处，俯视整个房间！",
+            "effects": {
+                "progress": {
+                    "territorial": 8,
+                    "curiosity": 5
+                }
+            }
+        },
+        "sunlight_bath": {
+            "id": "sunlight_bath",
+            "text": "晒太阳",
+            "log": "我在温暖的阳光下休息，感觉很舒服！",
+            "effects": {
+                "progress": {
+                    "happiness": 15,
+                    "energy": 10
+                }
+            }
+        },
+        "water_play": {
+            "id": "water_play",
+            "text": "玩水",
+            "log": "我开始玩水，虽然有些湿但很有趣！",
+            "effects": {
+                "progress": {
+                    "playfulness": 10,
+                    "mischief": 5
+                }
+            }
         }
     }
 } 

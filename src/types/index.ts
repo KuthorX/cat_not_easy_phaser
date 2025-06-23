@@ -10,6 +10,12 @@ export interface GameState {
         humanComingHome?: number;
         hungry?: number;
         needPoop?: number;
+        curiosity?: number;
+        playfulness?: number;
+        territorial?: number;
+        social?: number;
+        grooming?: number;
+        hunting?: number;
     };
     achievements: Record<string, Achievement>;
     achievementCounters: {
@@ -32,13 +38,69 @@ export interface GameState {
         fishHideCount: number;
         trapSetCount: number;
         invasionDefendCount: number;
+        groomingCount: number;
+        huntingCount: number;
+        socialInteractionCount: number;
+        territoryMarkingCount: number;
+        windowWatchingCount: number;
+        plantInteractionCount: number;
+        musicReactionCount: number;
+        shadowChasingCount: number;
+        boxHidingCount: number;
+        highPlaceClimbingCount: number;
     };
     flags?: Record<string, boolean>;
     history?: GameState[];
     savedAt?: string;
+    saveInfo?: {
+        name: string;
+        description: string;
+        playTime: number;
+        lastPlayed: string;
+        catPersonality?: CatPersonality;
+    };
     addToInventory: (itemId: string) => void;
     removeFromInventory: (itemId: string) => void;
     log: (msg: string) => void;
+}
+
+// 猫咪性格类型
+export interface CatPersonality {
+    type: 'curious' | 'playful' | 'territorial' | 'social' | 'independent' | 'lazy' | 'adventurous' | 'mischievous';
+    traits: {
+        curiosity: number;
+        playfulness: number;
+        territorial: number;
+        social: number;
+        independence: number;
+        mischief: number;
+    };
+    preferences: {
+        favoriteSleepSpot: string;
+        favoriteToy: string;
+        favoriteFood: string;
+        leastFavoriteActivity: string;
+    };
+}
+
+// 存档信息类型
+export interface SaveInfo {
+    id: string;
+    name: string;
+    description: string;
+    playTime: number;
+    lastPlayed: string;
+    catPersonality?: CatPersonality;
+    achievements: number;
+    currentLocation: string;
+    thumbnail?: string;
+}
+
+// 存档列表响应类型
+export interface SaveListResponse {
+    success: boolean;
+    saves: SaveInfo[];
+    message?: string;
 }
 
 // 成就类型
@@ -113,7 +175,7 @@ export interface ObjectData {
     look?: string;
     navTo?: string;
     interactive?: boolean;
-    actions?: string[]; // 改为动作ID数组
+    actions?: string[];
 }
 
 // 场景数据类型

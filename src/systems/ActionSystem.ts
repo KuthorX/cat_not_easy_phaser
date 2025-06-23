@@ -442,35 +442,35 @@ class ActionSystem {
         switch (endType) {
             case 'human_coming_home':
                 endTitle = '两脚兽回家了！';
-                endMessage = '你的一天结束了。';
+                endMessage = '我的一天结束了。';
                 break;
             case 'hungry':
                 endTitle = '太饿了！';
-                endMessage = '你饿得不行了，需要找点吃的。';
+                endMessage = '我饿得不行了，需要找点吃的。';
                 break;
             case 'need_poop':
                 endTitle = '憋不住了！';
-                endMessage = '你急需上厕所。';
+                endMessage = '我急需上厕所。';
                 break;
             case 'destruction':
                 endTitle = '今日最佳破坏王';
-                endMessage = '你成功成为了这个家的破坏之王！';
+                endMessage = '我成功成为了这个家的破坏之王！';
                 break;
             case 'obedient':
                 endTitle = '智人首席奴才';
-                endMessage = '你是一个完美的乖猫咪！';
+                endMessage = '我是一个完美的乖猫咪！';
                 break;
             case 'explorer':
                 endTitle = '这个家我说了算';
-                endMessage = '你探索了所有的秘密！';
+                endMessage = '我探索了所有的秘密！';
                 break;
             case 'strategist':
                 endTitle = '家庭安全顾问';
-                endMessage = '你成功保护了这个家！';
+                endMessage = '我成功保护了这个家！';
                 break;
             default:
                 endTitle = '游戏结束';
-                endMessage = '你的一天结束了。';
+                endMessage = '我的一天结束了。';
         }
 
         // 发出游戏结束事件

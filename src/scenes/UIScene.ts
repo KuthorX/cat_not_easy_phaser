@@ -510,20 +510,20 @@ export default class UIScene extends Phaser.Scene {
                 this.gameState.removeFromInventory(itemId);
                 this.gameState.progress.hungry = Math.max(0, (this.gameState.progress.hungry || 0) - 20);
                 this.gameState.progress.humanComingHome = Math.min(100, (this.gameState.progress.humanComingHome || 0) + 5);
-                this.gameState.log('你吃掉了小鱼干，感觉饱了！');
+                this.gameState.log('我吃掉了小鱼干，感觉饱了！');
                 break;
             case 'key_item':
-                this.gameState.log(`你使用了 ${this.gameData.items[itemId]?.name || itemId}`);
+                this.gameState.log(`我使用了 ${this.gameData.items[itemId]?.name || itemId}`);
                 break;
             default:
-                this.gameState.log(`你使用了 ${this.gameData.items[itemId]?.name || itemId}`);
+                this.gameState.log(`我使用了 ${this.gameData.items[itemId]?.name || itemId}`);
         }
     }
 
     dropItem(itemId: string): void {
         this.hideItemUseMenu();
         this.gameState.removeFromInventory(itemId);
-        this.gameState.log(`你丢弃了 ${this.gameData.items[itemId]?.name || itemId}`);
+        this.gameState.log(`我丢弃了 ${this.gameData.items[itemId]?.name || itemId}`);
         this.refreshUI();
     }
 
