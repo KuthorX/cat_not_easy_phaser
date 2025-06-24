@@ -1,10 +1,12 @@
 {
     "initialState": {
         "currentLocation": "living_room",
+        "currentTime": 0,
+        "timeRemaining": 720,
+        "hungry": 3,
+        "energy": 3,
         "progress": {
-            "humanComingHome": 0,
-            "hungry": 10,
-            "needPoop": 5
+            "humanComingHome": 0
         },
         "flags": {
             "door_to_hall_open": true,
@@ -16,7 +18,18 @@
         "inventory": [],
         "actionLog": [],
         "history": [],
-        "achievements": {}
+        "achievements": {},
+        "achievementCounters": {
+            "toyCollectionCount": 0,
+            "playInteractionCount": 0,
+            "expensiveItemDestroyCount": 0,
+            "balconyVisited": 0,
+            "neighborEscape": 0,
+            "trapSetupCount": 0,
+            "materialPreparationCount": 0,
+            "greetingAtDoor": 0,
+            "noDestructionFlag": false
+        }
     },
     "itemsFile": "assets/data/items.json",
     "actionsFile": "assets/data/actions.json",

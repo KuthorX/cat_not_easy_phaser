@@ -1,279 +1,132 @@
 {
     "achievements": {
-        "water_overflow": {
-            "id": "water_overflow",
-            "name": "水漫金山",
-            "description": "打翻所有水碗",
-            "category": "destruction",
-            "isMainAchievement": false,
+        "playtime_master": {
+            "id": "playtime_master",
+            "name": "玩耍时光",
+            "description": "尽！情！玩！个！爽！收集到所有猫玩具并进行过所有玩耍交互",
+            "category": "play",
+            "isMainAchievement": true,
             "condition": {
-                "type": "counter",
-                "counter": "waterBowlKnockOverCount",
-                "value": 3
+                "type": "play_completion",
+                "requiredToys": ["squeaky_mouse", "spinning_ball", "cat_rope", "black_sock"],
+                "requiredInteractions": ["scratch_post", "house_run", "closet_hide", "hammock_sleep"],
+                "timeLimit": 720
             }
         },
-        "table_justice": {
-            "id": "table_justice",
-            "name": "天降正义",
-            "description": "将桌子上的特定物品推到地上",
-            "category": "destruction",
-            "isMainAchievement": false,
-            "condition": {
-                "type": "counter",
-                "counter": "tableItemPushCount",
-                "value": 2
-            }
-        },
-        "sofa_destroyer": {
-            "id": "sofa_destroyer",
-            "name": "沙发毁灭者",
-            "description": "对沙发执行磨爪达到一定次数",
-            "category": "destruction",
-            "isMainAchievement": false,
-            "condition": {
-                "type": "counter",
-                "counter": "scratchCount",
-                "value": 5
-            }
-        },
-        "toilet_paper_terminator": {
-            "id": "toilet_paper_terminator",
-            "name": "厕纸终结者",
-            "description": "毁掉卷纸",
-            "category": "destruction",
-            "isMainAchievement": false,
-            "condition": {
-                "type": "counter",
-                "counter": "toiletPaperDestroyCount",
-                "value": 1
-            }
-        },
-        "food_beggar": {
-            "id": "food_beggar",
-            "name": "饭来张口",
-            "description": "通过喵喵叫等互动从智人处获得食物",
-            "category": "obedient",
-            "isMainAchievement": false,
-            "condition": {
-                "type": "counter",
-                "counter": "meowCount",
-                "value": 3
-            }
-        },
-        "afternoon_nap": {
-            "id": "afternoon_nap",
-            "name": "午后小憩",
-            "description": "在所有指定的地点都睡过觉",
-            "category": "obedient",
-            "isMainAchievement": false,
-            "condition": {
-                "type": "counter",
-                "counter": "sleepLocationCount",
-                "value": 3
-            }
-        },
-        "clean_champion": {
-            "id": "clean_champion",
-            "name": "清洁标兵",
-            "description": "在猫砂盆里完成所有如厕需求",
-            "category": "obedient",
-            "isMainAchievement": false,
-            "condition": {
-                "type": "counter",
-                "counter": "litterBoxCount",
-                "value": 5
-            }
-        },
-        "toy_lover": {
-            "id": "toy_lover",
-            "name": "玩具爱好者",
-            "description": "与所有玩具类物品进行过互动",
-            "category": "obedient",
-            "isMainAchievement": false,
-            "condition": {
-                "type": "counter",
-                "counter": "toyInteractionCount",
-                "value": 3
-            }
-        },
-        "balcony_patrol": {
-            "id": "balcony_patrol",
-            "name": "阳台巡视者",
-            "description": "成功到达阳台",
-            "category": "explorer",
-            "isMainAchievement": false,
-            "condition": {
-                "type": "flag",
-                "flag": "balcony_visited"
-            }
-        },
-        "key_hunter": {
-            "id": "key_hunter",
-            "name": "钥匙猎人",
-            "description": "找到并获取所有关键钥匙",
-            "category": "explorer",
-            "isMainAchievement": false,
-            "condition": {
-                "type": "counter",
-                "counter": "keyFindCount",
-                "value": 3
-            }
-        },
-        "door_secret": {
-            "id": "door_secret",
-            "name": "门缝里的大秘密",
-            "description": "解开并进入房间C",
-            "category": "explorer",
-            "isMainAchievement": false,
-            "condition": {
-                "type": "flag",
-                "flag": "room_c_unlocked"
-            }
-        },
-        "escape_master": {
-            "id": "escape_master",
-            "name": "越狱大师",
-            "description": "找到打开外门的方法并成功离家出走",
-            "category": "explorer",
-            "isMainAchievement": false,
-            "condition": {
-                "type": "flag",
-                "flag": "outside_escaped"
-            }
-        },
-        "strategic_reserve": {
-            "id": "strategic_reserve",
-            "name": "战略储备",
-            "description": "将所有小鱼干藏到指定地点",
-            "category": "strategist",
-            "isMainAchievement": false,
-            "condition": {
-                "type": "counter",
-                "counter": "fishHideCount",
-                "value": 3
-            }
-        },
-        "high_ground_defense": {
-            "id": "high_ground_defense",
-            "name": "高地防御",
-            "description": "将特定物品布置在高处，作为防御工事",
-            "category": "strategist",
-            "isMainAchievement": false,
-            "condition": {
-                "type": "counter",
-                "counter": "trapSetCount",
-                "value": 3
-            }
-        },
-        "invasion_alarm": {
-            "id": "invasion_alarm",
-            "name": "入侵者警报",
-            "description": "在门口设置一个能发出声响的警报器",
-            "category": "strategist",
-            "isMainAchievement": false,
-            "condition": {
-                "type": "flag",
-                "flag": "alarm_set"
-            }
-        },
-        "king_contempt": {
-            "id": "king_contempt",
-            "name": "王之蔑视",
-            "description": "成功触发隔壁的猫入侵事件，并用陷阱将其吓走",
-            "category": "strategist",
-            "isMainAchievement": false,
-            "condition": {
-                "type": "counter",
-                "counter": "invasionDefendCount",
-                "value": 1
-            }
-        },
-        "best_destroyer": {
-            "id": "best_destroyer",
-            "name": "今日最佳破坏王",
-            "description": "在两脚兽回家前，达成所有破坏系列子成就",
+        "destruction_king": {
+            "id": "destruction_king",
+            "name": "猫中哈士奇",
+            "description": "两脚兽回来时可能会心肺骤止。破坏所有昂贵的可破坏物",
             "category": "destruction",
             "isMainAchievement": true,
             "condition": {
-                "type": "path_completion",
-                "path": "destruction"
+                "type": "destruction_completion",
+                "requiredDestructions": ["tv_destroy", "computer_destroy", "table_items_destroy", "cat_nest_destroy"],
+                "timeLimit": 720
             }
         },
-        "chief_servant": {
-            "id": "chief_servant",
-            "name": "智人首席奴才",
-            "description": "完成所有温顺行为且未进行任何破坏活动",
+        "human_ally": {
+            "id": "human_ally",
+            "name": "两脚兽的盟友",
+            "description": "做一只温顺的好猫。没有进行任何破坏类交互，并在主子回家时选择门口迎接",
             "category": "obedient",
             "isMainAchievement": true,
             "condition": {
-                "type": "path_completion",
-                "path": "obedient"
+                "type": "obedient_completion",
+                "noDestruction": true,
+                "greetAtDoor": true,
+                "timeLimit": 720
             }
         },
-        "home_master": {
-            "id": "home_master",
-            "name": "这个家我说了算",
-            "description": "成功进入所有上锁的房间",
+        "escape_artist": {
+            "id": "escape_artist",
+            "name": "再见了两脚兽今天我就要远航",
+            "description": "成功离家出走。在下午四点前通过阳台进入邻居家，和邻居家猫战斗并存活，最后通过邻居开门逃脱",
             "category": "explorer",
             "isMainAchievement": true,
             "condition": {
-                "type": "path_completion",
-                "path": "explorer"
+                "type": "escape_completion",
+                "balconyAccess": true,
+                "neighborFight": true,
+                "neighborEscape": true,
+                "timeLimit": 420,
+                "energyRequirement": 3
             }
         },
-        "security_advisor": {
-            "id": "security_advisor",
-            "name": "家庭安全顾问",
-            "description": "成功布置好所有陷阱，并抵御隔壁的猫入侵事件",
+        "trap_master": {
+            "id": "trap_master",
+            "name": "走路小心点",
+            "description": "布置好一套陷害铲屎官的陷阱",
             "category": "strategist",
             "isMainAchievement": true,
             "condition": {
-                "type": "path_completion",
-                "path": "strategist"
+                "type": "trap_completion",
+                "requiredTraps": 3,
+                "timeLimit": 720
+            }
+        },
+        "logistics_officer": {
+            "id": "logistics_officer",
+            "name": "后勤官",
+            "description": "提前准备好材料，让两脚兽能构筑堡垒抵御隔壁的猫入侵",
+            "category": "strategist",
+            "isMainAchievement": true,
+            "condition": {
+                "type": "material_completion",
+                "requiredMaterials": ["cardboard_box", "string", "aluminum_foil"],
+                "timeLimit": 720
             }
         }
     },
     "achievementPaths": {
+        "play": {
+            "id": "play",
+            "name": "玩耍时光",
+            "description": "作为一个活泼的猫，把玩耍作为首要目标",
+            "mainAchievement": "playtime_master",
+            "subAchievements": [],
+            "endCondition": {
+                "type": "play_completion"
+            }
+        },
         "destruction": {
             "id": "destruction",
-            "name": "完美拆家王",
+            "name": "猫中哈士奇",
             "description": "作为一个精力旺盛的猫，把制造混乱作为首要目标",
-            "mainAchievement": "best_destroyer",
-            "subAchievements": ["water_overflow", "table_justice", "sofa_destroyer", "toilet_paper_terminator"],
+            "mainAchievement": "destruction_king",
+            "subAchievements": [],
             "endCondition": {
-                "type": "all_sub_achievements",
-                "humanComingHomeThreshold": 100
+                "type": "destruction_completion"
             }
         },
         "obedient": {
             "id": "obedient",
-            "name": "温顺的乖猫",
+            "name": "两脚兽的盟友",
             "description": "讨好两脚兽，做一个安静、可爱的陪伴者",
-            "mainAchievement": "chief_servant",
-            "subAchievements": ["food_beggar", "afternoon_nap", "clean_champion", "toy_lover"],
+            "mainAchievement": "human_ally",
+            "subAchievements": [],
             "endCondition": {
-                "type": "obedient_achievement",
-                "noDestruction": true
+                "type": "obedient_completion"
             }
         },
         "explorer": {
             "id": "explorer",
             "name": "大冒险家",
             "description": "对外界充满好奇，探索所有未知的领域",
-            "mainAchievement": "home_master",
-            "subAchievements": ["balcony_patrol", "key_hunter", "door_secret", "escape_master"],
+            "mainAchievement": "escape_artist",
+            "subAchievements": [],
             "endCondition": {
-                "type": "all_rooms_unlocked"
+                "type": "escape_completion"
             }
         },
         "strategist": {
             "id": "strategist",
             "name": "阴谋家",
             "description": "充满警惕与智慧，为潜在的威胁做好准备",
-            "mainAchievement": "security_advisor",
-            "subAchievements": ["strategic_reserve", "high_ground_defense", "invasion_alarm", "king_contempt"],
+            "mainAchievements": ["trap_master", "logistics_officer"],
+            "subAchievements": [],
             "endCondition": {
-                "type": "all_traps_set_and_defend"
+                "type": "strategist_completion"
             }
         }
     }

@@ -67,52 +67,123 @@ class ActionSystem {
 
         console.log(`Executing action: ${action.id} on target: ${target.name}`);
         
-        // 1. 记录动作日志
+        // 0. 检查动作是否可执行（状态值要求）
+        if (!this.canExecuteAction(action)) {
+            this.gameState.log(`无法执行动作：状态值不足`);
+            return;
+        }
+        
+        // 1. 消耗时间和状态值
+        this.consumeActionCosts(action);
+        
+        // 2. 记录动作日志
         if (action.log) {
             this.gameState.log(action.log);
         }
         
-        // 2. 更新进度条
+        // 3. 更新进度条
         if (action.effects && action.effects.progress) {
             this.updateProgress(action.effects.progress);
         }
         
-        // 3. 处理物品变化 (拾取/消耗)
+        // 4. 处理物品变化 (拾取/消耗)
         if (action.effects && action.effects.inventory) {
             this.updateInventory(action.effects.inventory, target);
         }
 
-        // 4. 处理对象状态变化
+        // 5. 处理对象状态变化
         if (action.effects && action.effects.object) {
             this.updateObjectState(target, action.effects.object);
         }
 
-        // 5. 处理场景变化
+        // 6. 处理场景变化
         if (action.effects && action.effects.scene) {
             this.updateSceneState(action.effects.scene);
         }
         
-        // 6. 处理目标对象状态变化
+        // 7. 处理目标对象状态变化
         if (action.effects && action.effects.updateTarget) {
             this.updateTargetState(target, action.effects.updateTarget);
         }
         
-        // 7. 处理特殊效果
+        // 8. 处理特殊效果
         if (action.effects && action.effects.special) {
             this.handleSpecialEffects(action.effects.special, target);
         }
         
-        // 8. 更新成就计数器
+        // 9. 更新成就计数器
         this.updateAchievementCounters(action, target);
         
-        // 9. 检查成就
+        // 10. 检查成就
         this.checkAchievements(action, target);
         
-        // 10. 检查游戏结束条件
+        // 11. 检查游戏结束条件
         this.checkGameEndConditions();
         
         // 发出状态更新事件，通知UI刷新
         this.scene.events.emit('gameStateChanged');
+    }
+
+    /**
+     * 检查动作是否可执行
+     */
+    private canExecuteAction(action: Action): boolean {
+        // 检查饥饿值要求
+        if (action.hungryRequirement && this.gameState.hungry < action.hungryRequirement) {
+            return false;
+        }
+        
+        // 检查精力值要求
+        if (action.energyRequirement && this.gameState.energy < action.energyRequirement) {
+            return false;
+        }
+        
+        // 检查精力值消耗
+        if (action.energyCost && this.gameState.energy < action.energyCost) {
+            return false;
+        }
+        
+        // 检查时间是否足够
+        const timeCost = action.timeCost || (action.category === 'simple' ? 30 : 60);
+        if (this.gameState.timeRemaining < timeCost) {
+            return false;
+        }
+        
+        return true;
+    }
+
+    /**
+     * 消耗动作的成本（时间和状态值）
+     */
+    private consumeActionCosts(action: Action): void {
+        // 消耗时间
+        const timeCost = action.timeCost || (action.category === 'simple' ? 30 : 60);
+        this.gameState.currentTime += timeCost;
+        this.gameState.timeRemaining -= timeCost;
+        
+        // 消耗精力值
+        if (action.energyCost) {
+            this.gameState.energy -= action.energyCost;
+        }
+        
+        // 恢复状态值
+        if (action.hungryRestore) {
+            this.gameState.hungry = Math.min(5, this.gameState.hungry + action.hungryRestore);
+        }
+        
+        if (action.energyRestore) {
+            this.gameState.energy = Math.min(5, this.gameState.energy + action.energyRestore);
+        }
+        
+        // 处理effects中的状态值变化
+        if (action.effects) {
+            if (action.effects.hungryChange) {
+                this.gameState.hungry = Math.max(0, Math.min(5, this.gameState.hungry + action.effects.hungryChange));
+            }
+            if (action.effects.energyChange) {
+                this.gameState.energy = Math.max(0, Math.min(5, this.gameState.energy + action.effects.energyChange));
+            }
+        }
     }
 
     /**
@@ -122,111 +193,69 @@ class ActionSystem {
         // 初始化成就计数器（如果不存在）
         if (!this.gameState.achievementCounters) {
             this.gameState.achievementCounters = {
-                knockOverCount: 0,
-                scratchCount: 0,
-                sleepCount: 0,
-                fishPickupCount: 0,
-                drinkCount: 0,
-                patrolCount: 0,
-                areaVisitCount: 0,
-                waterBowlKnockOverCount: 0,
-                tableItemPushCount: 0,
-                toiletPaperDestroyCount: 0,
-                meowCount: 0,
-                sleepLocationCount: 0,
-                litterBoxCount: 0,
-                toyInteractionCount: 0,
-                keyFindCount: 0,
-                roomUnlockCount: 0,
-                fishHideCount: 0,
-                trapSetCount: 0,
-                invasionDefendCount: 0
+                toyCollectionCount: 0,
+                playInteractionCount: 0,
+                expensiveItemDestroyCount: 0,
+                balconyVisited: 0,
+                neighborEscape: 0,
+                trapSetupCount: 0,
+                materialPreparationCount: 0,
+                greetingAtDoor: 0,
+                noDestructionFlag: false
             };
         }
         
         // 根据动作类型更新计数器
         switch (action.id) {
-            case 'knock_over':
-                this.gameState.achievementCounters.knockOverCount++;
-                if (target.name.includes('水碗')) {
-                    this.gameState.achievementCounters.waterBowlKnockOverCount++;
-                }
-                break;
-            case 'scratch_sofa':
-                this.gameState.achievementCounters.scratchCount++;
-                break;
-            case 'sleep_on_sofa':
-            case 'sleep_villa':
-            case 'sleep_nest':
-                this.gameState.achievementCounters.sleepCount++;
-                this.gameState.achievementCounters.sleepLocationCount++;
-                break;
-            case 'pickup_fish':
-                this.gameState.achievementCounters.fishPickupCount++;
-                break;
-            case 'drink':
-                this.gameState.achievementCounters.drinkCount++;
-                break;
-            case 'patrol_balcony':
-                this.gameState.achievementCounters.patrolCount++;
-                break;
-            case 'meow':
-                this.gameState.achievementCounters.meowCount++;
-                break;
-            case 'push_table_item':
-                this.gameState.achievementCounters.tableItemPushCount++;
-                break;
-            case 'destroy_toilet_paper':
-                this.gameState.achievementCounters.toiletPaperDestroyCount++;
-                break;
-            case 'use_litter_box':
-                this.gameState.achievementCounters.litterBoxCount++;
+            // 玩耍相关
+            case 'collect_toy':
+                this.gameState.achievementCounters.toyCollectionCount++;
                 break;
             case 'play_with_toy':
-                this.gameState.achievementCounters.toyInteractionCount++;
+            case 'scratch_post':
+            case 'house_run':
+            case 'closet_hide':
+            case 'hammock_sleep':
+                this.gameState.achievementCounters.playInteractionCount++;
                 break;
-            case 'find_key':
-                this.gameState.achievementCounters.keyFindCount++;
+                
+            // 破坏相关
+            case 'destroy_tv':
+            case 'destroy_computer':
+            case 'destroy_table_items':
+            case 'destroy_cat_nest':
+                this.gameState.achievementCounters.expensiveItemDestroyCount++;
                 break;
-            case 'unlock_room':
-                this.gameState.achievementCounters.roomUnlockCount++;
-                break;
-            case 'set_trap':
-                this.gameState.achievementCounters.trapSetCount++;
-                break;
-            case 'defend_invasion':
-                this.gameState.achievementCounters.invasionDefendCount++;
-                break;
+                
+            // 探索相关
             case 'visit_balcony':
-                // 设置阳台访问标志
-                if (!this.gameState.flags) this.gameState.flags = {};
-                this.gameState.flags.balcony_visited = true;
+            case 'patrol_balcony':
+                this.gameState.achievementCounters.balconyVisited++;
                 break;
-            case 'unlock_room_c':
-                // 设置房间C解锁标志
-                if (!this.gameState.flags) this.gameState.flags = {};
-                this.gameState.flags.room_c_unlocked = true;
+            case 'neighbor_escape':
+                this.gameState.achievementCounters.neighborEscape++;
                 break;
-            case 'escape_outside':
-                // 设置离家出走标志
-                if (!this.gameState.flags) this.gameState.flags = {};
-                this.gameState.flags.outside_escaped = true;
+                
+            // 策略相关
+            case 'set_trap':
+                this.gameState.achievementCounters.trapSetupCount++;
                 break;
-            case 'set_alarm':
-                // 设置警报标志
-                if (!this.gameState.flags) this.gameState.flags = {};
-                this.gameState.flags.alarm_set = true;
+            case 'prepare_material':
+                this.gameState.achievementCounters.materialPreparationCount++;
                 break;
-            case 'configure_traps':
-                // 设置陷阱配置标志
-                if (!this.gameState.flags) this.gameState.flags = {};
-                this.gameState.flags.traps_configured = true;
+                
+            // 其他
+            case 'greet_at_door':
+                this.gameState.achievementCounters.greetingAtDoor++;
                 break;
         }
-
-        // 检查特殊成就
-        if (action.id.includes('hide_fish')) {
-            this.gameState.achievementCounters.fishHideCount++;
+        
+        // 设置标志
+        if (action.effects && action.effects.special) {
+            if (action.effects.special.triggerEvent === 'neighbor_fight_completed') {
+                if (!this.gameState.flags) this.gameState.flags = {};
+                this.gameState.flags.neighbor_fight_completed = true;
+            }
         }
     }
 
@@ -311,30 +340,30 @@ class ActionSystem {
      * 检查游戏结束条件
      */
     checkGameEndConditions(): void {
-        const humanComingHome = this.gameState.progress.humanComingHome || 0;
-        const hungry = this.gameState.progress.hungry || 0;
-        const needPoop = this.gameState.progress.needPoop || 0;
-        
-        // 检查两脚兽回家
-        if (humanComingHome >= 100) {
-            this.endGame('human_coming_home');
+        // 检查时间是否用完
+        if (this.gameState.timeRemaining <= 0) {
+            this.endGame('time_up');
             return;
         }
         
-        // 检查饥饿
-        if (hungry >= 100) {
+        // 检查饥饿值
+        if (this.gameState.hungry <= 0) {
             this.endGame('hungry');
             return;
         }
         
-        // 检查拉屎需求
-        if (needPoop >= 100) {
-            this.endGame('need_poop');
+        // 检查精力值
+        if (this.gameState.energy <= 0) {
+            this.endGame('energy_depleted');
             return;
         }
-
-        // 只有在游戏真正结束时才检查主要成就线路
-        // 这里不检查，因为游戏还没结束
+        
+        // 检查两脚兽回家进度
+        const humanComingHome = this.gameState.progress.humanComingHome || 0;
+        if (humanComingHome >= 100) {
+            this.endGame('human_coming_home');
+            return;
+        }
     }
 
     /**
@@ -354,7 +383,6 @@ class ActionSystem {
             if (this.checkMainAchievementCondition(path)) {
                 const achievement = this.achievementsData[mainAchievementId];
                 this.unlockAchievement(mainAchievementId, achievement.name, achievement.description);
-                // 不在这里调用endGame，因为endGame已经在调用这个方法
                 console.log(`主要成就解锁: ${achievement.name}`);
                 return;
             }
@@ -368,65 +396,145 @@ class ActionSystem {
         const endCondition = path.endCondition;
         
         switch (endCondition.type) {
-            case 'all_sub_achievements':
-                // 检查所有子成就是否解锁
-                return path.subAchievements.every((subId: string) => 
-                    this.gameState.achievements[subId]
-                );
-            
-            case 'obedient_achievement':
-                // 检查所有子成就是否解锁
-                const obedientSubAchievementsUnlocked = path.subAchievements.every((subId: string) => 
-                    this.gameState.achievements[subId]
-                );
+            case 'play_completion':
+                return this.checkPlayCompletion(endCondition);
                 
-                // 检查是否有破坏活动
-                const obedientNoDestruction = endCondition.noDestruction ? 
-                    !this.hasDestructionAchievements() : true;
+            case 'destruction_completion':
+                return this.checkDestructionCompletion(endCondition);
                 
-                return obedientSubAchievementsUnlocked && obedientNoDestruction;
-            
-            case 'human_coming_home_low':
-                // 只有在两脚兽回家进度>=100%时才检查这个成就
-                const humanComingHome = this.gameState.progress.humanComingHome || 0;
-                if (humanComingHome < 100) {
-                    return false; // 游戏还没结束，不检查这个成就
-                }
+            case 'obedient_completion':
+                return this.checkObedientCompletion(endCondition);
                 
-                // 检查所有子成就是否解锁
-                const lowSubAchievementsUnlocked = path.subAchievements.every((subId: string) => 
-                    this.gameState.achievements[subId]
-                );
+            case 'escape_completion':
+                return this.checkEscapeCompletion(endCondition);
                 
-                // 检查两脚兽回家进度是否低于阈值
-                const isLow = humanComingHome <= endCondition.humanComingHomeThreshold;
+            case 'trap_completion':
+                return this.checkTrapCompletion(endCondition);
                 
-                // 检查是否有破坏活动
-                const lowNoDestruction = endCondition.noDestruction ? 
-                    !this.hasDestructionAchievements() : true;
+            case 'material_completion':
+                return this.checkMaterialCompletion(endCondition);
                 
-                return lowSubAchievementsUnlocked && isLow && lowNoDestruction;
-            
-            case 'all_rooms_unlocked':
-                return this.gameState.achievementCounters.roomUnlockCount >= 3;
-            
-            case 'all_traps_set_and_defend':
-                return this.gameState.achievementCounters.trapSetCount >= 3 && 
-                       this.gameState.achievementCounters.invasionDefendCount >= 1;
-            
+            case 'strategist_completion':
+                return this.checkStrategistCompletion(endCondition);
+                
             default:
                 return false;
         }
     }
 
     /**
+     * 检查玩耍成就完成条件
+     */
+    private checkPlayCompletion(condition: any): boolean {
+        if (!condition.requiredToys || !condition.requiredInteractions) {
+            return false;
+        }
+
+        // 检查是否收集了所有玩具
+        const hasAllToys = condition.requiredToys.every((toyId: string) => 
+            this.gameState.inventory.includes(toyId)
+        );
+
+        // 检查是否进行了所有玩耍交互
+        const hasAllInteractions = this.gameState.achievementCounters.playInteractionCount >= condition.requiredInteractions.length;
+
+        return hasAllToys && hasAllInteractions;
+    }
+
+    /**
+     * 检查破坏成就完成条件
+     */
+    private checkDestructionCompletion(condition: any): boolean {
+        if (!condition.requiredDestructions) {
+            return false;
+        }
+
+        return this.gameState.achievementCounters.expensiveItemDestroyCount >= condition.requiredDestructions.length;
+    }
+
+    /**
+     * 检查温顺成就完成条件
+     */
+    private checkObedientCompletion(condition: any): boolean {
+        // 检查是否没有进行破坏活动
+        if (condition.noDestruction && this.gameState.achievementCounters.expensiveItemDestroyCount > 0) {
+            return false;
+        }
+
+        // 检查是否在门口迎接
+        if (condition.greetAtDoor && this.gameState.achievementCounters.greetingAtDoor === 0) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * 检查逃脱成就完成条件
+     */
+    private checkEscapeCompletion(condition: any): boolean {
+        // 检查精力值要求
+        if (condition.energyRequirement && this.gameState.energy < condition.energyRequirement) {
+            return false;
+        }
+
+        // 检查是否访问了阳台
+        if (condition.balconyAccess && this.gameState.achievementCounters.balconyVisited === 0) {
+            return false;
+        }
+
+        // 检查是否与邻居猫战斗
+        if (condition.neighborFight && !this.gameState.flags?.neighbor_fight_completed) {
+            return false;
+        }
+
+        // 检查是否成功逃脱
+        if (condition.neighborEscape && this.gameState.achievementCounters.neighborEscape === 0) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * 检查陷阱成就完成条件
+     */
+    private checkTrapCompletion(condition: any): boolean {
+        if (!condition.requiredTraps) {
+            return false;
+        }
+
+        return this.gameState.achievementCounters.trapSetupCount >= condition.requiredTraps;
+    }
+
+    /**
+     * 检查材料成就完成条件
+     */
+    private checkMaterialCompletion(condition: any): boolean {
+        if (!condition.requiredMaterials) {
+            return false;
+        }
+
+        return condition.requiredMaterials.every((materialId: string) => 
+            this.gameState.inventory.includes(materialId)
+        );
+    }
+
+    /**
+     * 检查策略成就完成条件
+     */
+    private checkStrategistCompletion(condition: any): boolean {
+        const trapMasterUnlocked = this.gameState.achievements['trap_master'];
+        const logisticsOfficerUnlocked = this.gameState.achievements['logistics_officer'];
+        
+        return !!(trapMasterUnlocked && logisticsOfficerUnlocked);
+    }
+
+    /**
      * 检查是否有破坏类成就
      */
     hasDestructionAchievements(): boolean {
-        const destructionAchievements = [
-            'water_overflow', 'table_justice', 'sofa_destroyer', 'toilet_paper_terminator'
-        ];
-        return destructionAchievements.some(id => this.gameState.achievements[id]);
+        return this.gameState.achievementCounters.expensiveItemDestroyCount > 0;
     }
 
     /**
@@ -440,33 +548,45 @@ class ActionSystem {
         let endTitle = '';
 
         switch (endType) {
-            case 'human_coming_home':
-                endTitle = '两脚兽回家了！';
-                endMessage = '我的一天结束了。';
+            case 'time_up':
+                endTitle = '时间到了！';
+                endMessage = '12小时过去了，我的一天结束了。';
                 break;
             case 'hungry':
                 endTitle = '太饿了！';
                 endMessage = '我饿得不行了，需要找点吃的。';
                 break;
-            case 'need_poop':
-                endTitle = '憋不住了！';
-                endMessage = '我急需上厕所。';
+            case 'energy_depleted':
+                endTitle = '精力耗尽！';
+                endMessage = '我太累了，需要休息。';
                 break;
-            case 'destruction':
-                endTitle = '今日最佳破坏王';
+            case 'human_coming_home':
+                endTitle = '两脚兽回家了！';
+                endMessage = '我的一天结束了。';
+                break;
+            case 'playtime_master':
+                endTitle = '玩耍时光';
+                endMessage = '我尽情地玩了个爽！';
+                break;
+            case 'destruction_king':
+                endTitle = '猫中哈士奇';
                 endMessage = '我成功成为了这个家的破坏之王！';
                 break;
-            case 'obedient':
-                endTitle = '智人首席奴才';
+            case 'human_ally':
+                endTitle = '两脚兽的盟友';
                 endMessage = '我是一个完美的乖猫咪！';
                 break;
-            case 'explorer':
-                endTitle = '这个家我说了算';
-                endMessage = '我探索了所有的秘密！';
+            case 'escape_artist':
+                endTitle = '再见了两脚兽今天我就要远航';
+                endMessage = '我成功离家出走了！';
                 break;
-            case 'strategist':
-                endTitle = '家庭安全顾问';
-                endMessage = '我成功保护了这个家！';
+            case 'trap_master':
+                endTitle = '走路小心点';
+                endMessage = '我布置了完美的陷阱！';
+                break;
+            case 'logistics_officer':
+                endTitle = '后勤官';
+                endMessage = '我准备好了所有材料！';
                 break;
             default:
                 endTitle = '游戏结束';

@@ -1,13 +1,33 @@
 import { GameState, GameData, Achievement } from '../types/index';
 
 export interface AchievementCondition {
-    type: 'counter' | 'flag' | 'all_sub_achievements' | 'human_coming_home_low' | 'all_rooms_unlocked' | 'all_traps_set_and_defend' | 'path_completion' | 'obedient_achievement';
-    counter?: string;
-    flag?: string;
-    value?: number;
-    humanComingHomeThreshold?: number;
+    type: 'play_completion' | 'destruction_completion' | 'obedient_completion' | 'escape_completion' | 'trap_completion' | 'material_completion' | 'strategist_completion';
+    
+    // 玩耍成就条件
+    requiredToys?: string[];
+    requiredInteractions?: string[];
+    
+    // 破坏成就条件
+    requiredDestructions?: string[];
+    
+    // 温顺成就条件
     noDestruction?: boolean;
-    path?: string;
+    greetAtDoor?: boolean;
+    
+    // 逃脱成就条件
+    balconyAccess?: boolean;
+    neighborFight?: boolean;
+    neighborEscape?: boolean;
+    energyRequirement?: number;
+    
+    // 陷阱成就条件
+    requiredTraps?: number;
+    
+    // 材料成就条件
+    requiredMaterials?: string[];
+    
+    // 通用条件
+    timeLimit?: number; // 时间限制（分钟）
 }
 
 export interface AchievementData {
@@ -24,6 +44,7 @@ export interface AchievementPath {
     name: string;
     description: string;
     mainAchievement: string;
+    mainAchievements?: string[]; // 支持多个主成就
     subAchievements: string[];
     endCondition: AchievementCondition;
 }
@@ -58,21 +79,11 @@ export default class AchievementSystem {
      * 检查并更新成就状态
      */
     public checkAchievements(): void {
-        // 检查子成就
+        // 检查所有成就
         Object.values(this.achievementConfig.achievements).forEach(achievementData => {
-            if (!achievementData.isMainAchievement && !this.gameState.achievements[achievementData.id]) {
+            if (!this.gameState.achievements[achievementData.id]) {
                 if (this.checkAchievementCondition(achievementData.condition)) {
                     this.unlockAchievement(achievementData);
-                }
-            }
-        });
-
-        // 检查主成就
-        Object.values(this.achievementConfig.achievementPaths).forEach(path => {
-            const mainAchievementData = this.achievementConfig.achievements[path.mainAchievement];
-            if (mainAchievementData && !this.gameState.achievements[path.mainAchievement]) {
-                if (this.checkAchievementPathCondition(path)) {
-                    this.unlockAchievement(mainAchievementData);
                 }
             }
         });
@@ -82,115 +93,147 @@ export default class AchievementSystem {
      * 检查成就条件
      */
     private checkAchievementCondition(condition: AchievementCondition): boolean {
+        // 检查时间限制
+        if (condition.timeLimit && this.gameState.currentTime > condition.timeLimit) {
+            return false;
+        }
+
         switch (condition.type) {
-            case 'counter':
-                if (!condition.counter || condition.value === undefined) return false;
-                const counterValue = this.getCounterValue(condition.counter);
-                return counterValue >= condition.value;
-
-            case 'flag':
-                if (!condition.flag) return false;
-                return this.gameState.flags?.[condition.flag] === true;
-
-            case 'path_completion':
-                if (!condition.path) return false;
-                const path = this.achievementConfig.achievementPaths[condition.path];
-                if (!path) return false;
-                return this.checkAchievementPathCondition(path);
-
-            case 'all_sub_achievements':
-                // 这个条件通常用于主成就，在checkAchievementPathCondition中处理
-                return false;
-
-            case 'obedient_achievement':
-                // 检查是否没有进行破坏活动
-                if (condition.noDestruction) {
-                    const destructionCounters = [
-                        'waterBowlKnockOverCount',
-                        'tableItemPushCount',
-                        'scratchCount',
-                        'toiletPaperDestroyCount'
-                    ];
-                    const hasDestruction = destructionCounters.some(counter => 
-                        this.getCounterValue(counter) > 0
-                    );
-                    return !hasDestruction;
-                }
-                return true;
-
-            case 'human_coming_home_low':
-                if (condition.humanComingHomeThreshold !== undefined) {
-                    const humanProgress = this.gameState.progress.humanComingHome || 0;
-                    return humanProgress <= condition.humanComingHomeThreshold;
-                }
-                break;
-
-            case 'all_rooms_unlocked':
-                // 检查是否所有房间都已解锁
-                return this.checkAllRoomsUnlocked();
-
-            case 'all_traps_set_and_defend':
-                // 检查是否所有陷阱都已设置并成功防御
-                return this.checkAllTrapsSetAndDefend();
+            case 'play_completion':
+                return this.checkPlayCompletion(condition);
+                
+            case 'destruction_completion':
+                return this.checkDestructionCompletion(condition);
+                
+            case 'obedient_completion':
+                return this.checkObedientCompletion(condition);
+                
+            case 'escape_completion':
+                return this.checkEscapeCompletion(condition);
+                
+            case 'trap_completion':
+                return this.checkTrapCompletion(condition);
+                
+            case 'material_completion':
+                return this.checkMaterialCompletion(condition);
+                
+            case 'strategist_completion':
+                return this.checkStrategistCompletion(condition);
         }
         return false;
     }
 
     /**
-     * 检查成就路径条件（主成就）
+     * 检查玩耍成就完成条件
      */
-    private checkAchievementPathCondition(path: AchievementPath): boolean {
-        const condition = path.endCondition;
-
-        switch (condition.type) {
-            case 'all_sub_achievements':
-                // 检查所有子成就是否都已解锁
-                return path.subAchievements.every(achievementId => 
-                    this.gameState.achievements[achievementId]
-                );
-
-            case 'obedient_achievement':
-                // 检查所有子成就是否都已解锁
-                const obedientSubAchievementsUnlocked = path.subAchievements.every(achievementId => 
-                    this.gameState.achievements[achievementId]
-                );
-                
-                // 检查是否没有进行破坏活动
-                const obedientNoDestruction = condition.noDestruction ? 
-                    !this.hasDestructionAchievements() : true;
-                
-                return obedientSubAchievementsUnlocked && obedientNoDestruction;
-
-            case 'human_coming_home_low':
-                if (condition.humanComingHomeThreshold !== undefined) {
-                    const humanProgress = this.gameState.progress.humanComingHome || 0;
-                    const isLowProgress = humanProgress <= condition.humanComingHomeThreshold;
-                    
-                    if (condition.noDestruction) {
-                        // 检查是否没有进行破坏活动
-                        const destructionCounters = [
-                            'waterBowlKnockOverCount',
-                            'tableItemPushCount',
-                            'scratchCount',
-                            'toiletPaperDestroyCount'
-                        ];
-                        const hasDestruction = destructionCounters.some(counter => 
-                            this.getCounterValue(counter) > 0
-                        );
-                        return isLowProgress && !hasDestruction;
-                    }
-                    
-                    return isLowProgress;
-                }
-                break;
-
-            case 'all_rooms_unlocked':
-                return this.checkAllRoomsUnlocked();
-
-            case 'all_traps_set_and_defend':
-                return this.checkAllTrapsSetAndDefend();
+    private checkPlayCompletion(condition: AchievementCondition): boolean {
+        if (!condition.requiredToys || !condition.requiredInteractions) {
+            return false;
         }
-        return false;
+
+        // 检查是否收集了所有玩具
+        const hasAllToys = condition.requiredToys.every(toyId => 
+            this.gameState.inventory.includes(toyId)
+        );
+
+        // 检查是否进行了所有玩耍交互
+        const hasAllInteractions = condition.requiredInteractions.every(interactionId => 
+            this.gameState.achievementCounters.playInteractionCount > 0
+        );
+
+        return hasAllToys && hasAllInteractions;
+    }
+
+    /**
+     * 检查破坏成就完成条件
+     */
+    private checkDestructionCompletion(condition: AchievementCondition): boolean {
+        if (!condition.requiredDestructions) {
+            return false;
+        }
+
+        // 检查是否破坏了所有昂贵物品
+        return this.gameState.achievementCounters.expensiveItemDestroyCount >= condition.requiredDestructions.length;
+    }
+
+    /**
+     * 检查温顺成就完成条件
+     */
+    private checkObedientCompletion(condition: AchievementCondition): boolean {
+        // 检查是否没有进行破坏活动
+        if (condition.noDestruction && this.gameState.achievementCounters.expensiveItemDestroyCount > 0) {
+            return false;
+        }
+
+        // 检查是否在门口迎接
+        if (condition.greetAtDoor && this.gameState.achievementCounters.greetingAtDoor === 0) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * 检查逃脱成就完成条件
+     */
+    private checkEscapeCompletion(condition: AchievementCondition): boolean {
+        // 检查精力值要求
+        if (condition.energyRequirement && this.gameState.energy < condition.energyRequirement) {
+            return false;
+        }
+
+        // 检查是否访问了阳台
+        if (condition.balconyAccess && this.gameState.achievementCounters.balconyVisited === 0) {
+            return false;
+        }
+
+        // 检查是否与邻居猫战斗
+        if (condition.neighborFight && !this.gameState.flags?.neighbor_fight_completed) {
+            return false;
+        }
+
+        // 检查是否成功逃脱
+        if (condition.neighborEscape && this.gameState.achievementCounters.neighborEscape === 0) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * 检查陷阱成就完成条件
+     */
+    private checkTrapCompletion(condition: AchievementCondition): boolean {
+        if (!condition.requiredTraps) {
+            return false;
+        }
+
+        return this.gameState.achievementCounters.trapSetupCount >= condition.requiredTraps;
+    }
+
+    /**
+     * 检查材料成就完成条件
+     */
+    private checkMaterialCompletion(condition: AchievementCondition): boolean {
+        if (!condition.requiredMaterials) {
+            return false;
+        }
+
+        // 检查是否准备了所有材料
+        return condition.requiredMaterials.every(materialId => 
+            this.gameState.inventory.includes(materialId)
+        );
+    }
+
+    /**
+     * 检查策略成就完成条件
+     */
+    private checkStrategistCompletion(condition: AchievementCondition): boolean {
+        // 策略成就需要完成陷阱和材料两个成就
+        const trapMasterUnlocked = this.gameState.achievements['trap_master'];
+        const logisticsOfficerUnlocked = this.gameState.achievements['logistics_officer'];
+        
+        return !!(trapMasterUnlocked && logisticsOfficerUnlocked);
     }
 
     /**
@@ -349,25 +392,15 @@ export default class AchievementSystem {
     public resetAllAchievements(): void {
         this.gameState.achievements = {};
         this.gameState.achievementCounters = {
-            knockOverCount: 0,
-            scratchCount: 0,
-            sleepCount: 0,
-            fishPickupCount: 0,
-            drinkCount: 0,
-            patrolCount: 0,
-            areaVisitCount: 0,
-            waterBowlKnockOverCount: 0,
-            tableItemPushCount: 0,
-            toiletPaperDestroyCount: 0,
-            meowCount: 0,
-            sleepLocationCount: 0,
-            litterBoxCount: 0,
-            toyInteractionCount: 0,
-            keyFindCount: 0,
-            roomUnlockCount: 0,
-            fishHideCount: 0,
-            trapSetCount: 0,
-            invasionDefendCount: 0
+            toyCollectionCount: 0,
+            playInteractionCount: 0,
+            expensiveItemDestroyCount: 0,
+            balconyVisited: 0,
+            neighborEscape: 0,
+            trapSetupCount: 0,
+            materialPreparationCount: 0,
+            greetingAtDoor: 0,
+            noDestructionFlag: false
         };
         this.gameState.flags = {};
         console.log('所有成就已重置');
@@ -377,12 +410,10 @@ export default class AchievementSystem {
      * 游戏结束时专用：结算"智人首席奴才"成就
      */
     public checkChiefServantAchievement(): void {
-        const path = this.achievementConfig.achievementPaths['obedient'];
-        if (!path) return;
-        const mainAchievementData = this.achievementConfig.achievements[path.mainAchievement];
-        if (!mainAchievementData || this.gameState.achievements[path.mainAchievement]) return;
-        if (this.checkAchievementPathCondition(path)) {
-            this.unlockAchievement(mainAchievementData);
+        const achievementData = this.achievementConfig.achievements['human_ally'];
+        if (!achievementData || this.gameState.achievements['human_ally']) return;
+        if (this.checkAchievementCondition(achievementData.condition)) {
+            this.unlockAchievement(achievementData);
         }
     }
 
@@ -390,15 +421,7 @@ export default class AchievementSystem {
      * 检查是否有破坏类成就
      */
     private hasDestructionAchievements(): boolean {
-        const destructionCounters = [
-            'waterBowlKnockOverCount',
-            'tableItemPushCount',
-            'scratchCount',
-            'toiletPaperDestroyCount'
-        ];
-        return destructionCounters.some(counter => 
-            this.getCounterValue(counter) > 0
-        );
+        return this.gameState.achievementCounters.expensiveItemDestroyCount > 0;
     }
 }
 

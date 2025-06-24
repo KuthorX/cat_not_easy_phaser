@@ -16,6 +16,32 @@
             },
             "triggerAchievement": "fish_pickup"
         },
+        "eat_food": {
+            "id": "eat_food",
+            "text": "吃粮喝水",
+            "log": "我吃了猫粮，喝了水，感觉好多了！",
+            "category": "simple",
+            "timeCost": 30,
+            "hungryRestore": 2,
+            "effects": {
+                "progress": {
+                    "humanComingHome": 5
+                }
+            }
+        },
+        "eat_treat": {
+            "id": "eat_treat",
+            "text": "食用猫条",
+            "log": "我吃了美味的猫条，太满足了！",
+            "category": "complex",
+            "timeCost": 60,
+            "hungryRestore": 4,
+            "effects": {
+                "progress": {
+                    "humanComingHome": 8
+                }
+            }
+        },
         "eat_fish": {
             "id": "eat_fish",
             "text": "吃掉",
@@ -88,15 +114,187 @@
         },
         "sleep_nest": {
             "id": "sleep_nest",
-            "text": "在猫窝里睡觉",
+            "text": "猫窝睡觉",
             "log": "我在温暖的猫窝里睡着了...",
+            "category": "simple",
+            "timeCost": 30,
+            "energyRestore": 2,
             "effects": {
                 "progress": {
-                    "energy": 30,
-                    "happiness": 20
+                    "humanComingHome": 3
                 }
-            },
-            "triggerAchievement": "afternoon_nap"
+            }
+        },
+        "sleep_bed": {
+            "id": "sleep_bed",
+            "text": "床上睡觉",
+            "log": "我在主人的床上舒服地睡着了...",
+            "category": "complex",
+            "timeCost": 60,
+            "energyRestore": 4,
+            "effects": {
+                "progress": {
+                    "humanComingHome": 5
+                }
+            }
+        },
+        "poop": {
+            "id": "poop",
+            "text": "拉屎",
+            "log": "我在猫砂盆里解决了生理需求。",
+            "category": "simple",
+            "timeCost": 30,
+            "hungryRequirement": 4,
+            "effects": {
+                "progress": {
+                    "humanComingHome": 2
+                }
+            }
+        },
+        "shake_tail": {
+            "id": "shake_tail",
+            "text": "抖落尾毛",
+            "log": "我抖了抖尾巴，毛掉进了主人的水杯里。",
+            "category": "simple",
+            "timeCost": 30,
+            "effects": {
+                "progress": {
+                    "humanComingHome": 1
+                }
+            }
+        },
+        "house_run": {
+            "id": "house_run",
+            "text": "全屋跑酷",
+            "log": "我在房子里疯狂跑酷，太刺激了！",
+            "category": "complex",
+            "timeCost": 60,
+            "energyCost": 3,
+            "effects": {
+                "progress": {
+                    "humanComingHome": 10
+                }
+            }
+        },
+        "destroy_tv": {
+            "id": "destroy_tv",
+            "text": "砸坏电视",
+            "log": "我把电视推倒了，屏幕碎了！",
+            "category": "complex",
+            "timeCost": 60,
+            "energyCost": 2,
+            "effects": {
+                "progress": {
+                    "humanComingHome": 15
+                }
+            }
+        },
+        "destroy_computer": {
+            "id": "destroy_computer",
+            "text": "破坏电脑",
+            "log": "我把电脑主机推倒了！",
+            "category": "complex",
+            "timeCost": 60,
+            "energyCost": 2,
+            "effects": {
+                "progress": {
+                    "humanComingHome": 15
+                }
+            }
+        },
+        "destroy_table_items": {
+            "id": "destroy_table_items",
+            "text": "扫落桌上物品",
+            "log": "我把桌子上的东西都扫到地上了！",
+            "category": "complex",
+            "timeCost": 60,
+            "energyCost": 1,
+            "effects": {
+                "progress": {
+                    "humanComingHome": 8
+                }
+            }
+        },
+        "destroy_cat_nest": {
+            "id": "destroy_cat_nest",
+            "text": "压塌猫窝",
+            "log": "我把猫窝压塌了！",
+            "category": "complex",
+            "timeCost": 60,
+            "energyCost": 1,
+            "effects": {
+                "progress": {
+                    "humanComingHome": 8
+                }
+            }
+        },
+        "collect_toy": {
+            "id": "collect_toy",
+            "text": "收集玩具",
+            "log": "我找到了一个玩具！",
+            "category": "simple",
+            "timeCost": 30,
+            "effects": {
+                "inventory": {
+                    "action": "add",
+                    "item": "toy"
+                },
+                "progress": {
+                    "humanComingHome": 2
+                }
+            }
+        },
+        "play_with_toy": {
+            "id": "play_with_toy",
+            "text": "玩玩具",
+            "log": "我和玩具玩得很开心！",
+            "category": "complex",
+            "timeCost": 60,
+            "energyCost": 1,
+            "effects": {
+                "progress": {
+                    "humanComingHome": 5
+                }
+            }
+        },
+        "scratch_post": {
+            "id": "scratch_post",
+            "text": "抓猫抓板",
+            "log": "我在猫抓板上磨爪子！",
+            "category": "complex",
+            "timeCost": 60,
+            "energyCost": 1,
+            "effects": {
+                "progress": {
+                    "humanComingHome": 3
+                }
+            }
+        },
+        "closet_hide": {
+            "id": "closet_hide",
+            "text": "钻进衣柜",
+            "log": "我钻进了衣柜里躲猫猫！",
+            "category": "complex",
+            "timeCost": 60,
+            "energyCost": 1,
+            "effects": {
+                "progress": {
+                    "humanComingHome": 4
+                }
+            }
+        },
+        "hammock_sleep": {
+            "id": "hammock_sleep",
+            "text": "睡猫吊床",
+            "log": "我在猫吊床上荡秋千！",
+            "category": "complex",
+            "timeCost": 60,
+            "energyRestore": 2,
+            "effects": {
+                "progress": {
+                    "humanComingHome": 3
+                }
+            }
         },
         "patrol_balcony": {
             "id": "patrol_balcony",
@@ -164,163 +362,6 @@
                 }
             },
             "triggerAchievement": "clean_champion"
-        },
-        "play_with_toy": {
-            "id": "play_with_toy",
-            "text": "玩玩具",
-            "log": "我和玩具玩得很开心！",
-            "effects": {
-                "progress": {
-                    "playfulness": 15,
-                    "happiness": 10,
-                    "energy": -5
-                }
-            },
-            "triggerAchievement": "toy_lover"
-        },
-        "find_key": {
-            "id": "find_key",
-            "text": "找到钥匙",
-            "log": "我发现了一把钥匙！",
-            "effects": {
-                "inventory": {
-                    "action": "add",
-                    "item": "key"
-                },
-                "progress": {
-                    "curiosity": 10
-                }
-            },
-            "triggerAchievement": "key_hunter"
-        },
-        "unlock_room": {
-            "id": "unlock_room",
-            "text": "解锁房间",
-            "log": "我用钥匙解锁了一个房间！",
-            "effects": {
-                "inventory": {
-                    "action": "remove",
-                    "item": "key"
-                },
-                "progress": {
-                    "curiosity": 15
-                }
-            },
-            "triggerAchievement": "door_secret"
-        },
-        "escape_outside": {
-            "id": "escape_outside",
-            "text": "离家出走",
-            "log": "我成功逃出了家门！",
-            "effects": {
-                "special": {
-                    "unlockArea": "outside"
-                }
-            },
-            "triggerAchievement": "escape_master"
-        },
-        "set_trap": {
-            "id": "set_trap",
-            "text": "设置陷阱",
-            "log": "我设置了一个陷阱来保护领地！",
-            "effects": {
-                "progress": {
-                    "territorial": 10
-                }
-            },
-            "triggerAchievement": "high_ground_defense"
-        },
-        "set_alarm": {
-            "id": "set_alarm",
-            "text": "设置警报",
-            "log": "我在门口设置了警报器！",
-            "effects": {
-                "progress": { "humanComingHome": 10 }
-            },
-            "triggerAchievement": "invasion_alarm"
-        },
-        "defend_invasion": {
-            "id": "defend_invasion",
-            "text": "防御入侵",
-            "log": "我成功防御了入侵者！",
-            "effects": {
-                "progress": {
-                    "territorial": 15,
-                    "happiness": 10
-                }
-            },
-            "triggerAchievement": "king_contempt"
-        },
-        "visit_balcony": {
-            "id": "visit_balcony",
-            "text": "访问阳台",
-            "log": "我来到了阳台！",
-            "effects": {
-                "progress": { "humanComingHome": 1 }
-            },
-            "triggerAchievement": "balcony_patrol"
-        },
-        "unlock_room_c": {
-            "id": "unlock_room_c",
-            "text": "解锁房间C",
-            "log": "房间C的门打开了！",
-            "effects": {
-                "progress": { "humanComingHome": 3 }
-            },
-            "triggerAchievement": "door_secret"
-        },
-        "configure_traps": {
-            "id": "configure_traps",
-            "text": "配置陷阱",
-            "log": "我配置了所有陷阱！",
-            "effects": {
-                "progress": { "humanComingHome": 5 }
-            }
-        },
-        "groom_self": {
-            "id": "groom_self",
-            "text": "梳理毛发",
-            "log": "我仔细地梳理着自己的毛发。",
-            "effects": {
-                "progress": {
-                    "grooming": 10,
-                    "happiness": 5
-                }
-            }
-        },
-        "hunt_mouse": {
-            "id": "hunt_mouse",
-            "text": "捕猎老鼠",
-            "log": "我发现了一只老鼠，开始捕猎！",
-            "effects": {
-                "progress": {
-                    "hunting": 15,
-                    "hungry": -10,
-                    "energy": -10
-                }
-            }
-        },
-        "mark_territory": {
-            "id": "mark_territory",
-            "text": "标记领地",
-            "log": "我在标记自己的领地。",
-            "effects": {
-                "progress": {
-                    "territorial": 10,
-                    "humanComingHome": 3
-                }
-            }
-        },
-        "watch_window": {
-            "id": "watch_window",
-            "text": "看窗外",
-            "log": "我坐在窗边观察外面的世界。",
-            "effects": {
-                "progress": {
-                    "curiosity": 8,
-                    "happiness": 5
-                }
-            }
         },
         "play_with_plant": {
             "id": "play_with_plant",
@@ -440,6 +481,76 @@
             "effects": {
                 "progress": {
                     "territorial": 12
+                }
+            }
+        },
+        "neighbor_fight": {
+            "id": "neighbor_fight",
+            "text": "与邻居猫战斗",
+            "log": "我和邻居家的猫打了一架！",
+            "category": "complex",
+            "timeCost": 60,
+            "energyCost": 3,
+            "energyRequirement": 3,
+            "effects": {
+                "special": {
+                    "triggerEvent": "neighbor_fight_completed"
+                },
+                "progress": {
+                    "humanComingHome": 20
+                }
+            }
+        },
+        "neighbor_escape": {
+            "id": "neighbor_escape",
+            "text": "从邻居家逃脱",
+            "log": "我成功从邻居家逃脱了！",
+            "category": "simple",
+            "timeCost": 30,
+            "effects": {
+                "progress": {
+                    "humanComingHome": 5
+                }
+            }
+        },
+        "set_trap": {
+            "id": "set_trap",
+            "text": "设置陷阱",
+            "log": "我设置了一个陷阱！",
+            "category": "complex",
+            "timeCost": 60,
+            "energyCost": 1,
+            "effects": {
+                "progress": {
+                    "humanComingHome": 5
+                }
+            }
+        },
+        "prepare_material": {
+            "id": "prepare_material",
+            "text": "准备材料",
+            "log": "我准备了一些材料！",
+            "category": "simple",
+            "timeCost": 30,
+            "effects": {
+                "inventory": {
+                    "action": "add",
+                    "item": "material"
+                },
+                "progress": {
+                    "humanComingHome": 3
+                }
+            }
+        },
+        "greet_at_door": {
+            "id": "greet_at_door",
+            "text": "门口迎接",
+            "log": "我在门口迎接主人回家！",
+            "category": "simple",
+            "timeCost": 30,
+            "effects": {
+                "progress": {
+                    "humanComingHome": 1
                 }
             }
         }
@@ -572,6 +683,66 @@
                     },
                     "progress": {
                         "curiosity": 15
+                    }
+                }
+            }
+        },
+        "squeaky_mouse": {
+            "play": {
+                "id": "play",
+                "text": "玩发声老鼠",
+                "log": "我和发声老鼠玩得很开心！",
+                "category": "complex",
+                "timeCost": 60,
+                "energyCost": 1,
+                "effects": {
+                    "progress": {
+                        "humanComingHome": 5
+                    }
+                }
+            }
+        },
+        "spinning_ball": {
+            "play": {
+                "id": "play",
+                "text": "玩转球",
+                "log": "我追着转球跑来跑去！",
+                "category": "complex",
+                "timeCost": 60,
+                "energyCost": 1,
+                "effects": {
+                    "progress": {
+                        "humanComingHome": 5
+                    }
+                }
+            }
+        },
+        "cat_rope": {
+            "play": {
+                "id": "play",
+                "text": "玩猫咬绳",
+                "log": "我和猫咬绳玩得很开心！",
+                "category": "complex",
+                "timeCost": 60,
+                "energyCost": 1,
+                "effects": {
+                    "progress": {
+                        "humanComingHome": 5
+                    }
+                }
+            }
+        },
+        "black_sock": {
+            "play": {
+                "id": "play",
+                "text": "玩黑色筒状布",
+                "log": "我和黑色筒状布玩得很开心！",
+                "category": "complex",
+                "timeCost": 60,
+                "energyCost": 1,
+                "effects": {
+                    "progress": {
+                        "humanComingHome": 5
                     }
                 }
             }
