@@ -2,7 +2,6 @@ import { GameEvents } from '../constants/GameEvents';
 import { GameManager } from '@/core/GameManager';
 import { SceneManager } from '@/core/SceneManager';
 import { UIManager } from '@/core/UIManager';
-import { SaveManager } from '@/core/SaveManager';
 import { AudioManager } from '@/core/AudioManager';
 
 export abstract class BaseScene extends Phaser.Scene {
@@ -10,7 +9,6 @@ export abstract class BaseScene extends Phaser.Scene {
   protected sceneManager!: SceneManager;
   protected audioManager!: AudioManager;
   protected uiManager!: UIManager;
-  protected saveManager!: SaveManager;
 
   constructor(key: string) {
     super(key);
@@ -24,7 +22,6 @@ export abstract class BaseScene extends Phaser.Scene {
       this.sceneManager = game.sceneManager;
       this.audioManager = game.audioManager;
       this.uiManager = game.uiManager;
-      this.saveManager = game.saveManager;
     }
 
     // 设置当前场景

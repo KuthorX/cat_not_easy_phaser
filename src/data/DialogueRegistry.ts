@@ -214,13 +214,6 @@ export class DialogueRegistry {
           id: 'window_greeting',
           speaker: 'object',
           text: '我是窗户，连接室内和室外的桥梁。',
-          autoNext: true,
-          nextStep: 'cat_window_response'
-        },
-        {
-          id: 'cat_window_response',
-          speaker: 'cat',
-          text: '窗户，我想和你互动！',
           choices: [
             {
               id: 'sunbathing_choice',

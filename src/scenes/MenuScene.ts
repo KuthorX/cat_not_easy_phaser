@@ -27,14 +27,6 @@ export class MenuScene extends Phaser.Scene {
       this.startNewGame();
     });
 
-    // 检查是否有存档
-    const game = (window as any).game;
-    if (game && game.saveManager.hasSaveGame()) {
-      this.createButton('继续游戏', 640, 380, () => {
-        this.loadGame();
-      });
-    }
-
     this.createButton('设置', 640, 440, () => {
       this.showSettings();
     });
