@@ -11,6 +11,74 @@ export interface GameState {
   currentRoom: string;
   gameEnded: boolean;
   endingType: string | null;
+  currentDialogue?: DialogueState;
+  dialogueHistory: DialogueHistoryEntry[];
+}
+
+export interface DialogueState {
+  objectId: string;
+  objectName: string;
+  objectPosition: { x: number; y: number };
+  lastBubblePosition?: DialogueBubblePosition;
+  currentDialogue: Dialogue;
+  currentStep: number;
+  isActive: boolean;
+}
+
+export interface DialogueHistoryEntry {
+  timestamp: number;
+  objectId: string;
+  objectName: string;
+  dialogueText: string;
+  speaker: 'object' | 'cat';
+}
+
+export interface Dialogue {
+  id: string;
+  objectId: string;
+  objectName: string;
+  steps: DialogueStep[];
+  conditions?: DialogueCondition[];
+  effects?: DialogueEffect[];
+}
+
+export interface DialogueStep {
+  id: string;
+  speaker: 'object' | 'cat';
+  text: string;
+  choices?: DialogueChoice[];
+  autoNext?: boolean;
+  nextStep?: string;
+  effects?: DialogueEffect[];
+}
+
+export interface DialogueChoice {
+  id: string;
+  text: string;
+  nextStep: string;
+  conditions?: DialogueCondition[];
+  effects?: DialogueEffect[];
+}
+
+export interface DialogueCondition {
+  type: 'hunger' | 'energy' | 'inventory' | 'story_flag' | 'room_visited' | 'action_completed' | 'object_state';
+  operator: 'gte' | 'lte' | 'eq' | 'ne' | 'has' | 'not_has';
+  value: any;
+  objectId?: string;
+}
+
+export interface DialogueEffect {
+  type: 'hunger' | 'energy' | 'inventory' | 'story_flag' | 'achievement' | 'room_access' | 'object_state';
+  value: any;
+  operation: 'add' | 'remove' | 'set' | 'modify';
+  objectId?: string;
+}
+
+export interface DialogueBubblePosition {
+  x: number;
+  y: number;
+  anchor: 'left' | 'right' | 'center';
+  direction: 'up' | 'down' | 'left' | 'right';
 }
 
 export interface Action {
@@ -26,6 +94,8 @@ export interface Action {
   itemRequirement?: string;
   effects: ActionEffect[];
   conditions: ActionCondition[];
+  dialogueId?: string;
+  triggerDialogue?: boolean;
 }
 
 export interface ActionEffect {

@@ -3,22 +3,35 @@ import { GameConstants } from '../config/GameConfig';
 import { EventEmitter } from '../utils/EventEmitter';
 import { GameEvents } from '../constants/GameEvents';
 import { EventManager } from './EventManager';
+import { DialogueManager } from './DialogueManager';
 
 export class GameManager {
   private game: Phaser.Game;
   private state: GameState;
   private eventEmitter: EventEmitter;
   private eventManager: EventManager;
+  private dialogueManager: DialogueManager;
   private timeInterval: NodeJS.Timeout | null = null;
+  private realTimeStart: number = Date.now();
+  private gameTimeScale: number = 60; // 1秒真实时间 = 1分钟游戏时间
 
   constructor(game: Phaser.Game) {
     this.game = game;
     this.eventEmitter = new EventEmitter();
     this.eventManager = new EventManager();
+    this.dialogueManager = new DialogueManager();
     this.state = this.initializeGameState();
+    
+    // 设置对话管理器的效果回调
+    this.dialogueManager.setEffectCallback((effects) => {
+      this.applyDialogueEffects(effects);
+    });
     
     // 设置事件监听
     this.setupEventListeners();
+    
+    // 启动实时时钟
+    this.startRealTimeClock();
   }
 
   private initializeGameState(): GameState {
@@ -34,7 +47,9 @@ export class GameManager {
       storyFlags: new Map(),
       currentRoom: 'living_room_north',
       gameEnded: false,
-      endingType: null
+      endingType: null,
+      currentDialogue: undefined,
+      dialogueHistory: []
     };
   }
 
@@ -51,13 +66,27 @@ export class GameManager {
     });
   }
 
-  // 时间管理
-  public advanceTime(minutes: number): boolean {
-    const newTime = this.state.currentTime + (minutes / 60);
+  // 启动实时时钟
+  private startRealTimeClock(): void {
+    this.realTimeStart = Date.now();
     
+    // 每秒更新一次游戏时间
+    this.timeInterval = setInterval(() => {
+      this.updateGameTime();
+    }, 1000);
+  }
+
+  // 更新游戏时间
+  private updateGameTime(): void {
+    if (this.state.gameEnded) return;
+
+    const realTimeElapsed = (Date.now() - this.realTimeStart) / 1000; // 秒
+    const gameTimeElapsed = realTimeElapsed / this.gameTimeScale * 10; // 分钟
+    const newTime = this.state.currentTime + (gameTimeElapsed / 60); // 小时
+
     if (newTime >= GameConstants.GAME_END_TIME) {
       this.endGame('time_up');
-      return false;
+      return;
     }
 
     this.state.currentTime = newTime;
@@ -69,7 +98,40 @@ export class GameManager {
     // 检查随机事件
     this.checkRandomEvents();
     
-    return true;
+    // 更新真实时间起点，避免累积误差
+    this.realTimeStart = Date.now();
+  }
+
+  // 获取当前游戏时间（小时）
+  public getCurrentTime(): number {
+    return this.state.currentTime;
+  }
+
+  // 获取格式化的时间字符串
+  public getFormattedTime(): string {
+    const hours = Math.floor(this.state.currentTime);
+    const minutes = Math.floor((this.state.currentTime - hours) * 60);
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+  }
+
+  // 设置时间流逝速度
+  public setTimeScale(scale: number): void {
+    this.gameTimeScale = scale;
+  }
+
+  // 暂停时间流逝
+  public pauseTime(): void {
+    if (this.timeInterval) {
+      clearInterval(this.timeInterval);
+      this.timeInterval = null;
+    }
+  }
+
+  // 恢复时间流逝
+  public resumeTime(): void {
+    if (!this.timeInterval) {
+      this.startRealTimeClock();
+    }
   }
 
   private checkSpecialEvents(): void {
@@ -182,15 +244,22 @@ export class GameManager {
     this.state.gameEnded = true;
     this.state.endingType = endingType;
     this.eventEmitter.emit(GameEvents.GAME_ENDED, { endingType });
+    
+    // 停止时间流逝
+    this.pauseTime();
+  }
+
+  // 清理资源
+  public cleanup(): void {
+    if (this.timeInterval) {
+      clearInterval(this.timeInterval);
+      this.timeInterval = null;
+    }
   }
 
   // 获取状态
   public getState(): GameState {
     return { ...this.state };
-  }
-
-  public getCurrentTime(): number {
-    return this.state.currentTime;
   }
 
   public getHunger(): number {
@@ -236,5 +305,73 @@ export class GameManager {
     this.state = this.initializeGameState();
     this.eventManager.resetTriggeredEvents();
     this.eventEmitter.emit(GameEvents.GAME_RESET);
+  }
+
+  // 对话系统
+  public getDialogueManager(): DialogueManager {
+    return this.dialogueManager;
+  }
+
+  public startDialogue(dialogueId: string, objectId: string, objectName: string, objectPosition: { x: number; y: number }): boolean {
+    console.log('GameManager.startDialogue 被调用:', { dialogueId, objectId, objectName, objectPosition });
+    const success = this.dialogueManager.startDialogue(dialogueId, objectId, objectName, objectPosition);
+    console.log('dialogueManager.startDialogue 结果:', success);
+    if (success) {
+      this.state.currentDialogue = this.dialogueManager.getCurrentDialogueState() || undefined;
+      console.log('触发 DIALOGUE_STARTED 事件');
+      this.eventEmitter.emit(GameEvents.DIALOGUE_STARTED, { dialogueId, objectId });
+    }
+    return success;
+  }
+
+  public endDialogue(): void {
+    console.log('GameManager.endDialogue 被调用');
+    this.dialogueManager.endDialogue();
+    this.state.currentDialogue = undefined;
+    console.log('触发 DIALOGUE_ENDED 事件');
+    this.eventEmitter.emit(GameEvents.DIALOGUE_ENDED, {});
+  }
+
+  public getCurrentDialogueState(): any {
+    return this.dialogueManager.getCurrentDialogueState();
+  }
+
+  // 应用对话效果
+  public applyDialogueEffects(effects: any[]): void {
+    effects.forEach(effect => {
+      switch (effect.type) {
+        case 'hunger':
+          if (effect.operation === 'add') {
+            this.modifyHunger(effect.value);
+          } else if (effect.operation === 'remove') {
+            this.modifyHunger(-effect.value);
+          }
+          break;
+        case 'energy':
+          if (effect.operation === 'add') {
+            this.modifyEnergy(effect.value);
+          } else if (effect.operation === 'remove') {
+            this.modifyEnergy(-effect.value);
+          }
+          break;
+        case 'inventory':
+          if (effect.operation === 'add') {
+            this.addToInventory(effect.value);
+          } else if (effect.operation === 'remove') {
+            this.removeFromInventory(effect.value);
+          }
+          break;
+        case 'story_flag':
+          if (effect.operation === 'set') {
+            this.setStoryFlag(effect.value, true);
+          }
+          break;
+        case 'achievement':
+          if (effect.operation === 'add') {
+            this.unlockAchievement(effect.value);
+          }
+          break;
+      }
+    });
   }
 } 

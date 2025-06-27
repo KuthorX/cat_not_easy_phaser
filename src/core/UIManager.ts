@@ -1,5 +1,7 @@
 import { GameEvents } from '../constants/GameEvents';
 import { GameConstants } from '../config/GameConfig';
+import { DialogueManager } from './DialogueManager';
+import { DialogueBubblePosition, DialogueStep, DialogueChoice } from '../types/GameState';
 
 export class UIManager {
   private game: Phaser.Game;
@@ -9,9 +11,19 @@ export class UIManager {
   private dialogueBox: Phaser.GameObjects.Container | null = null;
   private inventoryPanel: Phaser.GameObjects.Container | null = null;
   private achievementPopup: Phaser.GameObjects.Container | null = null;
+  
+  // 新增：对话气泡相关
+  private dialogueBubbles: Map<string, Phaser.GameObjects.Container> = new Map();
+  private dialogueChoices: Phaser.GameObjects.Container | null = null;
+  private dialogueManager: DialogueManager | null = null;
 
   constructor(game: Phaser.Game) {
     this.game = game;
+  }
+
+  // 设置对话管理器
+  public setDialogueManager(dialogueManager: DialogueManager): void {
+    this.dialogueManager = dialogueManager;
   }
 
   // 初始化UI
@@ -22,12 +34,55 @@ export class UIManager {
     this.createDialogueBox();
     this.createInventoryPanel();
     this.createAchievementPopup();
+    this.createDialogueChoices();
     
     // 初始隐藏一些UI元素
     this.hideActionMenu();
     this.hideDialogueBox();
     this.hideInventoryPanel();
     this.hideAchievementPopup();
+    this.hideDialogueChoices();
+    
+    // 设置对话事件监听
+    this.setupDialogueEventListeners();
+  }
+
+  // 设置对话事件监听
+  private setupDialogueEventListeners(): void {
+    // 通过全局游戏实例获取GameManager
+    const game = (window as any).game;
+    if (!game || !game.gameManager) {
+      console.error('无法获取GameManager');
+      return;
+    }
+    
+    // 监听对话开始事件
+    game.gameManager.on(GameEvents.DIALOGUE_STARTED, (data: { dialogueId: string, objectId: string }) => {
+      this.onDialogueStarted(data);
+    });
+    
+    // 监听对话结束事件
+    game.gameManager.on(GameEvents.DIALOGUE_ENDED, () => {
+      this.onDialogueEnded();
+    });
+  }
+
+  // 对话开始事件处理
+  private onDialogueStarted(data: { dialogueId: string, objectId: string }): void {
+    console.log('UIManager.onDialogueStarted 被调用:', data);
+    if (this.dialogueManager) {
+      console.log('dialogueManager 存在，调用 updateDialogueDisplay');
+      this.updateDialogueDisplay();
+    } else {
+      console.error('dialogueManager 不存在！');
+    }
+  }
+
+  // 对话结束事件处理
+  private onDialogueEnded(): void {
+    console.log('UIManager.onDialogueEnded 被调用');
+    this.hideAllDialogueBubbles();
+    this.hideDialogueChoices();
   }
 
   // 创建状态栏
@@ -146,6 +201,14 @@ export class UIManager {
     this.achievementPopup.setDepth(1001);
   }
 
+  // 创建对话选择界面
+  private createDialogueChoices(): void {
+    if (!this.uiScene) return;
+
+    this.dialogueChoices = this.uiScene.add.container(640, 500);
+    this.dialogueChoices.setDepth(1001);
+  }
+
   // 更新状态栏
   public updateStatusBar(time: number, hunger: number, energy: number): void {
     if (!this.statusBar) return;
@@ -154,10 +217,19 @@ export class UIManager {
     const hungerText = this.statusBar.getAt(1) as Phaser.GameObjects.Text;
     const energyText = this.statusBar.getAt(2) as Phaser.GameObjects.Text;
 
-    const hours = Math.floor(time);
-    const minutes = Math.floor((time - hours) * 60);
-    timeText.setText(`时间: ${hours}:${minutes.toString().padStart(2, '0')}`);
+    // 获取格式化的时间字符串
+    const game = (window as any).game;
+    let formattedTime = '';
+    if (game && game.gameManager) {
+      formattedTime = game.gameManager.getFormattedTime();
+    } else {
+      // 备用格式化方法
+      const hours = Math.floor(time);
+      const minutes = Math.floor((time - hours) * 60);
+      formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    }
     
+    timeText.setText(`时间: ${formattedTime}`);
     hungerText.setText(`饥饿: ${hunger}/${GameConstants.MAX_HUNGER}`);
     energyText.setText(`精力: ${energy}/${GameConstants.MAX_ENERGY}`);
   }
@@ -307,17 +379,14 @@ export class UIManager {
     // 隐藏菜单
     this.hideActionMenu();
     
-    // 获取当前场景并执行动作
-    const currentScene = this.game.scene.getScene('LivingRoomNorthScene') || 
-                        this.game.scene.getScene('LivingRoomEastScene') ||
-                        this.game.scene.getScene('LivingRoomWestLowScene') ||
-                        this.game.scene.getScene('LivingRoomWestHighScene') ||
-                        this.game.scene.getScene('LivingRoomDoorScene') ||
-                        this.game.scene.getScene('BalconyScene') ||
-                        this.game.scene.getScene('RoomBScene') ||
-                        this.game.scene.getScene('HallwayScene') ||
-                        this.game.scene.getScene('DoorwayScene');
+    // 通过全局游戏实例获取SceneManager和当前场景
+    const game = (window as any).game;
+    if (!game || !game.sceneManager) {
+      console.error('无法获取SceneManager');
+      return;
+    }
     
+    const currentScene = game.sceneManager.getCurrentScene();
     console.log('找到当前场景:', currentScene?.scene.key);
     
     if (currentScene && (currentScene as any).executeAction) {
@@ -377,5 +446,295 @@ export class UIManager {
     };
     
     return endingTexts[endingType] || '游戏结束';
+  }
+
+  // 显示对话气泡
+  public showDialogueBubble(
+    bubbleId: string,
+    text: string,
+    position: DialogueBubblePosition,
+    speaker: 'object' | 'cat',
+    duration: number = 0
+  ): void {
+    if (!this.uiScene) return;
+
+    // 先隐藏已存在的同名气泡
+    this.hideDialogueBubble(bubbleId);
+
+    const bubble = this.uiScene.add.container(position.x, position.y);
+    
+    // 计算气泡大小
+    const textWidth = text.length * 8;
+    const bubbleWidth = Math.min(textWidth + 40, 300);
+    const bubbleHeight = 80;
+
+    // 创建气泡背景
+    const background = this.uiScene.add.rectangle(0, 0, bubbleWidth, bubbleHeight, 0xFFFFFF, 0.9);
+    background.setStrokeStyle(2, 0x000000);
+
+    // 创建文本
+    const textElement = this.uiScene.add.text(0, 0, text, {
+      fontSize: '16px',
+      color: '#000000',
+      wordWrap: { width: bubbleWidth - 20 }
+    });
+    textElement.setOrigin(0.5);
+
+    // 创建小尾巴（指向说话者）
+    const tail = this.createBubbleTail(position.direction, bubbleWidth, bubbleHeight);
+
+    bubble.add([background, textElement, tail]);
+    bubble.setDepth(1001);
+
+    // 设置锚点
+    if (position.anchor === 'left') {
+      bubble.setPosition(position.x, position.y);
+    } else if (position.anchor === 'right') {
+      bubble.setPosition(position.x - bubbleWidth, position.y);
+    } else {
+      bubble.setPosition(position.x - bubbleWidth / 2, position.y - bubbleHeight / 2);
+    }
+
+    this.dialogueBubbles.set(bubbleId, bubble);
+
+    // 如果设置了持续时间，自动隐藏
+    if (duration > 0) {
+      this.uiScene.time.delayedCall(duration, () => {
+        this.hideDialogueBubble(bubbleId);
+      });
+    }
+  }
+
+  // 创建气泡尾巴
+  private createBubbleTail(direction: 'up' | 'down' | 'left' | 'right', width: number, height: number): Phaser.GameObjects.Graphics {
+    const graphics = this.uiScene!.add.graphics();
+    graphics.fillStyle(0xFFFFFF, 0.9);
+    graphics.lineStyle(2, 0x000000);
+
+    const tailSize = 10;
+    let points: number[] = [];
+
+    switch (direction) {
+      case 'up':
+        points = [
+          -tailSize, height / 2,
+          0, height / 2 + tailSize,
+          tailSize, height / 2
+        ];
+        break;
+      case 'down':
+        points = [
+          -tailSize, -height / 2,
+          0, -height / 2 - tailSize,
+          tailSize, -height / 2
+        ];
+        break;
+      case 'left':
+        points = [
+          width / 2, -tailSize,
+          width / 2 + tailSize, 0,
+          width / 2, tailSize
+        ];
+        break;
+      case 'right':
+        points = [
+          -width / 2, -tailSize,
+          -width / 2 - tailSize, 0,
+          -width / 2, tailSize
+        ];
+        break;
+    }
+
+    graphics.fillPoints(points, true, true);
+    graphics.strokePoints(points, true, true);
+
+    return graphics;
+  }
+
+  // 隐藏对话气泡
+  public hideDialogueBubble(bubbleId: string): void {
+    const bubble = this.dialogueBubbles.get(bubbleId);
+    if (bubble) {
+      bubble.destroy();
+      this.dialogueBubbles.delete(bubbleId);
+    }
+  }
+
+  // 隐藏所有对话气泡
+  public hideAllDialogueBubbles(): void {
+    this.dialogueBubbles.forEach(bubble => bubble.destroy());
+    this.dialogueBubbles.clear();
+  }
+
+  // 显示对话选择
+  public showDialogueChoices(choices: DialogueChoice[], bubblePosition: DialogueBubblePosition): void {
+    if (!this.dialogueChoices || !this.uiScene) return;
+
+    this.hideDialogueChoices();
+
+    choices.forEach((choice, index) => {
+      const button = this.uiScene!.add.rectangle(0, index * 50, 200, 40, 0x4A4A4A, 0.8);
+      button.setStrokeStyle(1, 0xFFFFFF);
+      
+      const text = this.uiScene!.add.text(0, index * 50, choice.text, {
+        fontSize: '14px',
+        color: '#ffffff'
+      });
+      text.setOrigin(0.5);
+
+      button.setInteractive();
+      button.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+        // 阻止事件冒泡，避免触发场景的点击事件
+        pointer.event.stopPropagation();
+        this.selectDialogueChoice(choice.id);
+      });
+
+      this.dialogueChoices!.add([button, text]);
+    });
+
+    // 根据最后一个对话框的位置设置选项框位置
+    let optionsX = bubblePosition.x;
+    let optionsY = bubblePosition.y;
+
+    // 根据最后一个对话框的方向决定选项框位置
+    if (bubblePosition.direction === 'right') {
+      // 对话框向右，选项框在右侧
+      optionsX = bubblePosition.x + 200;
+    } else if (bubblePosition.direction === 'left') {
+      // 对话框向左，选项框在左侧
+      optionsX = bubblePosition.x - 200;
+    } else if (bubblePosition.direction === 'up') {
+      // 对话框向上，选项框在右侧
+      optionsX = bubblePosition.x + 200;
+    } else if (bubblePosition.direction === 'down') {
+      // 对话框向下，选项框在右侧
+      optionsX = bubblePosition.x + 200;
+    }
+
+    // 确保选项框不超出屏幕边界
+    const optionsWidth = 200;
+    const optionsHeight = choices.length * 50;
+    
+    if (optionsX < optionsWidth / 2) {
+      optionsX = optionsWidth / 2;
+    } else if (optionsX > 1280 - optionsWidth / 2) {
+      optionsX = 1280 - optionsWidth / 2;
+    }
+    
+    if (optionsY < optionsHeight / 2) {
+      optionsY = optionsHeight / 2;
+    } else if (optionsY > 720 - optionsHeight / 2) {
+      optionsY = 720 - optionsHeight / 2;
+    }
+
+    // 确保位置有效
+    if (isNaN(optionsX) || isNaN(optionsY)) {
+      // 如果位置无效，使用默认位置
+      optionsX = 640;
+      optionsY = 360;
+    }
+
+    console.log('设置选项框位置:', { optionsX, optionsY, bubblePosition });
+    this.dialogueChoices.setPosition(optionsX, optionsY);
+    // 设置渲染层级到正常值，确保选项框可见
+    this.dialogueChoices.setDepth(1000);
+  }
+
+  // 隐藏对话选择
+  public hideDialogueChoices(): void {
+    if (this.dialogueChoices) {
+      this.dialogueChoices.removeAll();
+      // 设置到最底层来隐藏选项框
+      this.dialogueChoices.setDepth(-9999);
+    }
+  }
+
+  // 选择对话选项
+  private selectDialogueChoice(choiceId: string): void {
+    console.log('选择对话选项:', choiceId);
+    if (this.dialogueManager) {
+      this.dialogueManager.nextStep(choiceId);
+      this.hideDialogueChoices();
+      this.hideAllDialogueBubbles(); // 隐藏当前的气泡
+      this.updateDialogueDisplay();
+    }
+  }
+
+  // 更新对话显示
+  public updateDialogueDisplay(): void {
+    console.log('UIManager.updateDialogueDisplay 被调用');
+    if (!this.dialogueManager) {
+      console.error('dialogueManager 不存在！');
+      return;
+    }
+
+    const currentState = this.dialogueManager.getCurrentDialogueState();
+    console.log('当前对话状态:', currentState);
+    if (!currentState) {
+      console.log('没有当前对话状态，隐藏所有对话元素');
+      this.hideAllDialogueBubbles();
+      this.hideDialogueChoices();
+      return;
+    }
+
+    const currentStep = this.dialogueManager.getCurrentStep();
+    console.log('当前对话步骤:', currentStep);
+    if (!currentStep) {
+      console.error('没有当前对话步骤！');
+      return;
+    }
+
+    console.log(`显示对话: ${currentStep.speaker} - ${currentStep.text}`);
+
+    // 显示当前对话步骤的气泡
+    if (currentStep.speaker === 'object') {
+      const objectPosition = this.dialogueManager.calculateBubblePosition(
+        currentState.objectPosition,
+        currentStep.text,
+        'object'
+      );
+      console.log('物体气泡位置:', objectPosition);
+      this.showDialogueBubble('object', currentStep.text, objectPosition, 'object', 0); // 不自动消失
+      
+      // 更新对话状态中的最后一个气泡位置
+      currentState.lastBubblePosition = objectPosition;
+      
+    } else {
+      // 猫的对话气泡
+      const catPosition = { x: 640, y: 600 }; // 猫的默认位置
+      const catBubblePosition = this.dialogueManager.calculateBubblePosition(
+        catPosition,
+        currentStep.text,
+        'cat'
+      );
+      console.log('猫气泡位置:', catBubblePosition);
+      this.showDialogueBubble('cat', currentStep.text, catBubblePosition, 'cat', 0); // 不自动消失
+      
+      // 更新对话状态中的最后一个气泡位置
+      currentState.lastBubblePosition = catBubblePosition;
+    }
+
+    // 检查当前步骤是否有选项需要显示
+    if (currentStep.choices && currentStep.choices.length > 0) {
+      console.log('当前步骤有选项，显示选项框');
+      // 使用最后一个气泡位置来显示选项框
+      if (currentState.lastBubblePosition) {
+        this.showDialogueChoices(currentStep.choices, currentState.lastBubblePosition);
+      }
+    }
+
+    // 处理自动进入下一步的情况
+    if (currentStep.autoNext && !currentStep.choices) {
+      console.log('自动进入下一步，2秒后执行');
+      // 自动进入下一步
+      this.uiScene!.time.delayedCall(2000, () => {
+        console.log('自动进入下一步');
+        // 检查对话是否还在进行
+        if (this.dialogueManager?.getCurrentDialogueState()) {
+          this.dialogueManager!.nextStep();
+          this.updateDialogueDisplay();
+        }
+      });
+    }
   }
 } 

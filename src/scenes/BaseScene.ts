@@ -1,12 +1,16 @@
-import { SceneKeys } from '../constants/SceneKeys';
 import { GameEvents } from '../constants/GameEvents';
+import { GameManager } from '@/core/GameManager';
+import { SceneManager } from '@/core/SceneManager';
+import { UIManager } from '@/core/UIManager';
+import { SaveManager } from '@/core/SaveManager';
+import { AudioManager } from '@/core/AudioManager';
 
 export abstract class BaseScene extends Phaser.Scene {
-  protected gameManager: any;
-  protected sceneManager: any;
-  protected audioManager: any;
-  protected uiManager: any;
-  protected saveManager: any;
+  protected gameManager!: GameManager;
+  protected sceneManager!: SceneManager;
+  protected audioManager!: AudioManager;
+  protected uiManager!: UIManager;
+  protected saveManager!: SaveManager;
 
   constructor(key: string) {
     super(key);
@@ -28,11 +32,19 @@ export abstract class BaseScene extends Phaser.Scene {
       this.sceneManager.setCurrentScene(this);
     }
 
+    // 设置UIManager的对话管理器
+    if (this.uiManager && this.gameManager) {
+      this.uiManager.setDialogueManager(this.gameManager.getDialogueManager());
+    }
+
     // 初始化场景
     this.initializeScene();
     
     // 设置事件监听
     this.setupEventListeners();
+    
+    // 添加点击空白区域隐藏对话选项的功能
+    this.setupClickOutsideHandler();
   }
 
   protected abstract initializeScene(): void;
@@ -53,6 +65,8 @@ export abstract class BaseScene extends Phaser.Scene {
   protected onTimeChanged(data: { time: number }): void {
     if (this.uiManager) {
       const state = this.gameManager.getState();
+      // 使用GameManager的格式化时间
+      const formattedTime = this.gameManager.getFormattedTime();
       this.uiManager.updateStatusBar(data.time, state.hunger, state.energy);
     }
   }
@@ -93,7 +107,7 @@ export abstract class BaseScene extends Phaser.Scene {
   }
 
   // 执行动作
-  protected executeAction(actionId: string): boolean {
+  protected executeAction(actionId: string, initialPosition?: { x: number, y: number }): boolean {
     if (!this.gameManager) return false;
 
     const action = this.sceneManager.getAction(actionId);
@@ -119,15 +133,23 @@ export abstract class BaseScene extends Phaser.Scene {
       this.audioManager.playActionSound(actionId);
     }
 
-    // 显示对话框
-    if (this.uiManager) {
+    // 处理对话或显示描述
+    if (action.triggerDialogue && action.dialogueId && this.uiManager) {
+      console.log('BaseScene.executeAction: 触发对话', { actionId, dialogueId: action.dialogueId });
+      // 启动对话系统
+      const objectPosition = initialPosition || { x: 640, y: 360 }; // 使用传入的位置或默认位置
+      // 使用动作ID作为objectId，因为对话系统需要知道是哪个物体在说话
+      this.gameManager.startDialogue(action.dialogueId, action.id, action.name, objectPosition);
+    } else if (this.uiManager) {
+      console.log('BaseScene.executeAction: 显示传统对话框', action.description);
+      // 显示传统对话框
       this.uiManager.showDialogue(action.description, 2000);
     }
 
     return true;
   }
 
-  private checkActionRequirements(action: any, gameState: any): boolean {
+  protected checkActionRequirements(action: any, gameState: any): boolean {
     // 检查饥饿值要求
     if (action.hungerRequirement && gameState.hunger < action.hungerRequirement) {
       return false;
@@ -146,15 +168,7 @@ export abstract class BaseScene extends Phaser.Scene {
     return true;
   }
 
-  private applyActionEffects(action: any, gameState: any): void {
-    // 消耗时间
-    if (action.timeCost > 0) {
-      this.gameManager.advanceTime(action.timeCost);
-      if (this.audioManager) {
-        this.audioManager.playTimeAdvanceSound();
-      }
-    }
-
+  protected applyActionEffects(action: any, gameState: any): void {
     // 消耗饥饿值
     if (action.hungerCost) {
       this.gameManager.modifyHunger(-action.hungerCost);
@@ -237,16 +251,48 @@ export abstract class BaseScene extends Phaser.Scene {
   protected onObjectClicked(obj: any, pointer?: Phaser.Input.Pointer): void {
     if (!this.gameManager) return;
 
-    const gameState = this.gameManager.getState();
-    const availableActions = obj.actions
-      .map((actionId: string) => this.sceneManager.getAction(actionId))
-      .filter((action: any) => action && this.sceneManager.canExecuteAction(action.id, gameState));
+    // 检查是否正在对话中，如果是则禁止点击
+    if (this.gameManager.getCurrentDialogueState()) {
+      console.log('正在对话中，禁止点击物体');
+      return;
+    }
 
-    if (availableActions.length > 0 && this.uiManager) {
-      // 优先使用点击位置，否则使用对象中心位置
-      const x = pointer ? pointer.worldX : obj.x;
-      const y = pointer ? pointer.worldY : obj.y;
-      this.uiManager.showActionMenu(availableActions, x, y);
+    const gameState = this.gameManager.getState();
+    
+    // 检查是否有对话动作
+    const dialogueActions = obj.actions
+      .map((actionId: string) => this.sceneManager.getAction(actionId))
+      .filter((action: any) => action && action.triggerDialogue && action.dialogueId);
+    
+    if (dialogueActions.length > 0) {
+      // 如果有对话动作，直接触发第一个对话
+      const dialogueAction = dialogueActions[0];
+      console.log('直接触发对话:', dialogueAction.id);
+      
+      // 使用点击位置作为初始对话位置（带随机偏移）
+      const clickPosition = pointer ? { x: pointer.worldX, y: pointer.worldY } : { x: obj.x, y: obj.y };
+      const randomOffset = {
+        x: (Math.random() - 0.5) * 100, // -50 到 50 的随机偏移
+        y: (Math.random() - 0.5) * 100
+      };
+      const initialPosition = {
+        x: clickPosition.x + randomOffset.x,
+        y: clickPosition.y + randomOffset.y
+      };
+      
+      this.executeAction(dialogueAction.id, initialPosition);
+    } else {
+      // 如果没有对话动作，显示传统动作菜单
+      const availableActions = obj.actions
+        .map((actionId: string) => this.sceneManager.getAction(actionId))
+        .filter((action: any) => action && this.sceneManager.canExecuteAction(action.id, gameState));
+
+      if (availableActions.length > 0 && this.uiManager) {
+        // 优先使用点击位置，否则使用对象中心位置
+        const x = pointer ? pointer.worldX : obj.x;
+        const y = pointer ? pointer.worldY : obj.y;
+        this.uiManager.showActionMenu(availableActions, x, y);
+      }
     }
   }
 
@@ -260,5 +306,18 @@ export abstract class BaseScene extends Phaser.Scene {
       this.gameManager.off(GameEvents.ACHIEVEMENT_UNLOCKED, this.onAchievementUnlocked.bind(this));
       this.gameManager.off(GameEvents.GAME_ENDED, this.onGameEnded.bind(this));
     }
+  }
+
+  // 设置点击空白区域处理
+  private setupClickOutsideHandler(): void {
+    // 监听场景的点击事件
+    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      // 如果当前有对话状态，点击空白区域时隐藏对话选项
+      if (this.gameManager && this.gameManager.getCurrentDialogueState()) {
+        // 简单的实现：点击任何地方都隐藏对话选项（除了对话选项本身）
+        // 这里可以通过检查点击位置是否在对话选项区域内来优化
+        this.uiManager?.hideDialogueChoices();
+      }
+    });
   }
 } 

@@ -40,7 +40,9 @@ export class ActionRegistry {
       effects: [
         { type: 'energy', value: GameConstants.BASIC_ENERGY_RESTORE, operation: 'add' }
       ],
-      conditions: []
+      conditions: [],
+      dialogueId: 'sofa_conversation',
+      triggerDialogue: true
     });
 
     this.registerAction({
@@ -52,7 +54,9 @@ export class ActionRegistry {
       effects: [
         { type: 'story_flag', value: 'sofa_damaged', operation: 'set' }
       ],
-      conditions: []
+      conditions: [],
+      dialogueId: 'sofa_conversation',
+      triggerDialogue: true
     });
 
     // 笼子相关动作
@@ -65,7 +69,9 @@ export class ActionRegistry {
       effects: [
         { type: 'story_flag', value: 'cage_damaged', operation: 'set' }
       ],
-      conditions: []
+      conditions: [],
+      dialogueId: 'cage_conversation',
+      triggerDialogue: true
     });
 
     this.registerAction({
@@ -76,7 +82,9 @@ export class ActionRegistry {
       effects: [],
       conditions: [
         { type: 'story_flag', operator: 'eq', value: 'cage_damaged' }
-      ]
+      ],
+      dialogueId: 'cage_conversation',
+      triggerDialogue: true
     });
 
     // 猫厕所动作
@@ -90,7 +98,9 @@ export class ActionRegistry {
       ],
       conditions: [
         { type: 'hunger', operator: 'gte', value: 4 }
-      ]
+      ],
+      dialogueId: 'litter_box_conversation',
+      triggerDialogue: true
     });
 
     // 猫别墅动作
