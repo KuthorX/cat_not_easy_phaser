@@ -14,15 +14,21 @@ export class GameManager {
   private timeInterval: NodeJS.Timeout | null = null;
   private realTimeStart: number = Date.now();
   private gameTimeScale: number = 60; // 1秒真实时间 = 1分钟游戏时间
+  private isInDialogue: boolean = false; // 全局对话状态
 
   constructor(game: Phaser.Game) {
     this.game = game;
+    this.state = this.initializeGameState();
     this.eventEmitter = new EventEmitter();
     this.eventManager = new EventManager();
     this.dialogueManager = new DialogueManager();
-    this.state = this.initializeGameState();
     
-    // 设置对话管理器的效果回调
+    // 设置对话结束回调
+    this.dialogueManager.setOnDialogueEndCallback(() => {
+      this.endDialogue();
+    });
+    
+    // 设置对话效果回调
     this.dialogueManager.setEffectCallback((effects) => {
       this.applyDialogueEffects(effects);
     });
@@ -314,10 +320,18 @@ export class GameManager {
 
   public startDialogue(dialogueId: string, objectId: string, objectName: string, objectPosition: { x: number; y: number }): boolean {
     console.log('GameManager.startDialogue 被调用:', { dialogueId, objectId, objectName, objectPosition });
+    
+    // 如果已经在对话中，拒绝新的对话
+    if (this.isInDialogue) {
+      console.log('已在对话中，拒绝新对话');
+      return false;
+    }
+    
     const success = this.dialogueManager.startDialogue(dialogueId, objectId, objectName, objectPosition);
     console.log('dialogueManager.startDialogue 结果:', success);
     if (success) {
       this.state.currentDialogue = this.dialogueManager.getCurrentDialogueState() || undefined;
+      this.setDialogueMode(true); // 设置对话状态
       console.log('触发 DIALOGUE_STARTED 事件');
       this.eventEmitter.emit(GameEvents.DIALOGUE_STARTED, { dialogueId, objectId });
     }
@@ -328,6 +342,7 @@ export class GameManager {
     console.log('GameManager.endDialogue 被调用');
     this.dialogueManager.endDialogue();
     this.state.currentDialogue = undefined;
+    this.setDialogueMode(false); // 清除对话状态
     console.log('触发 DIALOGUE_ENDED 事件');
     this.eventEmitter.emit(GameEvents.DIALOGUE_ENDED, {});
   }
@@ -373,5 +388,16 @@ export class GameManager {
           break;
       }
     });
+  }
+
+  // 检查是否正在对话中
+  public isInDialogueMode(): boolean {
+    return this.isInDialogue;
+  }
+
+  // 设置对话状态
+  public setDialogueMode(inDialogue: boolean): void {
+    this.isInDialogue = inDialogue;
+    console.log('对话状态变更:', inDialogue ? '进入对话模式' : '退出对话模式');
   }
 } 

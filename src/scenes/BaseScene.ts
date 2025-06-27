@@ -169,6 +169,21 @@ export abstract class BaseScene extends Phaser.Scene {
   }
 
   protected applyActionEffects(action: any, gameState: any): void {
+    // 如果是对话动作，不立即应用效果，让效果在对话选项中选择后执行
+    if (action.triggerDialogue && action.dialogueId) {
+      // 只应用消耗，不应用效果
+      if (action.hungerCost) {
+        this.gameManager.modifyHunger(-action.hungerCost);
+      }
+      if (action.energyCost) {
+        this.gameManager.modifyEnergy(-action.energyCost);
+      }
+      // 记录动作完成
+      this.gameManager.completeAction(action.id);
+      return;
+    }
+
+    // 非对话动作，正常应用效果
     // 消耗饥饿值
     if (action.hungerCost) {
       this.gameManager.modifyHunger(-action.hungerCost);
@@ -252,7 +267,7 @@ export abstract class BaseScene extends Phaser.Scene {
     if (!this.gameManager) return;
 
     // 检查是否正在对话中，如果是则禁止点击
-    if (this.gameManager.getCurrentDialogueState()) {
+    if (this.gameManager.isInDialogueMode()) {
       console.log('正在对话中，禁止点击物体');
       return;
     }
@@ -310,14 +325,6 @@ export abstract class BaseScene extends Phaser.Scene {
 
   // 设置点击空白区域处理
   private setupClickOutsideHandler(): void {
-    // 监听场景的点击事件
-    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-      // 如果当前有对话状态，点击空白区域时隐藏对话选项
-      if (this.gameManager && this.gameManager.getCurrentDialogueState()) {
-        // 简单的实现：点击任何地方都隐藏对话选项（除了对话选项本身）
-        // 这里可以通过检查点击位置是否在对话选项区域内来优化
-        this.uiManager?.hideDialogueChoices();
-      }
-    });
+
   }
 } 

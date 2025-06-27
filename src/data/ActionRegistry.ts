@@ -14,32 +14,39 @@ export class ActionRegistry {
       id: 'eat_food_water',
       name: '吃粮喝水',
       description: '吃猫粮和喝水，恢复饥饿值。',
-      timeCost: GameConstants.BASIC_ACTION_COST,
       effects: [
         { type: 'hunger', value: GameConstants.BASIC_HUNGER_RESTORE, operation: 'add' }
       ],
       conditions: []
     });
 
+    // 窗户对话动作 - 纯对话触发
     this.registerAction({
       id: 'sunbathing',
       name: '晒太阳',
       description: '在温暖的阳光下晒太阳，恢复精力。',
-      timeCost: GameConstants.BASIC_ACTION_COST,
-      effects: [
-        { type: 'energy', value: GameConstants.BASIC_ENERGY_RESTORE, operation: 'add' }
-      ],
-      conditions: []
+      effects: [], // 效果在对话选项中选择后执行
+      conditions: [],
+      dialogueId: 'window_conversation',
+      triggerDialogue: true
     });
 
+    this.registerAction({
+      id: 'look_outside',
+      name: '看外面',
+      description: '透过门缝看外面的世界。',
+      effects: [], // 效果在对话选项中选择后执行
+      conditions: [],
+      dialogueId: 'window_conversation',
+      triggerDialogue: true
+    });
+
+    // 沙发对话动作 - 纯对话触发，不包含效果
     this.registerAction({
       id: 'sleep_on_sofa',
       name: '在沙发上睡觉',
       description: '在柔软的沙发上小憩。',
-      timeCost: GameConstants.BASIC_ACTION_COST,
-      effects: [
-        { type: 'energy', value: GameConstants.BASIC_ENERGY_RESTORE, operation: 'add' }
-      ],
+      effects: [], // 效果在对话选项中选择后执行
       conditions: [],
       dialogueId: 'sofa_conversation',
       triggerDialogue: true
@@ -49,26 +56,20 @@ export class ActionRegistry {
       id: 'scratch_sofa',
       name: '抓沙发',
       description: '用爪子抓沙发，感觉很爽。',
-      timeCost: GameConstants.ADVANCED_ACTION_COST,
       hungerCost: 1,
-      effects: [
-        { type: 'story_flag', value: 'sofa_damaged', operation: 'set' }
-      ],
+      effects: [], // 效果在对话选项中选择后执行
       conditions: [],
       dialogueId: 'sofa_conversation',
       triggerDialogue: true
     });
 
-    // 笼子相关动作
+    // 笼子相关动作 - 纯对话触发
     this.registerAction({
       id: 'attack_cage',
       name: '攻击笼子',
       description: '用爪子攻击笼子，试图破坏它。',
-      timeCost: GameConstants.BASIC_ACTION_COST,
       energyCost: 1,
-      effects: [
-        { type: 'story_flag', value: 'cage_damaged', operation: 'set' }
-      ],
+      effects: [], // 效果在对话选项中选择后执行
       conditions: [],
       dialogueId: 'cage_conversation',
       triggerDialogue: true
@@ -78,8 +79,7 @@ export class ActionRegistry {
       id: 'jump_on_cage',
       name: '踩跳',
       description: '跳到笼子上，解锁高处地图。',
-      timeCost: 0,
-      effects: [],
+      effects: [], // 效果在对话选项中选择后执行
       conditions: [
         { type: 'story_flag', operator: 'eq', value: 'cage_damaged' }
       ],
@@ -87,15 +87,12 @@ export class ActionRegistry {
       triggerDialogue: true
     });
 
-    // 猫厕所动作
+    // 猫厕所动作 - 纯对话触发
     this.registerAction({
       id: 'use_litter_box',
       name: '使用猫厕所',
       description: '在猫厕所里方便。',
-      timeCost: GameConstants.BASIC_ACTION_COST,
-      effects: [
-        { type: 'energy', value: 1, operation: 'add' }
-      ],
+      effects: [], // 效果在对话选项中选择后执行
       conditions: [
         { type: 'hunger', operator: 'gte', value: 4 }
       ],
@@ -108,7 +105,6 @@ export class ActionRegistry {
       id: 'play_in_house',
       name: '在猫别墅里玩耍',
       description: '在猫别墅里玩耍，消耗饥饿值。',
-      timeCost: GameConstants.BASIC_ACTION_COST,
       hungerCost: 1,
       effects: [
         { type: 'story_flag', value: 'play_time', operation: 'set' }
@@ -121,7 +117,6 @@ export class ActionRegistry {
       id: 'eat_fish_treat',
       name: '吃鱼干',
       description: '享用美味的鱼干。',
-      timeCost: GameConstants.BASIC_ACTION_COST,
       effects: [
         { type: 'hunger', value: GameConstants.ADVANCED_HUNGER_RESTORE, operation: 'add' }
       ],
@@ -133,7 +128,6 @@ export class ActionRegistry {
       id: 'play_with_mouse',
       name: '和玩具老鼠玩耍',
       description: '和玩具老鼠玩耍，消耗饥饿值。',
-      timeCost: GameConstants.BASIC_ACTION_COST,
       hungerCost: 1,
       effects: [
         { type: 'story_flag', value: 'play_time', operation: 'set' }
@@ -145,7 +139,6 @@ export class ActionRegistry {
       id: 'carry_mouse',
       name: '叼走玩具老鼠',
       description: '把玩具老鼠叼走。',
-      timeCost: 0,
       effects: [
         { type: 'inventory', value: 'toy_mouse', operation: 'add' }
       ],
@@ -156,7 +149,6 @@ export class ActionRegistry {
       id: 'destroy_screen',
       name: '破坏显示屏',
       description: '破坏主人的显示屏。',
-      timeCost: GameConstants.ADVANCED_ACTION_COST,
       hungerCost: 1,
       energyCost: 3,
       effects: [
@@ -169,7 +161,6 @@ export class ActionRegistry {
       id: 'sleep_on_bed',
       name: '在床上睡觉',
       description: '在主人的床上睡觉，恢复更多精力。',
-      timeCost: GameConstants.BASIC_ACTION_COST,
       effects: [
         { type: 'energy', value: GameConstants.ADVANCED_ENERGY_RESTORE, operation: 'add' }
       ],
@@ -181,7 +172,6 @@ export class ActionRegistry {
       id: 'house_parkour',
       name: '全屋跑酷',
       description: '在整个房子里跑酷，消耗大量精力。',
-      timeCost: GameConstants.ADVANCED_ACTION_COST,
       energyCost: 3,
       effects: [
         { type: 'story_flag', value: 'parkour_completed', operation: 'set' }
@@ -193,7 +183,6 @@ export class ActionRegistry {
       id: 'climb_wardrobe',
       name: '钻进衣柜',
       description: '钻进衣柜探索。',
-      timeCost: GameConstants.ADVANCED_ACTION_COST,
       effects: [
         { type: 'story_flag', value: 'wardrobe_explored', operation: 'set' }
       ],
@@ -204,30 +193,17 @@ export class ActionRegistry {
       id: 'sleep_hammock',
       name: '睡猫吊床',
       description: '在猫吊床上睡觉。',
-      timeCost: GameConstants.BASIC_ACTION_COST,
       effects: [
         { type: 'energy', value: GameConstants.BASIC_ENERGY_RESTORE, operation: 'add' }
       ],
       conditions: []
     });
 
-    // 新增动作
-    this.registerAction({
-      id: 'look_outside',
-      name: '看外面',
-      description: '透过门缝看外面的世界。',
-      timeCost: GameConstants.BASIC_ACTION_COST,
-      effects: [
-        { type: 'story_flag', value: 'door_opened', operation: 'set' }
-      ],
-      conditions: []
-    });
-
+    // 逃跑动作
     this.registerAction({
       id: 'escape',
       name: '逃跑',
       description: '逃离这个房子，获得自由！',
-      timeCost: 0,
       effects: [
         { type: 'story_flag', value: 'escaped', operation: 'set' },
         { type: 'achievement', value: 'freedom_achieved', operation: 'add' }

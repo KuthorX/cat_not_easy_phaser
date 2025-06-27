@@ -70,6 +70,11 @@ export class UIManager {
   // 对话开始事件处理
   private onDialogueStarted(data: { dialogueId: string, objectId: string }): void {
     console.log('UIManager.onDialogueStarted 被调用:', data);
+    
+    // 在开始新对话前，先清理所有旧的对话元素
+    this.hideAllDialogueBubbles();
+    this.hideDialogueChoices();
+    
     if (this.dialogueManager) {
       console.log('dialogueManager 存在，调用 updateDialogueDisplay');
       this.updateDialogueDisplay();
@@ -643,7 +648,7 @@ export class UIManager {
   // 隐藏对话选择
   public hideDialogueChoices(): void {
     if (this.dialogueChoices) {
-      this.dialogueChoices.removeAll();
+      this.dialogueChoices.removeAll(true);
       // 设置到最底层来隐藏选项框
       this.dialogueChoices.setDepth(-9999);
     }

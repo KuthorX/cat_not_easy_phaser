@@ -8,217 +8,31 @@ import {
   DialogueBubblePosition,
   GameState 
 } from '../types/GameState';
+import { DialogueRegistry } from '../data/DialogueRegistry';
 
 export class DialogueManager {
-  private dialogues: Map<string, Dialogue> = new Map();
+  private dialogueRegistry: DialogueRegistry;
   private currentDialogueState: DialogueState | null = null;
   private dialogueHistory: any[] = [];
 
+  // 添加对话结束回调
+  private onDialogueEndCallback: (() => void) | null = null;
+
   constructor() {
-    this.initializeDialogues();
+    this.dialogueRegistry = new DialogueRegistry();
   }
 
-  private initializeDialogues(): void {
-    // 初始化所有对话
-    this.registerDialogue({
-      id: 'sofa_conversation',
-      objectId: 'sofa_north',
-      objectName: '沙发',
-      steps: [
-        {
-          id: 'sofa_greeting',
-          speaker: 'object',
-          text: '嘿，小猫咪！我是沙发，你的老朋友。',
-          autoNext: true,
-          nextStep: 'cat_response'
-        },
-        {
-          id: 'cat_response',
-          speaker: 'cat',
-          text: '喵~ 沙发，我想在你身上睡觉！',
-          choices: [
-            {
-              id: 'sleep_choice',
-              text: '睡觉',
-              nextStep: 'sofa_sleep_offer',
-              effects: [
-                { type: 'energy', value: 2, operation: 'add' }
-              ]
-            },
-            {
-              id: 'scratch_choice',
-              text: '抓沙发',
-              nextStep: 'sofa_scratch_reaction',
-              effects: [
-                { type: 'story_flag', value: 'sofa_damaged', operation: 'set' }
-              ]
-            }
-          ]
-        },
-        {
-          id: 'sofa_sleep_offer',
-          speaker: 'object',
-          text: '当然可以！我的怀抱永远为你敞开。',
-          autoNext: true,
-          nextStep: 'cat_sleep_response'
-        },
-        {
-          id: 'cat_sleep_response',
-          speaker: 'cat',
-          text: '谢谢沙发！我要好好睡一觉~',
-          autoNext: true,
-          nextStep: 'end'
-        },
-        {
-          id: 'sofa_scratch_reaction',
-          speaker: 'object',
-          text: '哎呀！你这个小调皮，又抓我了！',
-          autoNext: true,
-          nextStep: 'cat_scratch_response'
-        },
-        {
-          id: 'cat_scratch_response',
-          speaker: 'cat',
-          text: '嘿嘿，抓沙发的感觉太爽了！',
-          autoNext: true,
-          nextStep: 'end'
-        }
-      ]
-    });
-
-    this.registerDialogue({
-      id: 'cage_conversation',
-      objectId: 'cat_cage',
-      objectName: '笼子',
-      steps: [
-        {
-          id: 'cage_greeting',
-          speaker: 'object',
-          text: '哼！我是笼子，你休想破坏我！',
-          autoNext: true,
-          nextStep: 'cat_cage_response'
-        },
-        {
-          id: 'cat_cage_response',
-          speaker: 'cat',
-          text: '我要自由！我要破坏你！',
-          choices: [
-            {
-              id: 'attack_choice',
-              text: '攻击笼子',
-              nextStep: 'cage_damaged',
-              effects: [
-                { type: 'story_flag', value: 'cage_damaged', operation: 'set' },
-                { type: 'energy', value: 1, operation: 'remove' }
-              ]
-            },
-            {
-              id: 'jump_choice',
-              text: '跳到笼子上',
-              nextStep: 'cage_jump',
-              conditions: [
-                { type: 'story_flag', operator: 'eq', value: 'cage_damaged' }
-              ]
-            }
-          ]
-        },
-        {
-          id: 'cage_damaged',
-          speaker: 'object',
-          text: '啊！你这个小恶魔！我受伤了！',
-          autoNext: true,
-          nextStep: 'cat_victory'
-        },
-        {
-          id: 'cat_victory',
-          speaker: 'cat',
-          text: '哈哈！我成功了！',
-          autoNext: true,
-          nextStep: 'end'
-        },
-        {
-          id: 'cage_jump',
-          speaker: 'object',
-          text: '哼！就算我受伤了，你也不能这样对我！',
-          autoNext: true,
-          nextStep: 'cat_jump_response'
-        },
-        {
-          id: 'cat_jump_response',
-          speaker: 'cat',
-          text: '我就是要跳！',
-          autoNext: true,
-          nextStep: 'end'
-        }
-      ]
-    });
-
-    this.registerDialogue({
-      id: 'litter_box_conversation',
-      objectId: 'cat_litter_box',
-      objectName: '猫厕所',
-      steps: [
-        {
-          id: 'litter_greeting',
-          speaker: 'object',
-          text: '我是猫厕所，你的私人空间。',
-          autoNext: true,
-          nextStep: 'cat_litter_response'
-        },
-        {
-          id: 'cat_litter_response',
-          speaker: 'cat',
-          text: '我需要方便一下...',
-          choices: [
-            {
-              id: 'use_choice',
-              text: '使用厕所',
-              nextStep: 'litter_use',
-              conditions: [
-                { type: 'hunger', operator: 'gte', value: 4 }
-              ],
-              effects: [
-                { type: 'energy', value: 1, operation: 'add' }
-              ]
-            },
-            {
-              id: 'refuse_choice',
-              text: '拒绝',
-              nextStep: 'litter_refuse'
-            }
-          ]
-        },
-        {
-          id: 'litter_use',
-          speaker: 'object',
-          text: '好的，请便。我会保持清洁的。',
-          autoNext: true,
-          nextStep: 'cat_thanks'
-        },
-        {
-          id: 'cat_thanks',
-          speaker: 'cat',
-          text: '谢谢！感觉好多了~',
-          autoNext: true,
-          nextStep: 'end'
-        },
-        {
-          id: 'litter_refuse',
-          speaker: 'object',
-          text: '没关系，什么时候需要都可以。',
-          autoNext: true,
-          nextStep: 'end'
-        }
-      ]
-    });
+  // 设置对话结束回调
+  public setOnDialogueEndCallback(callback: () => void): void {
+    this.onDialogueEndCallback = callback;
   }
 
   public registerDialogue(dialogue: Dialogue): void {
-    this.dialogues.set(dialogue.id, dialogue);
+    this.dialogueRegistry.registerDialogue(dialogue);
   }
 
   public getDialogue(dialogueId: string): Dialogue | null {
-    return this.dialogues.get(dialogueId) || null;
+    return this.dialogueRegistry.getDialogue(dialogueId);
   }
 
   public startDialogue(dialogueId: string, objectId: string, objectName: string, objectPosition: { x: number; y: number }): boolean {
@@ -296,6 +110,11 @@ export class DialogueManager {
       // 应用对话结束时的效果
       this.applyDialogueEffects(this.currentDialogueState.currentDialogue.effects || []);
       this.currentDialogueState = null;
+      
+      // 通知GameManager对话结束
+      if (this.onDialogueEndCallback) {
+        this.onDialogueEndCallback();
+      }
     }
   }
 
@@ -353,66 +172,6 @@ export class DialogueManager {
         y = objectPosition.y + 50;
         direction = 'down';
       }
-    }
-
-    // 确保气泡不超出屏幕边界
-    if (x - bubbleWidth / 2 < 10) {
-      x = bubbleWidth / 2 + 10;
-      anchor = 'left';
-    } else if (x + bubbleWidth / 2 > screenWidth - 10) {
-      x = screenWidth - bubbleWidth / 2 - 10;
-      anchor = 'right';
-    }
-
-    if (y - bubbleHeight / 2 < 10) {
-      y = bubbleHeight / 2 + 10;
-    } else if (y + bubbleHeight / 2 > screenHeight - 10) {
-      y = screenHeight - bubbleHeight / 2 - 10;
-    }
-
-    return { x, y, anchor, direction };
-  }
-
-  // 计算猫的对话气泡位置（相对于物体气泡）
-  public calculateCatBubblePosition(
-    objectBubblePosition: DialogueBubblePosition,
-    catPosition: { x: number; y: number },
-    text: string,
-    screenWidth: number = 1280,
-    screenHeight: number = 720
-  ): DialogueBubblePosition {
-    const textWidth = text.length * 8;
-    const bubbleWidth = Math.min(textWidth + 40, 300);
-    const bubbleHeight = 80;
-
-    let x = catPosition.x;
-    let y = catPosition.y;
-    let anchor: 'left' | 'right' | 'center' = 'center';
-    let direction: 'up' | 'down' | 'left' | 'right' = 'up';
-
-    // 根据物体气泡位置决定猫气泡位置
-    if (objectBubblePosition.direction === 'right') {
-      // 物体气泡向右，猫气泡在下方
-      x = objectBubblePosition.x;
-      y = objectBubblePosition.y + 100;
-      direction = 'up';
-    } else if (objectBubblePosition.direction === 'left') {
-      // 物体气泡向左，猫气泡在下方
-      x = objectBubblePosition.x;
-      y = objectBubblePosition.y + 100;
-      direction = 'up';
-    } else {
-      // 物体气泡向上或向下，猫气泡在旁边
-      if (objectBubblePosition.x < screenWidth / 2) {
-        x = objectBubblePosition.x + 150;
-        anchor = 'left';
-        direction = 'left';
-      } else {
-        x = objectBubblePosition.x - 150;
-        anchor = 'right';
-        direction = 'right';
-      }
-      y = objectBubblePosition.y;
     }
 
     // 确保气泡不超出屏幕边界
