@@ -9,8 +9,8 @@ export class BalconyScene extends BaseScene {
   }
 
   protected initializeScene(): void {
-    // 设置背景
-    this.add.rectangle(640, 360, 1280, 720, 0x87CEEB); // 天蓝色背景
+    // 设置背景图片
+    this.add.image(640, 360, 'balcony_bg');
     
     // 添加房间标题
     this.add.text(640, 50, '阳台', {
@@ -18,6 +18,9 @@ export class BalconyScene extends BaseScene {
       color: '#000000',
       fontStyle: 'bold'
     }).setOrigin(0.5);
+
+    // 添加balcony场景的图片对象
+    this.addBalconyObjects();
 
     // 获取房间数据
     const roomData = this.sceneManager?.getRoomData(RoomKeys.BALCONY);
@@ -55,6 +58,42 @@ export class BalconyScene extends BaseScene {
 
     // 设置键盘快捷键
     this.setupKeyboardShortcuts();
+  }
+
+  private addBalconyObjects(): void {
+    // 为这些对象创建交互区域
+    this.createInteractiveImageObject({
+      id: 'balcony_chair',
+      name: '阳台椅子',
+      description: '阳台上的椅子，可以在这里休息。',
+      x: 400,
+      y: 500,
+      width: 150,
+      height: 100,
+      actions: ['sit_on_chair', 'jump_on_chair']
+    }, 'balcony_chair');
+
+    this.createInteractiveImageObject({
+      id: 'balcony_coat_hanger',
+      name: '衣架',
+      description: '挂衣服的衣架。',
+      x: 800,
+      y: 300,
+      width: 100,
+      height: 80,
+      actions: ['climb_hanger', 'play_with_clothes']
+    }, 'balcony_coat_hanger');
+
+    this.createInteractiveImageObject({
+      id: 'balcony_robot_cleaner',
+      name: '扫地机器人',
+      description: '自动清洁地面的机器人。',
+      x: 600,
+      y: 350,
+      width: 120,
+      height: 80,
+      actions: ['chase_robot', 'ride_robot']
+    }, 'balcony_robot_cleaner');
   }
 
   private createExit(exit: RoomExit): void {

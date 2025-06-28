@@ -62,6 +62,20 @@ export class PreloadScene extends Phaser.Scene {
     this.load.image('hallway_bg', 'assets/rooms/hallway_bg.png');
     this.load.image('room_b_bg', 'assets/rooms/room_b_bg.png');
 
+    // 加载balcony场景图片
+    this.load.image('balcony_bg', 'assets/images/balcony_bg.png');
+    this.load.image('balcony_chair', 'assets/images/balcony_chair.png');
+    this.load.image('balcony_coat_hanger', 'assets/images/balcony_coat_hanger.png');
+    this.load.image('balcony_robot_cleaner', 'assets/images/balcony_robot_cleaner.png');
+
+    // 加载room_b场景图片
+    this.load.image('room_b_bg', 'assets/images/room_b_bg.png');
+    this.load.image('room_b_bed', 'assets/images/room_b_bed.png');
+    this.load.image('room_b_chair', 'assets/images/room_b_chair.png');
+    this.load.image('room_b_computer_screen', 'assets/images/room_b_computer_screen.png');
+    this.load.image('room_b_kettle', 'assets/images/room_b_kettle.png');
+    this.load.image('room_b_side_wall', 'assets/images/room_b_side_wall.png');
+
     // 加载物品精灵
     this.load.image('window_north', 'assets/objects/window_north.png');
     this.load.image('sofa', 'assets/objects/sofa.png');

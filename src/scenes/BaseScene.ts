@@ -260,6 +260,64 @@ export abstract class BaseScene extends Phaser.Scene {
     return rect;
   }
 
+  // 创建带描边效果的图片交互对象
+  protected createInteractiveImageObject(obj: any, imageKey: string): Phaser.GameObjects.Image {
+    // 创建图片对象
+    const image = this.add.image(obj.x, obj.y, imageKey);
+    
+    // 创建不可见的交互区域
+    const interactiveArea = this.add.rectangle(obj.x, obj.y, obj.width, obj.height, 0x000000, 0);
+    interactiveArea.setInteractive();
+    
+    // 创建描边效果（初始隐藏）
+    const outline = this.add.graphics();
+    outline.setDepth(image.depth + 1); // 确保描边在图片上方
+    
+    // 存储引用关系
+    (interactiveArea as any).outline = outline;
+    (interactiveArea as any).targetImage = image;
+    
+    // 点击事件
+    interactiveArea.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      this.onObjectClicked(obj, pointer);
+    });
+
+    // 鼠标悬停事件 - 显示描边
+    interactiveArea.on('pointerover', () => {
+      this.showObjectOutline(interactiveArea, 0x00ff00, 3);
+    });
+
+    // 鼠标离开事件 - 隐藏描边
+    interactiveArea.on('pointerout', () => {
+      this.hideObjectOutline(interactiveArea);
+    });
+
+    return image;
+  }
+
+  // 显示物体描边
+  private showObjectOutline(interactiveArea: Phaser.GameObjects.Rectangle, color: number, thickness: number = 3): void {
+    const outline = (interactiveArea as any).outline;
+    const targetImage = (interactiveArea as any).targetImage;
+    
+    if (!outline || !targetImage) return;
+
+    outline.clear();
+    outline.lineStyle(thickness, color, 1);
+    
+    // 获取图片的边界
+    const bounds = targetImage.getBounds();
+    outline.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
+  }
+
+  // 隐藏物体描边
+  private hideObjectOutline(interactiveArea: Phaser.GameObjects.Rectangle): void {
+    const outline = (interactiveArea as any).outline;
+    if (outline) {
+      outline.clear();
+    }
+  }
+
   protected onObjectClicked(obj: any, pointer?: Phaser.Input.Pointer): void {
     if (!this.gameManager) return;
 
