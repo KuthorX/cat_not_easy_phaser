@@ -95,6 +95,11 @@ export interface Action {
   conditions: ActionCondition[];
   dialogueId?: string;
   triggerDialogue?: boolean;
+  specialCondition?: {
+    type: string;
+    value: any;
+    failureMessage: string;
+  };
 }
 
 export interface ActionEffect {
@@ -129,6 +134,7 @@ export interface InteractiveObject {
   imageKey?: string;
   actions: string[];
   state?: any;
+  thought?: string;
 }
 
 export interface RoomExit {

@@ -9,12 +9,105 @@ export class ActionRegistry {
   }
 
   private initializeActions(): void {
-    // 基础交互动作
+    // 基础恢复动作
     this.registerAction({
       id: 'eat_food_water',
       name: '吃粮喝水',
+      timeCost: GameConstants.BASIC_ACTION_COST,
       effects: [
         { type: 'hunger', value: GameConstants.BASIC_HUNGER_RESTORE, operation: 'add' }
+      ],
+      conditions: []
+    });
+
+    this.registerAction({
+      id: 'sleep_in_cat_bed',
+      name: '猫窝睡觉',
+      timeCost: GameConstants.BASIC_ACTION_COST,
+      effects: [
+        { type: 'energy', value: GameConstants.BASIC_ENERGY_RESTORE, operation: 'add' }
+      ],
+      conditions: []
+    });
+
+    // 客厅-向东看场景动作
+    this.registerAction({
+      id: 'chew_rope',
+      name: '啃咬',
+      timeCost: GameConstants.ADVANCED_ACTION_COST,
+      effects: [
+        { type: 'story_flag', value: 'chew_rope_completed', operation: 'set' }
+      ],
+      conditions: []
+    });
+
+    this.registerAction({
+      id: 'chase_ball',
+      name: '追逐',
+      timeCost: GameConstants.ADVANCED_ACTION_COST,
+      effects: [
+        { type: 'story_flag', value: 'chase_ball_completed', operation: 'set' }
+      ],
+      conditions: []
+    });
+
+    this.registerAction({
+      id: 'sweep_table',
+      name: '扫落',
+      timeCost: GameConstants.ADVANCED_ACTION_COST,
+      effects: [
+        { type: 'story_flag', value: 'table_swept', operation: 'set' }
+      ],
+      conditions: []
+    });
+
+    this.registerAction({
+      id: 'attack_tv',
+      name: '攻击',
+      timeCost: GameConstants.ADVANCED_ACTION_COST,
+      energyCost: 1,
+      effects: [
+        { type: 'story_flag', value: 'tv_destroyed', operation: 'set' }
+      ],
+      conditions: [
+        { type: 'story_flag', value: 'on_cat_bed', operator: 'eq' }
+      ],
+      specialCondition: {
+        type: 'position_check',
+        value: 'cat_bed',
+        failureMessage: '我够不到它！'
+      }
+    });
+
+    // 主人房间动作
+    this.registerAction({
+      id: 'sleep_on_bed',
+      name: '床上睡觉',
+      timeCost: GameConstants.ADVANCED_ACTION_COST,
+      effects: [
+        { type: 'energy', value: GameConstants.ADVANCED_ENERGY_RESTORE, operation: 'add' }
+      ],
+      conditions: []
+    });
+
+    // 特殊动作
+    this.registerAction({
+      id: 'poop',
+      name: '拉屎',
+      timeCost: GameConstants.BASIC_ACTION_COST,
+      effects: [],
+      conditions: [
+        { type: 'hunger', operator: 'gte', value: 4 }
+      ]
+    });
+
+    this.registerAction({
+      id: 'house_parkour',
+      name: '全屋跑酷',
+      timeCost: GameConstants.ADVANCED_ACTION_COST,
+      energyCost: 3,
+      effects: [
+        { type: 'story_flag', value: 'parkour_completed', operation: 'set' }
       ],
       conditions: []
     });
@@ -113,7 +206,6 @@ export class ActionRegistry {
       conditions: []
     });
 
-    // 主人房间动作
     this.registerAction({
       id: 'play_with_mouse',
       name: '和玩具老鼠玩耍',
@@ -140,26 +232,6 @@ export class ActionRegistry {
       energyCost: 3,
       effects: [
         { type: 'story_flag', value: 'screen_destroyed', operation: 'set' }
-      ],
-      conditions: []
-    });
-
-    this.registerAction({
-      id: 'sleep_on_bed',
-      name: '在床上睡觉',
-      effects: [
-        { type: 'energy', value: GameConstants.ADVANCED_ENERGY_RESTORE, operation: 'add' }
-      ],
-      conditions: []
-    });
-
-    // 特殊动作
-    this.registerAction({
-      id: 'house_parkour',
-      name: '全屋跑酷',
-      energyCost: 3,
-      effects: [
-        { type: 'story_flag', value: 'parkour_completed', operation: 'set' }
       ],
       conditions: []
     });

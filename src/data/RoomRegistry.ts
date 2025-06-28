@@ -276,26 +276,59 @@ export class RoomRegistry {
       background: 'living_room_east_bg',
       interactiveObjects: [
         {
-          id: 'wardrobe',
-          name: '大衣柜',
-          
-          x: 400,
-          y: 300,
-          width: 200,
-          height: 300,
-          sprite: 'wardrobe',
-          actions: ['climb_wardrobe']
+          id: 'chew_rope',
+          name: '咬绳',
+          thought: '我是不是该咬咬这个东西？',
+          x: 300,
+          y: 400,
+          width: 100,
+          height: 80,
+          sprite: 'chew_rope',
+          actions: ['chew_rope']
         },
         {
-          id: 'cat_hammock',
-          name: '猫吊床',
-          
-          x: 600,
+          id: 'chase_ball',
+          name: '转球',
+          thought: '这个球看起来很好玩！',
+          x: 500,
           y: 400,
+          width: 80,
+          height: 80,
+          sprite: 'chase_ball',
+          actions: ['chase_ball']
+        },
+        {
+          id: 'table',
+          name: '桌子',
+          thought: '堆满了不知道什么东西。',
+          x: 700,
+          y: 350,
+          width: 200,
+          height: 120,
+          sprite: 'table',
+          actions: ['sweep_table']
+        },
+        {
+          id: 'tv',
+          name: '电视',
+          thought: '没有两脚兽的命令，这个大家伙寂静无声。',
+          x: 900,
+          y: 300,
           width: 150,
           height: 100,
-          sprite: 'cat_hammock',
-          actions: ['sleep_hammock']
+          sprite: 'tv',
+          actions: ['attack_tv']
+        },
+        {
+          id: 'cat_bed',
+          name: '猫窝',
+          thought: '哦，我的宝地。',
+          x: 400,
+          y: 500,
+          width: 120,
+          height: 100,
+          sprite: 'cat_bed',
+          actions: ['sleep_in_cat_bed']
         }
       ],
       exits: [

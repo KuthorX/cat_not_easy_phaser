@@ -122,6 +122,15 @@ export abstract class BaseScene extends Phaser.Scene {
       return false;
     }
 
+    // 检查特殊条件
+    if (action.specialCondition && !this.checkSpecialCondition(action.specialCondition, gameState)) {
+      // 显示失败消息
+      if (this.uiManager) {
+        this.uiManager.showDialogue(action.specialCondition.failureMessage, 2000);
+      }
+      return false;
+    }
+
     // 执行动作效果
     this.applyActionEffects(action, gameState);
 
@@ -181,6 +190,11 @@ export abstract class BaseScene extends Phaser.Scene {
     }
 
     // 非对话动作，正常应用效果
+    // 消耗时间
+    if (action.timeCost) {
+      this.gameManager.advanceTime(action.timeCost);
+    }
+
     // 消耗饥饿值
     if (action.hungerCost) {
       this.gameManager.modifyHunger(-action.hungerCost);
@@ -224,6 +238,16 @@ export abstract class BaseScene extends Phaser.Scene {
 
     // 记录动作完成
     this.gameManager.completeAction(action.id);
+  }
+
+  protected checkSpecialCondition(specialCondition: any, gameState: any): boolean {
+    switch (specialCondition.type) {
+      case 'position_check':
+        // 检查是否在指定物体上
+        return gameState.storyFlags.get(specialCondition.value) === true;
+      default:
+        return true;
+    }
   }
 
   // 切换到其他房间
@@ -399,6 +423,14 @@ export abstract class BaseScene extends Phaser.Scene {
     }
 
     const gameState = this.gameManager.getState();
+    
+    // 如果有thought，先显示想法气泡（会自动替换当前的气泡）
+    if (obj.thought && this.uiManager) {
+      const thoughtId = `thought_${obj.id}`;
+      const x = 1280 - 200; // 右下角位置
+      const y = 720 - 100;
+      this.uiManager.showThought(thoughtId, obj.thought, x, y, 3000);
+    }
     
     // 检查是否有对话动作
     const dialogueActions = obj.actions

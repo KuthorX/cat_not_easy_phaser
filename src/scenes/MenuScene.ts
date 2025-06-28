@@ -75,7 +75,7 @@ export class MenuScene extends Phaser.Scene {
       game.gameManager.resetGame();
       
       // 启动游戏场景
-      this.scene.start(SceneKeys.BALCONY);
+      this.scene.start(SceneKeys.LIVING_ROOM_EAST);
     }
   }
 

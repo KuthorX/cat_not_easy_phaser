@@ -14,15 +14,8 @@ export class AchievementRegistry {
       name: '玩耍时光',
       description: '尽！情！玩！个！爽！收集到所有猫玩具并进行过所有玩耍交互。',
       conditions: [
-        { type: 'action_completed', value: 'play_in_house' },
-        { type: 'action_completed', value: 'play_with_mouse' },
-        { type: 'action_completed', value: 'house_parkour' },
-        { type: 'action_completed', value: 'climb_wardrobe' },
-        { type: 'action_completed', value: 'sleep_hammock' },
-        { type: 'inventory_has', value: 'toy_mouse' },
-        { type: 'inventory_has', value: 'cat_ball' },
-        { type: 'inventory_has', value: 'cat_rope' },
-        { type: 'inventory_has', value: 'cat_sock' }
+        { type: 'action_completed', value: 'chew_rope' },
+        { type: 'action_completed', value: 'chase_ball' }
       ]
     });
 
@@ -32,10 +25,8 @@ export class AchievementRegistry {
       name: '猫中哈士奇',
       description: '两脚兽回来时可能会心肺骤止。破坏所有昂贵的可破坏物。',
       conditions: [
-        { type: 'item_destroyed', value: 'sofa' },
-        { type: 'item_destroyed', value: 'computer_screen' },
-        { type: 'item_destroyed', value: 'living_room_table' },
-        { type: 'item_destroyed', value: 'cat_house' }
+        { type: 'action_completed', value: 'sweep_table' },
+        { type: 'action_completed', value: 'attack_tv' }
       ]
     });
 

@@ -1,13 +1,14 @@
-export type { IUIComponent } from './IUIComponent';
 export { StatusBar } from './StatusBar';
 export { ActionMenu } from './ActionMenu';
-export type { Action } from './ActionMenu';
 export { DialogueBox } from './DialogueBox';
-export { InventoryPanel } from './InventoryPanel';
-export { AchievementPopup } from './AchievementPopup';
 export { DialogueBubble } from './DialogueBubble';
+export { ThoughtBubble } from './ThoughtBubble';
 export { DialogueChoices } from './DialogueChoices';
 export { DialogueUIManager } from './DialogueManager';
+export { InventoryPanel } from './InventoryPanel';
+export { AchievementPopup } from './AchievementPopup';
 export { GameEndScreen } from './GameEndScreen';
 export { TransitionPanel } from './TransitionPanel';
+export type { IUIComponent } from './IUIComponent';
+export type { Action } from './ActionMenu';
 export type { TransitionConfig } from './TransitionPanel'; 

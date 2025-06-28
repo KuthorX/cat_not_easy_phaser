@@ -32,8 +32,8 @@ export const GameConfig: Phaser.Types.Core.GameConfig = {
 // 游戏常量配置
 export const GameConstants = {
   // 时间相关
-  GAME_START_TIME: 8, // 早上8点开始
-  GAME_END_TIME: 20,  // 晚上8点结束
+  GAME_START_TIME: 9, // 早上9点开始
+  GAME_END_TIME: 21,  // 晚上9点结束
   TIME_UNIT: 30,      // 最小时间单位30分钟
   
   // 状态相关

@@ -8,6 +8,7 @@ import {
   AchievementPopup,
   DialogueUIManager,
   GameEndScreen,
+  ThoughtBubble,
   type Action
 } from './ui';
 
@@ -23,6 +24,7 @@ export class UIManager {
   private achievementPopup: AchievementPopup;
   private dialogueUIManager: DialogueUIManager;
   private gameEndScreen: GameEndScreen;
+  private thoughtBubble: ThoughtBubble;
   
   // 对话管理器
   private dialogueManager: DialogueManager | null = null;
@@ -38,6 +40,7 @@ export class UIManager {
     this.achievementPopup = new AchievementPopup();
     this.dialogueUIManager = new DialogueUIManager();
     this.gameEndScreen = new GameEndScreen();
+    this.thoughtBubble = new ThoughtBubble();
   }
 
   // 设置对话管理器
@@ -58,6 +61,7 @@ export class UIManager {
     this.achievementPopup.initialize(scene);
     this.dialogueUIManager.initialize(scene);
     this.gameEndScreen.initialize(scene);
+    this.thoughtBubble.initialize(scene);
     
     // 设置动作菜单回调
     this.actionMenu.setActionCallback((actionId: string) => {
@@ -198,5 +202,15 @@ export class UIManager {
   // 更新对话显示
   public updateDialogueDisplay(): void {
     this.dialogueUIManager.updateDialogueDisplay();
+  }
+
+  // 显示想法气泡
+  public showThought(thoughtId: string, text: string, x: number, y: number, duration: number = 3000): void {
+    this.thoughtBubble.showThought(thoughtId, text, x, y, duration);
+  }
+
+  // 隐藏想法气泡
+  public hideThought(thoughtId: string): void {
+    this.thoughtBubble.hideThought(thoughtId);
   }
 }
