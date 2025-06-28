@@ -5,6 +5,7 @@ import { RoomKeys } from '../constants/SceneKeys';
 import { InteractiveObject, RoomExit } from '../types/GameState';
 import { TransitionScene } from './TransitionScene';
 import { runTransitionTests } from '../test/TransitionSceneTest';
+import { GameEvents } from '../constants/GameEvents';
 
 export class LivingRoomNorthScene extends BaseScene {
   private interactiveObjects: Map<string, InteractiveObject> = new Map();
@@ -66,6 +67,8 @@ export class LivingRoomNorthScene extends BaseScene {
 
     // 创建扫地机器人
     this.robotCleaner = new RobotCleaner(this, 0, 400);
+    // 检查是否有战斗结果需要处理
+    this.checkBattleResult();
   }
 
   private createExit(exit: RoomExit): void {
@@ -144,6 +147,23 @@ export class LivingRoomNorthScene extends BaseScene {
         },
         'LivingRoomNorthScene'
       );
+    });
+
+    // 测试战斗系统
+    this.input.keyboard?.on('keydown-B', () => {
+      console.log('测试战斗系统...');
+      // 直接触发战斗开始事件
+      const battleEvent = new CustomEvent('start_battle', {
+        detail: {
+          enemyId: 'sofa_north',
+          enemyName: '沙发',
+          enemyImage: 'room_b_bed',
+          playerImage: 'balcony_robot_cleaner',
+          returnScene: 'LivingRoomNorthScene',
+          returnObjectId: 'sofa_north'
+        }
+      });
+      window.dispatchEvent(battleEvent);
     });
   }
 
@@ -268,5 +288,93 @@ export class LivingRoomNorthScene extends BaseScene {
     };
     
     return transitionTexts[exitName] || `你走向${exitName}...`;
+  }
+
+  protected setupEventListeners(): void {
+    super.setupEventListeners();
+    
+    // 监听战斗开始事件
+    window.addEventListener('start_battle', this.onStartBattle.bind(this) as EventListener);
+    
+    // 监听战斗结束事件
+    this.events.on(GameEvents.BATTLE_END, this.onBattleEnd.bind(this));
+  }
+
+  private onStartBattle(event: Event): void {
+    const customEvent = event as CustomEvent;
+    const battleData = customEvent.detail;
+    console.log('开始战斗:', battleData);
+    
+    // 切换到战斗场景
+    this.sceneManager?.startScene(SceneKeys.BATTLE, battleData);
+  }
+
+  private onBattleEnd(data: any): void {
+    console.log('战斗结束:', data);
+    
+    if (data.result === 'success') {
+      // 战斗成功，将沙发标记为损坏
+      this.markObjectAsDamaged(data.returnObjectId);
+    }
+    // 战斗失败则不做任何改变
+  }
+
+  private markObjectAsDamaged(objectId: string): void {
+    // 更新物体的损坏状态
+    const object = this.interactiveObjects.get(objectId);
+    if (object) {
+      // 更新物体精灵为损坏状态
+      const objectSprite = this.interactiveObjectBodies.find((_, index) => {
+        const objArray = Array.from(this.interactiveObjects.values());
+        return objArray[index]?.id === objectId;
+      });
+      
+      if (objectSprite) {
+        // 将损坏的沙发替换为损坏的椅子图片
+        // 这里我们暂时用颜色变化表示损坏，实际项目中应该替换为损坏的图片
+        objectSprite.setFillStyle(0x8b4513, 0.8);
+        
+        // 如果有损坏的图片，可以这样替换：
+        // const damagedSprite = this.add.sprite(object.x, object.y, 'room_b_chair');
+        // damagedSprite.setScale(0.8);
+        // objectSprite.destroy();
+      }
+      
+      // 记录损坏状态到游戏状态
+      if (this.gameManager) {
+        this.gameManager.getState().destroyedItems.add(objectId);
+      }
+    }
+  }
+
+  private checkBattleResult(): void {
+    // 从场景数据中获取战斗结果
+    const sceneData = (this as any).scene.settings.data;
+    if (sceneData && sceneData.battleResult) {
+      console.log('处理战斗结果:', sceneData);
+      
+      if (sceneData.battleResult === 'success' && sceneData.damagedObject) {
+        // 战斗成功，标记物体为损坏状态
+        this.markObjectAsDamaged(sceneData.damagedObject);
+        
+        // 显示成功提示
+        if (this.uiManager) {
+          this.uiManager.showDialogue('破坏成功！', 3000);
+        }
+      } else if (sceneData.battleResult === 'failure') {
+        // 战斗失败，显示失败提示
+        if (this.uiManager) {
+          this.uiManager.showDialogue('破坏失败！', 3000);
+        }
+      }
+    }
+  }
+
+  shutdown(): void {
+    // 清理事件监听器
+    window.removeEventListener('start_battle', this.onStartBattle.bind(this) as EventListener);
+    this.events.off(GameEvents.BATTLE_END, this.onBattleEnd.bind(this));
+    
+    super.shutdown();
   }
 }

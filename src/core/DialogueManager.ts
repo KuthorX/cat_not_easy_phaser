@@ -87,9 +87,18 @@ export class DialogueManager {
       }
     }
 
-    // 检查是否结束对话
+    // 获取新的当前步骤
     const newCurrentStep = this.getCurrentStep();
-    if (newCurrentStep && newCurrentStep.nextStep === 'end') {
+    if (!newCurrentStep) return false;
+
+    // 处理特殊动作（在步骤更新后）
+    if (newCurrentStep.specialAction) {
+      console.log('处理特殊动作:', newCurrentStep.specialAction);
+      this.handleSpecialAction(newCurrentStep.specialAction);
+    }
+
+    // 检查是否结束对话
+    if (newCurrentStep.nextStep === 'end') {
       // 检查当前步骤是否有选项需要显示
       if (newCurrentStep.choices && newCurrentStep.choices.length > 0) {
         // 如果有选项，不结束对话，让UI显示选项
@@ -231,5 +240,32 @@ export class DialogueManager {
       default:
         return true;
     }
+  }
+
+  // 处理特殊动作
+  private handleSpecialAction(action: string): void {
+    switch (action) {
+      case 'start_battle':
+        this.startBattle();
+        break;
+      default:
+        console.log('未知的特殊动作:', action);
+    }
+  }
+
+  // 开始战斗
+  private startBattle(): void {
+    // 触发战斗开始事件
+    const event = new CustomEvent('start_battle', {
+      detail: {
+        enemyId: this.currentDialogueState?.objectId || 'sofa_north',
+        enemyName: this.currentDialogueState?.objectName || '沙发',
+        enemyImage: 'room_b_bed',
+        playerImage: 'balcony_robot_cleaner',
+        returnScene: 'LivingRoomNorthScene',
+        returnObjectId: this.currentDialogueState?.objectId || 'sofa_north'
+      }
+    });
+    window.dispatchEvent(event);
   }
 } 
