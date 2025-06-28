@@ -13,13 +13,13 @@ export class RoomRegistry {
     this.registerRoom({
       id: RoomKeys.LIVING_ROOM_NORTH,
       name: '客厅-向北看',
-      description: '宽敞的客厅，阳光从北面的窗户洒进来。',
+      
       background: 'living_room_north_bg',
       interactiveObjects: [
         {
           id: 'window_north',
           name: '北窗',
-          description: '阳光透过窗户洒在地板上，温暖舒适。',
+          
           x: 640,
           y: 200,
           width: 200,
@@ -30,7 +30,7 @@ export class RoomRegistry {
         {
           id: 'sofa_north',
           name: '沙发',
-          description: '柔软的沙发，是休息的好地方。',
+          
           x: 400,
           y: 400,
           width: 300,
@@ -65,13 +65,13 @@ export class RoomRegistry {
     this.registerRoom({
       id: RoomKeys.LIVING_ROOM_WEST_LOW,
       name: '客厅-向西看（低处）',
-      description: '客厅的西侧，地面较低的区域。',
+      
       background: 'living_room_west_low_bg',
       interactiveObjects: [
         {
           id: 'cat_cage',
           name: '笼子',
-          description: '一个恶毒的陷阱，两脚兽有时会用这个囚禁我。',
+          
           x: 200,
           y: 400,
           width: 150,
@@ -82,7 +82,7 @@ export class RoomRegistry {
         {
           id: 'cat_litter_box',
           name: '猫厕所',
-          description: '我的排泄处。沙土的质感和野外不太一样。',
+          
           x: 400,
           y: 500,
           width: 100,
@@ -93,7 +93,7 @@ export class RoomRegistry {
         {
           id: 'cat_house',
           name: '猫别墅',
-          description: '自从门坏了之后，就变成我的游乐园了。',
+          
           x: 600,
           y: 450,
           width: 120,
@@ -135,13 +135,13 @@ export class RoomRegistry {
     this.registerRoom({
       id: RoomKeys.LIVING_ROOM_WEST_HIGH,
       name: '客厅-向西看（高处）',
-      description: '客厅西侧的高处，视野很好。',
+      
       background: 'living_room_west_high_bg',
       interactiveObjects: [
         {
           id: 'fish_treat',
           name: '长条硬皮鱼',
-          description: '皮特别坚韧，但肉是浆糊状，非常美味。',
+          
           x: 300,
           y: 350,
           width: 80,
@@ -167,41 +167,63 @@ export class RoomRegistry {
     this.registerRoom({
       id: RoomKeys.ROOM_B,
       name: '主人房间',
-      description: '主人的房间，充满了主人的气味。',
+      
       background: 'room_b_bg',
       interactiveObjects: [
         {
-          id: 'toy_mouse',
-          name: '发声玩具老鼠',
-          description: '我的劲敌。一只怎么也咬不死，叫声尖锐的老鼠。',
-          x: 400,
-          y: 300,
-          width: 60,
-          height: 40,
-          sprite: 'toy_mouse',
-          actions: ['play_with_mouse', 'carry_mouse']
-        },
-        {
-          id: 'computer_screen',
-          name: '显示屏',
-          description: '大又扁，有时候黑漆漆，有时候亮闪闪。',
-          x: 600,
-          y: 200,
+          id: 'room_b_bed',
+          name: '主人的床',
+          
+          x: 300,
+          y: 400,
           width: 200,
           height: 150,
-          sprite: 'computer_screen',
-          actions: ['destroy_screen']
+          imageKey: 'room_b_bed',
+          actions: ['sleep_on_bed', 'scratch_bed']
         },
         {
-          id: 'owner_bed',
-          name: '主人的床',
-          description: '柔软的床铺，比猫窝舒服多了。',
-          x: 200,
-          y: 400,
-          width: 300,
-          height: 200,
-          sprite: 'owner_bed',
-          actions: ['sleep_on_bed']
+          id: 'room_b_chair',
+          name: '椅子',
+          
+          x: 800,
+          y: 450,
+          width: 120,
+          height: 100,
+          imageKey: 'room_b_chair',
+          actions: ['sit_on_chair', 'climb_chair']
+        },
+        {
+          id: 'room_b_computer_screen',
+          name: '电脑屏幕',
+          
+          x: 900,
+          y: 350,
+          width: 150,
+          height: 100,
+          imageKey: 'room_b_computer_screen',
+          actions: ['watch_screen', 'paw_screen']
+        },
+        {
+          id: 'room_b_kettle',
+          name: '水壶',
+          
+          x: 700,
+          y: 300,
+          width: 80,
+          height: 60,
+          imageKey: 'room_b_kettle',
+          actions: ['investigate_kettle', 'knock_over_kettle']
+        },
+        {
+          id: 'room_b_side_wall',
+          name: '侧墙',
+          
+          x: 1000,
+          y: 360,
+          width: 100,
+          height: 400,
+          imageKey: 'room_b_side_wall',
+          actions: ['climb_wall', 'scratch_wall']
         }
       ],
       exits: [
@@ -221,7 +243,7 @@ export class RoomRegistry {
     this.registerRoom({
       id: RoomKeys.HALLWAY,
       name: '过道',
-      description: '连接各个房间的过道。',
+      
       background: 'hallway_bg',
       interactiveObjects: [],
       exits: [
@@ -250,13 +272,13 @@ export class RoomRegistry {
     this.registerRoom({
       id: RoomKeys.LIVING_ROOM_EAST,
       name: '客厅-向东看',
-      description: '客厅的东侧，有一个大衣柜。',
+      
       background: 'living_room_east_bg',
       interactiveObjects: [
         {
           id: 'wardrobe',
           name: '大衣柜',
-          description: '一个巨大的衣柜，里面有很多有趣的东西。',
+          
           x: 400,
           y: 300,
           width: 200,
@@ -267,7 +289,7 @@ export class RoomRegistry {
         {
           id: 'cat_hammock',
           name: '猫吊床',
-          description: '一个舒适的猫吊床，是休息的好地方。',
+          
           x: 600,
           y: 400,
           width: 150,
@@ -302,19 +324,37 @@ export class RoomRegistry {
     this.registerRoom({
       id: RoomKeys.BALCONY,
       name: '阳台',
-      description: '户外的阳台，可以看到外面的世界。',
       background: 'balcony_bg',
       interactiveObjects: [
         {
-          id: 'outdoor_exploration',
-          name: '户外探索',
-          description: '在阳台上探索外面的世界。',
-          x: 640,
-          y: 360,
-          width: 400,
-          height: 200,
-          sprite: 'outdoor_exploration',
-          actions: ['house_parkour']
+          id: 'balcony_chair',
+          name: '阳台椅子',
+          x: 150,
+          y: 244,
+          width: 150,
+          height: 100,
+          imageKey: 'balcony_chair',
+          actions: ['sit_on_chair', 'jump_on_chair']
+        },
+        {
+          id: 'balcony_coat_hanger',
+          name: '衣架',
+          x: 110,
+          y: 550,
+          width: 100,
+          height: 80,
+          imageKey: 'balcony_coat_hanger',
+          actions: ['climb_hanger', 'play_with_clothes']
+        },
+        {
+          id: 'balcony_robot_cleaner',
+          name: '扫地机器人',
+          x: 900,
+          y: 550,
+          width: 120,
+          height: 80,
+          imageKey: 'balcony_robot_cleaner',
+          actions: ['chase_robot', 'ride_robot']
         }
       ],
       exits: [
@@ -334,13 +374,13 @@ export class RoomRegistry {
     this.registerRoom({
       id: RoomKeys.LIVING_ROOM_DOOR,
       name: '客厅门口',
-      description: '客厅的门口，通向外面。',
+      
       background: 'living_room_door_bg',
       interactiveObjects: [
         {
           id: 'front_door',
           name: '前门',
-          description: '通向外面的大门。',
+          
           x: 640,
           y: 400,
           width: 200,
@@ -382,13 +422,13 @@ export class RoomRegistry {
     this.registerRoom({
       id: RoomKeys.DOORWAY,
       name: '门口',
-      description: '房子的门口，通向自由的世界。',
+      
       background: 'doorway_bg',
       interactiveObjects: [
         {
           id: 'freedom',
           name: '自由',
-          description: '通向自由的道路。',
+          
           x: 640,
           y: 360,
           width: 400,
@@ -414,7 +454,7 @@ export class RoomRegistry {
     this.registerRoom({
       id: RoomKeys.ROOM_A,
       name: '房间A',
-      description: '一个备用房间。',
+      
       background: 'room_a_bg',
       interactiveObjects: [],
       exits: [
@@ -434,7 +474,7 @@ export class RoomRegistry {
     this.registerRoom({
       id: RoomKeys.ROOM_C,
       name: '房间C',
-      description: '另一个备用房间。',
+      
       background: 'room_c_bg',
       interactiveObjects: [],
       exits: [

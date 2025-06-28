@@ -284,7 +284,7 @@ export abstract class BaseScene extends Phaser.Scene {
 
     // 鼠标悬停事件 - 显示描边
     interactiveArea.on('pointerover', () => {
-      this.showObjectOutline(interactiveArea, 0x00ff00, 3);
+      this.showObjectOutline(interactiveArea, 0x000000, 3);
     });
 
     // 鼠标离开事件 - 隐藏描边
@@ -295,7 +295,7 @@ export abstract class BaseScene extends Phaser.Scene {
     return image;
   }
 
-  // 显示物体描边
+  // 显示物体描边 - 基于图片的实际形状
   private showObjectOutline(interactiveArea: Phaser.GameObjects.Rectangle, color: number, thickness: number = 3): void {
     const outline = (interactiveArea as any).outline;
     const targetImage = (interactiveArea as any).targetImage;
@@ -305,9 +305,79 @@ export abstract class BaseScene extends Phaser.Scene {
     outline.clear();
     outline.lineStyle(thickness, color, 1);
     
-    // 获取图片的边界
-    const bounds = targetImage.getBounds();
-    outline.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
+    // 获取图片的实际边界（去除透明区域）
+    const bounds = this.getImageNonTransparentBounds(targetImage);
+    if (bounds) {
+      outline.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
+    }
+  }
+
+  // 获取图片的非透明区域边界
+  private getImageNonTransparentBounds(image: Phaser.GameObjects.Image): { x: number; y: number; width: number; height: number } | null {
+    try {
+      // 获取图片的纹理
+      const texture = image.texture;
+      const source = texture.getSourceImage() as HTMLImageElement;
+      
+      if (!source || !source.complete) {
+        // 如果图片还没加载完成，使用默认边界
+        const bounds = image.getBounds();
+        return bounds;
+      }
+
+      // 创建canvas来分析图片的透明区域
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return null;
+
+      canvas.width = source.width;
+      canvas.height = source.height;
+      ctx.drawImage(source, 0, 0);
+
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imageData.data;
+
+      let minX = canvas.width;
+      let minY = canvas.height;
+      let maxX = 0;
+      let maxY = 0;
+      let hasNonTransparentPixel = false;
+
+      // 扫描图片找到非透明像素的边界
+      for (let y = 0; y < canvas.height; y++) {
+        for (let x = 0; x < canvas.width; x++) {
+          const index = (y * canvas.width + x) * 4;
+          const alpha = data[index + 3]; // 透明度通道
+          
+          if (alpha > 0) { // 非透明像素
+            hasNonTransparentPixel = true;
+            minX = Math.min(minX, x);
+            minY = Math.min(minY, y);
+            maxX = Math.max(maxX, x);
+            maxY = Math.max(maxY, y);
+          }
+        }
+      }
+
+      if (!hasNonTransparentPixel) {
+        return null;
+      }
+
+      // 计算实际边界
+      const imageBounds = image.getBounds();
+      const scaleX = imageBounds.width / canvas.width;
+      const scaleY = imageBounds.height / canvas.height;
+      
+      return {
+        x: imageBounds.x + minX * scaleX,
+        y: imageBounds.y + minY * scaleY,
+        width: (maxX - minX + 1) * scaleX,
+        height: (maxY - minY + 1) * scaleY
+      };
+    } catch (error) {
+      console.warn('无法分析图片透明区域，使用默认边界:', error);
+      return image.getBounds();
+    }
   }
 
   // 隐藏物体描边

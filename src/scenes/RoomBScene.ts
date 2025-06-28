@@ -19,16 +19,21 @@ export class RoomBScene extends BaseScene {
       fontStyle: 'bold'
     }).setOrigin(0.5);
 
-    // 添加room_b场景的图片对象
-    this.addRoomBObjects();
-
     // 获取房间数据
     const roomData = this.sceneManager?.getRoomData(RoomKeys.ROOM_B);
     if (!roomData) return;
 
-    // 创建交互对象
+    // 添加图片对象并创建交互区域
     roomData.interactiveObjects.forEach((obj: InteractiveObject) => {
-      this.createInteractiveObject(obj);
+      if (obj.imageKey) {
+        // 添加图片对象
+        this.add.image(obj.x, obj.y, obj.imageKey);
+        // 创建交互对象
+        this.createInteractiveImageObject(obj, obj.imageKey);
+      } else {
+        // 创建传统的矩形交互对象
+        this.createInteractiveObject(obj);
+      }
     });
 
     // 创建出口
@@ -58,79 +63,6 @@ export class RoomBScene extends BaseScene {
 
     // 设置键盘快捷键
     this.setupKeyboardShortcuts();
-  }
-
-  private addRoomBObjects(): void {
-    // 添加床
-    const bed = this.add.image(300, 400, 'room_b_bed');
-    
-    // 添加椅子
-    const chair = this.add.image(800, 450, 'room_b_chair');
-    
-    // 添加电脑屏幕
-    const computerScreen = this.add.image(900, 350, 'room_b_computer_screen');
-    
-    // 添加水壶
-    const kettle = this.add.image(700, 300, 'room_b_kettle');
-    
-    // 添加侧墙
-    const sideWall = this.add.image(1000, 360, 'room_b_side_wall');
-
-    // 为这些对象创建交互区域
-    this.createInteractiveImageObject({
-      id: 'room_b_bed',
-      name: '主人的床',
-      description: '柔软的床铺，比猫窝舒服多了。',
-      x: 300,
-      y: 400,
-      width: 200,
-      height: 150,
-      actions: ['sleep_on_bed', 'scratch_bed']
-    }, 'room_b_bed');
-
-    this.createInteractiveImageObject({
-      id: 'room_b_chair',
-      name: '椅子',
-      description: '主人坐的椅子。',
-      x: 800,
-      y: 450,
-      width: 120,
-      height: 100,
-      actions: ['sit_on_chair', 'climb_chair']
-    }, 'room_b_chair');
-
-    this.createInteractiveImageObject({
-      id: 'room_b_computer_screen',
-      name: '电脑屏幕',
-      description: '大又扁，有时候黑漆漆，有时候亮闪闪。',
-      x: 900,
-      y: 350,
-      width: 150,
-      height: 100,
-      actions: ['watch_screen', 'paw_screen']
-    }, 'room_b_computer_screen');
-
-    this.createInteractiveImageObject({
-      id: 'room_b_kettle',
-      name: '水壶',
-      description: '主人用来烧水的壶。',
-      x: 700,
-      y: 300,
-      width: 80,
-      height: 60,
-      actions: ['investigate_kettle', 'knock_over_kettle']
-    }, 'room_b_kettle');
-
-    this.createInteractiveImageObject({
-      id: 'room_b_side_wall',
-      name: '侧墙',
-      description: '房间的侧墙。',
-      x: 1000,
-      y: 360,
-      width: 100,
-      height: 400,
-      actions: ['climb_wall', 'scratch_wall']
-    }, 'room_b_side_wall');
   }
 
   private createExit(exit: RoomExit): void {
