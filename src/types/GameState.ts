@@ -13,6 +13,7 @@ export interface GameState {
   endingType: string | null;
   currentDialogue?: DialogueState;
   dialogueHistory: DialogueHistoryEntry[];
+  battleState: BattleState;
 }
 
 export interface DialogueState {
@@ -44,12 +45,13 @@ export interface Dialogue {
 
 export interface DialogueStep {
   id: string;
-  speaker: 'object' | 'cat';
+  speaker: 'object' | 'cat' | 'system';
   text: string;
   choices?: DialogueChoice[];
   autoNext?: boolean;
   nextStep?: string;
   effects?: DialogueEffect[];
+  specialAction?: string;
 }
 
 export interface DialogueChoice {
@@ -166,4 +168,23 @@ export interface AchievementCondition {
   type: 'action_completed' | 'item_destroyed' | 'room_visited' | 'inventory_has' | 'story_flag';
   value: any;
   count?: number;
+}
+
+export interface BattleAction {
+  id: string;
+  name: string;
+  description: string;
+  successRate: number;
+}
+
+export interface BattleState {
+  isActive: boolean;
+  enemyId: string;
+  enemyName: string;
+  enemyImage: string;
+  playerImage: string;
+  selectedAction: string | null;
+  result: 'success' | 'failure' | null;
+  returnScene: string;
+  returnObjectId: string;
 } 

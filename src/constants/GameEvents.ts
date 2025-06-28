@@ -61,5 +61,11 @@ export enum GameEvents {
   SAVE_SUCCESS = 'save_success',
   SAVE_FAILED = 'save_failed',
   LOAD_SUCCESS = 'load_success',
-  LOAD_FAILED = 'load_failed'
+  LOAD_FAILED = 'load_failed',
+  
+  // 战斗相关
+  BATTLE_START = 'battle_start',
+  BATTLE_END = 'battle_end',
+  BATTLE_ACTION_SELECTED = 'battle_action_selected',
+  BATTLE_RESULT = 'battle_result'
 } 
