@@ -10,7 +10,7 @@ export class MenuScene extends Phaser.Scene {
     // 设置背景
     this.add.rectangle(640, 360, 1280, 720, 0x87CEEB);
     
-    // 播放背景音乐
+    // 播放背景音乐 - 使用BgmManager确保不会重复播放
     const game = (window as any).game;
     if (game && game.audioManager) {
       game.audioManager.playMusic('bgm_living_room', this);
@@ -75,7 +75,7 @@ export class MenuScene extends Phaser.Scene {
       game.gameManager.resetGame();
       
       // 启动游戏场景
-      this.scene.start(SceneKeys.LIVING_ROOM_NORTH);
+      this.scene.start(SceneKeys.LIVING_ROOM_EAST);
     }
   }
 

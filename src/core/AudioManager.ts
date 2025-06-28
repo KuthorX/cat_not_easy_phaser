@@ -1,14 +1,16 @@
 import { VolumeManager } from './VolumeManager';
+import { BgmManager } from './BgmManager';
 
 export class AudioManager {
   private game: Phaser.Game;
   private sounds: Map<string, Phaser.Sound.BaseSound> = new Map();
-  private music: Phaser.Sound.BaseSound | null = null;
   private volumeManager: VolumeManager;
+  private bgmManager: BgmManager;
 
   constructor(game: Phaser.Game) {
     this.game = game;
     this.volumeManager = VolumeManager.getInstance();
+    this.bgmManager = BgmManager.getInstance();
     
     // 监听音量变化事件
     this.volumeManager.onMusicVolumeChanged((volume) => {
@@ -44,49 +46,33 @@ export class AudioManager {
     }
   }
 
-  // 播放背景音乐
+  // 播放背景音乐 - 使用BgmManager
   public playMusic(musicKey: string, scene?: Phaser.Scene, loop: boolean = true): void {
-    this.stopMusic();
-    
     // 如果没有传入场景，尝试获取当前活跃场景
     const targetScene = scene || this.game.scene.getScene('MENU');
     if (targetScene) {
-      this.music = targetScene.sound.add(musicKey, {
-        volume: this.volumeManager.getMusicVolume(),
-        loop: loop
-      });
-      this.music.play();
+      this.bgmManager.playBgm(musicKey, targetScene, loop);
     }
   }
 
   // 停止背景音乐
   public stopMusic(): void {
-    if (this.music) {
-      this.music.stop();
-      this.music.destroy();
-      this.music = null;
-    }
+    this.bgmManager.stopBgm();
   }
 
   // 暂停背景音乐
   public pauseMusic(): void {
-    if (this.music) {
-      this.music.pause();
-    }
+    this.bgmManager.pauseBgm();
   }
 
   // 恢复背景音乐
   public resumeMusic(): void {
-    if (this.music) {
-      this.music.resume();
-    }
+    this.bgmManager.resumeBgm();
   }
 
   // 更新音乐音量（内部方法，由VolumeManager调用）
   private updateMusicVolume(volume: number): void {
-    if (this.music && this.music instanceof Phaser.Sound.WebAudioSound) {
-      this.music.setVolume(volume);
-    }
+    // BgmManager会自动处理音量更新
   }
 
   // 更新音效音量（内部方法，由VolumeManager调用）
