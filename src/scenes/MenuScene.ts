@@ -75,21 +75,7 @@ export class MenuScene extends Phaser.Scene {
       game.gameManager.resetGame();
       
       // 启动游戏场景
-      this.scene.start(SceneKeys.LIVING_ROOM_EAST);
-    }
-  }
-
-  private loadGame(): void {
-    const game = (window as any).game;
-    if (game) {
-      const saveData = game.saveManager.loadGame();
-      if (saveData) {
-        // 恢复游戏状态
-        // 这里需要实现状态恢复逻辑
-        
-        // 启动游戏场景
-        this.scene.start(SceneKeys.LIVING_ROOM_NORTH);
-      }
+      this.scene.start(SceneKeys.LIVING_ROOM_NORTH);
     }
   }
 

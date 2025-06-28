@@ -78,6 +78,10 @@ export class PreloadScene extends Phaser.Scene {
       'cat_grab_down_wall',
       'cat_lick',
       'cat_shock',
+      'cat_hit_laptop',
+      'cat_meow',
+      'cat_oars',
+      'cat_run',
     ];
 
     // 为每个序列加载PNG文件
