@@ -2,13 +2,11 @@ import { BaseScene } from './BaseScene';
 import { SceneKeys } from '../constants/SceneKeys';
 import { RoomKeys } from '../constants/SceneKeys';
 import { InteractiveObject, InteractiveObjectWithSprite, RoomExit } from '../types/GameState';
-import { RobotCleaner } from '../objects/RobotCleaner';
 import { GameEvents } from '../constants/GameEvents';
 
 export class LivingRoomNorthScene extends BaseScene {
   private interactiveObjects: Map<string, InteractiveObject> = new Map();
-  private interactiveObjectBodies: Phaser.GameObjects.Rectangle[] = [];
-  private robotCleaner!: RobotCleaner;
+  private interactiveObjectBodies: Phaser.GameObjects.GameObject [] = [];
 
   constructor() {
     super(SceneKeys.LIVING_ROOM_NORTH);
@@ -32,7 +30,7 @@ export class LivingRoomNorthScene extends BaseScene {
     // 创建交互对象
     roomData.interactiveObjects.forEach((obj: InteractiveObject | InteractiveObjectWithSprite) => {
       this.interactiveObjects.set(obj.id, obj as InteractiveObject);
-      const objSprite = this.createInteractiveObject(obj);
+      const objSprite = this.addInteractiveObjecrs(obj);
       this.interactiveObjectBodies.push(objSprite);
     });
 
@@ -40,9 +38,6 @@ export class LivingRoomNorthScene extends BaseScene {
     roomData.exits.forEach((exit: RoomExit) => {
       this.createExit(exit);
     });
-
-    // 添加碰撞
-    this.physics.add.collider(this.robotCleaner, this.interactiveObjectBodies);
 
     // 初始化UI
     if (this.uiManager) {
@@ -106,8 +101,6 @@ export class LivingRoomNorthScene extends BaseScene {
     // 设置键盘快捷键
     this.setupKeyboardShortcuts();
 
-    // 创建扫地机器人
-    this.robotCleaner = new RobotCleaner(this, 0, 400);
     // 检查是否有战斗结果需要处理
     this.checkBattleResult();
   }
@@ -287,7 +280,7 @@ export class LivingRoomNorthScene extends BaseScene {
       if (objectSprite) {
         // 将损坏的沙发替换为损坏的椅子图片
         // 这里我们暂时用颜色变化表示损坏，实际项目中应该替换为损坏的图片
-        objectSprite.setFillStyle(0x8b4513, 0.8);
+        // objectSprite.setFillStyle(0x8b4513, 0.8);
         
         // 如果有损坏的图片，可以这样替换：
         // const damagedSprite = this.add.sprite(object.x, object.y, 'room_b_chair');

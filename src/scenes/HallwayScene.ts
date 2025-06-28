@@ -24,8 +24,8 @@ export class HallwayScene extends BaseScene {
     if (!roomData) return;
 
     // 创建交互对象
-    roomData.interactiveObjects.forEach((obj: InteractiveObject) => {
-      this.createInteractiveObject(obj);
+    roomData.interactiveObjects.forEach((obj) => {
+      this.addInteractiveObjecrs(obj);
     });
 
     // 创建出口

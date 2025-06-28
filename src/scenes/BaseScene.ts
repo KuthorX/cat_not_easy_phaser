@@ -3,7 +3,7 @@ import { GameManager } from '@/core/GameManager';
 import { SceneManager } from '@/core/SceneManager';
 import { UIManager } from '@/core/UIManager';
 import { AudioManager } from '@/core/AudioManager';
-import { InteractiveObjectWithSprite } from '@/types/GameState';
+import { InteractiveObject, InteractiveObjectWithSprite } from '@/types/GameState';
 import { OutlineRenderer } from '../utils/OutlineRenderer';
 import { TransitionHelper } from '../utils/TransitionHelper';
 
@@ -284,8 +284,25 @@ export abstract class BaseScene extends Phaser.Scene {
     return transitionTexts[exitName] || `你走向${exitName}...`;
   }
 
+  protected addInteractiveObjecrs(obj : InteractiveObject | InteractiveObjectWithSprite) : Phaser.GameObjects.GameObject {
+    switch (obj.type) {
+      case 'InteractiveObject':
+        if (obj.imageKey) {
+          // 创建交互对象
+          return this.createInteractiveImageObject(obj, obj.imageKey);
+        } else {
+          // 创建传统的矩形交互对象
+          return this.createInteractiveObject(obj);
+        }
+        break;
+      case 'InteractiveObjectWithSprite':
+        return this.createInteractiveObjectsWithSprite(obj);
+        break;
+    }
+  }
+
   // 创建交互对象
-  protected createInteractiveObject(obj: any): Phaser.GameObjects.Rectangle {
+  private createInteractiveObject(obj: any): Phaser.GameObjects.Rectangle {
     const rect = this.add.rectangle(obj.x, obj.y, obj.width, obj.height, 0x00ff00, 0.3);
     this.physics.add.existing(rect, true);
     rect.setInteractive();
@@ -306,7 +323,7 @@ export abstract class BaseScene extends Phaser.Scene {
   }
 
   // 创建带描边效果的图片交互对象
-  protected createInteractiveImageObject(obj: any, imageKey: string): Phaser.GameObjects.Image {
+  private createInteractiveImageObject(obj: any, imageKey: string): Phaser.GameObjects.Image {
     // 创建图片对象
     const image = this.add.image(obj.x, obj.y, imageKey);
     
@@ -325,11 +342,12 @@ export abstract class BaseScene extends Phaser.Scene {
     return image;
   }
 
-  protected createInteractiveObjectsWithSprite(obj : InteractiveObjectWithSprite): void {
+  private createInteractiveObjectsWithSprite(obj : InteractiveObjectWithSprite): Phaser.GameObjects.Sprite {
     const sprite = obj.spriteConstructor(this, obj.x, obj.y);
     sprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
       this.onObjectClicked(obj, pointer);
     });
+    return sprite;
   }
 
   // 显示物体描边 - 基于图片的实际形状

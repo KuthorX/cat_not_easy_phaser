@@ -23,22 +23,9 @@ export class BalconyScene extends BaseScene {
     const roomData = this.sceneManager?.getRoomData(RoomKeys.BALCONY);
     if (!roomData) return;
 
-    // 添加图片对象并创建交互区域
+    // 创建交互对象
     roomData.interactiveObjects.forEach((obj) => {
-      switch (obj.type) {
-        case 'InteractiveObject':
-          if (obj.imageKey) {
-            // 创建交互对象
-            this.createInteractiveImageObject(obj, obj.imageKey);
-          } else {
-            // 创建传统的矩形交互对象
-            this.createInteractiveObject(obj);
-          }
-          break;
-        case 'InteractiveObjectWithSprite':
-          this.createInteractiveObjectsWithSprite(obj);
-          break;
-      }
+      this.addInteractiveObjecrs(obj);
     });
 
     // 创建出口

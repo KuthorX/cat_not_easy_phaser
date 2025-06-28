@@ -22,10 +22,10 @@ export class LivingRoomWestHighScene extends BaseScene {
     // 获取房间数据
     const roomData = this.sceneManager?.getRoomData(RoomKeys.LIVING_ROOM_WEST_HIGH);
     if (!roomData) return;
-
+    
     // 创建交互对象
-    roomData.interactiveObjects.forEach((obj: InteractiveObject) => {
-      this.createInteractiveObject(obj);
+    roomData.interactiveObjects.forEach((obj) => {
+      this.addInteractiveObjecrs(obj);
     });
 
     // 创建出口

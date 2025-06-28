@@ -24,9 +24,7 @@ export class LivingRoomWestLowScene extends BaseScene {
     if (!roomData) return;
 
     // 创建交互对象
-    roomData.interactiveObjects.forEach((obj: InteractiveObject) => {
-      this.createInteractiveObject(obj);
-    });
+    this.addInteractiveObjecrs(roomData.interactiveObjects);
 
     // 创建出口
     roomData.exits.forEach((exit: RoomExit) => {
