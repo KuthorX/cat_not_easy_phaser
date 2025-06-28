@@ -52,13 +52,16 @@ export class LivingRoomNorthScene extends BaseScene {
       // 设置右上角按钮回调
       this.uiManager.setupTopRightButtons({
         onTimeWaste: () => {
+          console.log('打开消磨时间面板');
           this.uiManager?.showTimeWastePanel();
         },
         onOpenLog: () => {
+          console.log('打开日志页');
           this.uiManager?.showLogPage();
         },
         onOpenSettings: () => {
           console.log('打开设置');
+          this.uiManager?.showSettingsPanel();
         }
       });
       

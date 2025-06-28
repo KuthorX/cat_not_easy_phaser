@@ -16,4 +16,5 @@ export type { IUIComponent } from './IUIComponent';
 export type { Action } from './ActionMenu';
 export type { TransitionConfig } from './TransitionPanel';
 export type { TopRightButtonCallback } from './TopRightButtons';
-export type { TimeWasteCallback } from './TimeWastePanel'; 
+export type { TimeWasteCallback } from './TimeWastePanel';
+export * from './SettingsPanel'; // 导出 SettingsPanel

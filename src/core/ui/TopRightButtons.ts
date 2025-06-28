@@ -20,6 +20,7 @@ export class TopRightButtons implements IUIComponent {
   }
 
   private createButtons(): void {
+    console.log('create buttons');
     if (!this.scene) return;
 
     this.container = this.scene.add.container(1280 - 150, 10);
@@ -65,6 +66,7 @@ export class TopRightButtons implements IUIComponent {
   }
 
   private onTimeWasteClick(): void {
+    console.log('onTimeWasteClick');
     if (this.callback.onTimeWaste) {
       this.callback.onTimeWaste();
     }
@@ -83,6 +85,7 @@ export class TopRightButtons implements IUIComponent {
   }
 
   setCallback(callback: TopRightButtonCallback): void {
+    console.log('set callback, ', callback);
     this.callback = callback;
   }
 
