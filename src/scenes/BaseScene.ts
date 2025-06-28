@@ -284,21 +284,23 @@ export abstract class BaseScene extends Phaser.Scene {
     return transitionTexts[exitName] || `你走向${exitName}...`;
   }
 
-  protected addInteractiveObjecrs(obj : InteractiveObject | InteractiveObjectWithSprite) : Phaser.GameObjects.GameObject {
+  protected addInteractiveObjecrs(obj : InteractiveObject | InteractiveObjectWithSprite) : { first: string; second: Phaser.GameObjects.GameObject } {
+    let gameObject: Phaser.GameObjects.GameObject;
     switch (obj.type) {
       case 'InteractiveObject':
         if (obj.imageKey) {
-          // 创建交互对象
-          return this.createInteractiveImageObject(obj, obj.imageKey);
+          // Create interactive object
+          gameObject = this.createInteractiveImageObject(obj, obj.imageKey);
         } else {
-          // 创建传统的矩形交互对象
-          return this.createInteractiveObject(obj);
+          // Create traditional rectangular interactive object
+          gameObject = this.createInteractiveObject(obj);
         }
         break;
       case 'InteractiveObjectWithSprite':
-        return this.createInteractiveObjectsWithSprite(obj);
+        gameObject = this.createInteractiveObjectsWithSprite(obj);
         break;
     }
+    return { first: obj.id, second: gameObject };
   }
 
   // 创建交互对象
@@ -326,6 +328,11 @@ export abstract class BaseScene extends Phaser.Scene {
   private createInteractiveImageObject(obj: any, imageKey: string): Phaser.GameObjects.Image {
     // 创建图片对象
     const image = this.add.image(obj.x, obj.y, imageKey);
+    this.physics.add.existing(image, true); // true使其成为静态物理体
+
+    // 设置物理体的大小以匹配交互区域
+    const body = image.body as Phaser.Physics.Arcade.StaticBody;
+    body.setSize(obj.width, obj.height);
     
     // 创建不可见的交互区域
     const interactiveArea = this.add.rectangle(obj.x, obj.y, obj.width, obj.height, 0x000000, 0);
