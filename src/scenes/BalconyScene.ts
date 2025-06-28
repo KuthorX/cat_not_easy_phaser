@@ -2,6 +2,7 @@ import { BaseScene } from './BaseScene';
 import { SceneKeys } from '../constants/SceneKeys';
 import { RoomKeys } from '../constants/SceneKeys';
 import { InteractiveObject, RoomExit, InteractiveObjectWithSprite } from '../types/GameState';
+import { TextRenderer } from '../utils/TextRenderer';
 
 export class BalconyScene extends BaseScene {
   constructor() {
@@ -13,11 +14,11 @@ export class BalconyScene extends BaseScene {
     this.add.image(640, 360, 'balcony_bg');
     
     // 添加房间标题
-    this.add.text(640, 50, '阳台', {
+    TextRenderer.createCenteredText(this, 640, 50, '阳台', {
       fontSize: '32px',
       color: '#000000',
       fontStyle: 'bold'
-    }).setOrigin(0.5);
+    });
 
     // 获取房间数据
     const roomData = this.sceneManager?.getRoomData(RoomKeys.BALCONY);
@@ -117,12 +118,12 @@ export class BalconyScene extends BaseScene {
     });
 
     // 添加出口标签
-    this.add.text(exit.x, exit.y, exit.name, {
+    TextRenderer.createCenteredText(this, exit.x, exit.y, exit.name, {
       fontSize: '14px',
       color: '#ffffff',
       backgroundColor: '#000000',
       padding: { x: 2, y: 1 }
-    }).setOrigin(0.5);
+    });
   }
 
   private setupKeyboardShortcuts(): void {

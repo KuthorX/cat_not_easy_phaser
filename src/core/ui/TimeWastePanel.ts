@@ -1,4 +1,5 @@
 import { IUIComponent } from './IUIComponent';
+import { TextRenderer } from '../../utils/TextRenderer';
 
 export interface TimeWasteCallback {
   onCancel?: () => void;
@@ -31,47 +32,43 @@ export class TimeWastePanel implements IUIComponent {
     this.background.setStrokeStyle(2, 0xffffff);
 
     // 标题
-    this.title = this.scene.add.text(0, -100, '消磨时间', {
+    this.title = TextRenderer.createCenteredText(this.scene, 0, -100, '消磨时间', {
       fontSize: '24px',
       color: '#ffffff',
       fontStyle: 'bold'
     });
-    this.title.setOrigin(0.5);
 
     // 取消按钮
-    this.cancelButton = this.scene.add.text(0, 0, '取消', {
+    this.cancelButton = TextRenderer.createCenteredText(this.scene, 0, 0, '取消', {
       fontSize: '18px',
       color: '#ffffff',
       backgroundColor: '#666666',
       padding: { x: 20, y: 10 }
     });
-    this.cancelButton.setOrigin(0.5);
     this.cancelButton.setInteractive();
     this.cancelButton.on('pointerdown', () => this.onCancelClick());
     this.cancelButton.on('pointerover', () => this.cancelButton?.setStyle({ backgroundColor: '#888888' }));
     this.cancelButton.on('pointerout', () => this.cancelButton?.setStyle({ backgroundColor: '#666666' }));
 
     // 消磨一小时按钮
-    this.oneHourButton = this.scene.add.text(0, 50, '消磨一小时', {
+    this.oneHourButton = TextRenderer.createCenteredText(this.scene, 0, 50, '消磨一小时', {
       fontSize: '18px',
       color: '#ffffff',
       backgroundColor: '#4169E1',
       padding: { x: 20, y: 10 }
     });
-    this.oneHourButton.setOrigin(0.5);
     this.oneHourButton.setInteractive();
     this.oneHourButton.on('pointerdown', () => this.onOneHourClick());
     this.oneHourButton.on('pointerover', () => this.oneHourButton?.setStyle({ backgroundColor: '#5A7BE1' }));
     this.oneHourButton.on('pointerout', () => this.oneHourButton?.setStyle({ backgroundColor: '#4169E1' }));
 
     // 消磨一整天按钮
-    this.oneDayButton = this.scene.add.text(0, 100, '消磨一整天', {
+    this.oneDayButton = TextRenderer.createCenteredText(this.scene, 0, 100, '消磨一整天', {
       fontSize: '18px',
       color: '#ffffff',
       backgroundColor: '#8B4513',
       padding: { x: 20, y: 10 }
     });
-    this.oneDayButton.setOrigin(0.5);
     this.oneDayButton.setInteractive();
     this.oneDayButton.on('pointerdown', () => this.onOneDayClick());
     this.oneDayButton.on('pointerover', () => this.oneDayButton?.setStyle({ backgroundColor: '#A0522D' }));
@@ -120,6 +117,7 @@ export class TimeWastePanel implements IUIComponent {
   }
 
   destroy(): void {
+    console.log('destroy TimeWastePanel');
     if (this.container) {
       this.container.destroy();
       this.container = null;

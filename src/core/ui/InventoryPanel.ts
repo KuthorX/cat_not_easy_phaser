@@ -1,4 +1,5 @@
 import { IUIComponent } from './IUIComponent';
+import { TextRenderer } from '../../utils/TextRenderer';
 
 export class InventoryPanel implements IUIComponent {
   private scene: Phaser.Scene | null = null;
@@ -19,11 +20,10 @@ export class InventoryPanel implements IUIComponent {
     const background = this.scene.add.rectangle(0, 0, 400, 300, 0x000000, 0.9);
     
     // 标题
-    const title = this.scene.add.text(0, -120, '物品栏', {
+    const title = TextRenderer.createCenteredText(this.scene, 0, -120, '物品栏', {
       fontSize: '24px',
       color: '#ffffff'
     });
-    title.setOrigin(0.5);
 
     // 物品列表容器
     this.itemsContainer = this.scene.add.container(0, 0);
@@ -38,11 +38,10 @@ export class InventoryPanel implements IUIComponent {
     this.itemsContainer.removeAll();
 
     inventory.forEach((item, index) => {
-      const itemText = this.scene!.add.text(0, index * 25, `• ${item}`, {
+      const itemText = TextRenderer.createChineseText(this.scene!, 0, index * 25, `• ${item}`, {
         fontSize: '14px',
         color: '#ffffff'
       });
-      itemText.setOrigin(0, 0.5);
       this.itemsContainer!.add(itemText);
     });
   }

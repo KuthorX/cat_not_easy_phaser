@@ -1,5 +1,6 @@
 import { IUIComponent } from './IUIComponent';
 import { GameConstants } from '../../config/GameConfig';
+import { TextRenderer } from '../../utils/TextRenderer';
 
 export class StatusBar implements IUIComponent {
   private scene: Phaser.Scene | null = null;
@@ -18,7 +19,7 @@ export class StatusBar implements IUIComponent {
     this.container = this.scene.add.container(10, 10);
 
     // 时间显示
-    this.timeText = this.scene.add.text(0, 0, '时间: 8:00', {
+    this.timeText = TextRenderer.createChineseText(this.scene, 0, 0, '时间: 8:00', {
       fontSize: '16px',
       color: '#ffffff',
       backgroundColor: '#000000',
@@ -26,7 +27,7 @@ export class StatusBar implements IUIComponent {
     });
 
     // 精力值显示
-    this.energyText = this.scene.add.text(0, 30, '精力: 1/5', {
+    this.energyText = TextRenderer.createChineseText(this.scene, 0, 30, '精力: 1/5', {
       fontSize: '16px',
       color: '#ffffff',
       backgroundColor: '#4169E1',

@@ -6,7 +6,7 @@ import { DialogueManager as CoreDialogueManager } from '../DialogueManager';
 import { BaseScene } from '../../scenes/BaseScene';
 
 export class DialogueUIManager implements IUIComponent {
-  private scene: BaseScene | null = null;
+  private scene: Phaser.Scene | null = null;
   private dialogueBubble: DialogueBubble;
   private dialogueChoices: DialogueChoices;
   private coreDialogueManager: CoreDialogueManager | null = null;
@@ -16,7 +16,7 @@ export class DialogueUIManager implements IUIComponent {
     this.dialogueChoices = new DialogueChoices();
   }
 
-  initialize(scene: BaseScene): void {
+  initialize(scene: Phaser.Scene): void {
     this.scene = scene;
     this.dialogueBubble.initialize(scene);
     this.dialogueChoices.initialize(scene);

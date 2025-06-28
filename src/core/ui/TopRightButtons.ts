@@ -1,5 +1,6 @@
 import { IUIComponent } from './IUIComponent';
 import { SceneKeys } from '../../constants/SceneKeys';
+import { TextRenderer } from '../../utils/TextRenderer';
 
 export interface TopRightButtonCallback {
   onTimeWaste?: () => void;
@@ -27,7 +28,7 @@ export class TopRightButtons implements IUIComponent {
     this.container = this.scene.add.container(1280 - 150, 10);
 
     // 消磨时间按钮
-    this.timeWasteButton = this.scene.add.text(0, 0, '💤', {
+    this.timeWasteButton = TextRenderer.createChineseText(this.scene, 0, 0, '💤', {
       fontSize: '24px',
       backgroundColor: '#00000000',
       padding: { x: 8, y: 4 },
@@ -39,7 +40,7 @@ export class TopRightButtons implements IUIComponent {
     this.timeWasteButton.on('pointerout', () => this.timeWasteButton?.setStyle({ backgroundColor: '#00000000' }));
 
     // 日志页按钮
-    this.logButton = this.scene.add.text(50, 0, '📖', {
+    this.logButton = TextRenderer.createChineseText(this.scene, 50, 0, '📖', {
       fontSize: '24px',
       backgroundColor: '#00000000',
       padding: { x: 8, y: 4 },
@@ -51,7 +52,7 @@ export class TopRightButtons implements IUIComponent {
     this.logButton.on('pointerout', () => this.logButton?.setStyle({ backgroundColor: '#00000000' }));
 
     // 设置按钮
-    this.settingsButton = this.scene.add.text(100, 0, '⚙️', {
+    this.settingsButton = TextRenderer.createChineseText(this.scene, 100, 0, '⚙️', {
       fontSize: '24px',
       backgroundColor: '#00000000',
       padding: { x: 8, y: 4 },

@@ -1,4 +1,5 @@
 import { IUIComponent } from './IUIComponent';
+import { TextRenderer } from '../../utils/TextRenderer';
 
 export class ThoughtBubble implements IUIComponent {
   private scene: Phaser.Scene | null = null;
@@ -33,13 +34,12 @@ export class ThoughtBubble implements IUIComponent {
     background.setStrokeStyle(2, 0x000000, 0.5);
 
     // 创建文本
-    const textElement = this.scene.add.text(0, 0, text, {
+    const textElement = TextRenderer.createCenteredText(this.scene, 0, 0, text, {
       fontSize: '16px',
       color: '#000000',
       fontStyle: 'italic',
       wordWrap: { width: bubbleWidth - 20 }
     });
-    textElement.setOrigin(0.5);
 
     // 创建小圆点表示想法
     const dots = this.createThoughtDots(bubbleWidth, bubbleHeight);

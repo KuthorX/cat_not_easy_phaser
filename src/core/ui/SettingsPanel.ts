@@ -1,5 +1,6 @@
 import { VolumeManager } from '../VolumeManager';
 import { IUIComponent } from './IUIComponent';
+import { TextRenderer } from '../../utils/TextRenderer';
 
 export class SettingsPanel implements IUIComponent {
   private scene: Phaser.Scene | null = null;
@@ -32,8 +33,10 @@ export class SettingsPanel implements IUIComponent {
     background.fillRect(-200, -150, 400, 300);
     this.container.add(background);
 
-    const title = this.scene.add.text(0, -120, '设置', { fontSize: '24px', color: '#ffffff' });
-    title.setOrigin(0.5, 0.5);
+    const title = TextRenderer.createCenteredText(this.scene, 0, -120, '设置', { 
+      fontSize: '24px', 
+      color: '#ffffff' 
+    });
     this.container.add(title);
 
     this.createVolumeControl('音乐音量', 0, -50, (volume: number) => {
@@ -44,8 +47,12 @@ export class SettingsPanel implements IUIComponent {
       this.volumeManager.setSoundVolume(volume);
     }, false);
 
-    const closeButton = this.scene.add.text(0, 120, '关闭', { fontSize: '20px', color: '#ffffff', backgroundColor: '#333333', padding: { x: 10, y: 5 } });
-    closeButton.setOrigin(0.5, 0.5);
+    const closeButton = TextRenderer.createCenteredText(this.scene, 0, 120, '关闭', { 
+      fontSize: '20px', 
+      color: '#ffffff', 
+      backgroundColor: '#333333', 
+      padding: { x: 10, y: 5 } 
+    });
     closeButton.setInteractive();
     closeButton.on('pointerdown', () => this.hide());
     this.container.add(closeButton);
@@ -60,10 +67,16 @@ export class SettingsPanel implements IUIComponent {
   ): void {
     if (!this.scene || !this.container) return;
 
-    const labelText = this.scene.add.text(x - 150, y, label + ':', { fontSize: '18px', color: '#ffffff' });
+    const labelText = TextRenderer.createChineseText(this.scene, x - 150, y, label + ':', { 
+      fontSize: '18px', 
+      color: '#ffffff' 
+    });
     this.container.add(labelText);
 
-    const volumeText = this.scene.add.text(x + 100, y, '0%', { fontSize: '18px', color: '#ffffff' });
+    const volumeText = TextRenderer.createChineseText(this.scene, x + 100, y, '0%', { 
+      fontSize: '18px', 
+      color: '#ffffff' 
+    });
     this.container.add(volumeText);
 
     const slider = this.scene.add.rectangle(x + 10, y + 10, 150, 8, 0x666666);

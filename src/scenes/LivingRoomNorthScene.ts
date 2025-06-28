@@ -3,6 +3,7 @@ import { SceneKeys } from '../constants/SceneKeys';
 import { RoomKeys } from '../constants/SceneKeys';
 import { InteractiveObject, InteractiveObjectWithSprite, RoomExit } from '../types/GameState';
 import { GameEvents } from '../constants/GameEvents';
+import { TextRenderer } from '../utils/TextRenderer';
 
 export class LivingRoomNorthScene extends BaseScene {
   private interactiveObjects: Map<string, InteractiveObject> = new Map();
@@ -17,11 +18,11 @@ export class LivingRoomNorthScene extends BaseScene {
     this.add.rectangle(640, 360, 1280, 720, 0x87CEEB);
     
     // 添加房间标题
-    this.add.text(640, 50, '客厅 - 向北看', {
+    TextRenderer.createCenteredText(this, 640, 50, '客厅 - 向北看', {
       fontSize: '32px',
       color: '#000000',
       fontStyle: 'bold'
-    }).setOrigin(0.5);
+    });
 
     // 获取房间数据
     const roomData = this.sceneManager?.getRoomData(RoomKeys.LIVING_ROOM_NORTH);
@@ -38,58 +39,6 @@ export class LivingRoomNorthScene extends BaseScene {
     roomData.exits.forEach((exit: RoomExit) => {
       this.createExit(exit);
     });
-
-    // 初始化UI
-    if (this.uiManager) {
-      this.uiManager.initialize(this);
-      this.uiManager.setDialogueManager(this.gameManager?.getDialogueManager() || null);
-      const state = this.gameManager?.getState();
-      if (state) {
-        this.uiManager.updateStatusBar(state.currentTime, state.energy);
-        this.uiManager.updateInventory(state.inventory);
-      }
-      
-      // 设置右上角按钮回调
-      this.uiManager.setupTopRightButtons({
-        onTimeWaste: () => {
-          console.log('打开消磨时间面板');
-          this.uiManager?.showTimeWastePanel();
-        },
-        onOpenLog: () => {
-          console.log('打开日志页');
-          this.uiManager?.showLogPage();
-        },
-        onOpenSettings: () => {
-          console.log('打开设置');
-          this.uiManager?.showSettingsPanel();
-        }
-      });
-      
-      // 设置消磨时间面板回调
-      this.uiManager.setupTimeWastePanel({
-        onCancel: () => {
-          console.log('取消消磨时间');
-        },
-        onWasteOneHour: () => {
-          if (this.gameManager) {
-            this.gameManager.advanceTime(60); // 前进1小时
-            console.log('消磨了一小时');
-          }
-        },
-        onWasteOneDay: () => {
-          if (this.gameManager) {
-            this.gameManager.advanceTime(720); // 前进12小时
-            console.log('消磨了一整天');
-          }
-        }
-      });
-      
-      // 设置日志页数据
-      const game = (window as any).game;
-      if (game && game.achievementRegistry) {
-        this.uiManager.setupLogPage(game.achievementRegistry, this.gameManager?.getState());
-      }
-    }
 
     // 播放背景音乐
     if (this.audioManager) {
@@ -125,12 +74,12 @@ export class LivingRoomNorthScene extends BaseScene {
     });
 
     // 添加出口标签
-    this.add.text(exit.x, exit.y, exit.name, {
+    TextRenderer.createCenteredText(this, exit.x, exit.y, exit.name, {
       fontSize: '14px',
       color: '#ffffff',
       backgroundColor: '#000000',
       padding: { x: 2, y: 1 }
-    }).setOrigin(0.5);
+    });
   }
 
   private setupKeyboardShortcuts(): void {

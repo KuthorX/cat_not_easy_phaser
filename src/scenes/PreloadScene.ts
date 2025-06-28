@@ -1,4 +1,5 @@
 import { SceneKeys } from '../constants/SceneKeys';
+import { TextRenderer } from '../utils/TextRenderer';
 
 export class PreloadScene extends Phaser.Scene {
   private progressBar!: Phaser.GameObjects.Graphics;
@@ -19,11 +20,10 @@ export class PreloadScene extends Phaser.Scene {
     this.progressBar.setPosition(240, 360);
     
     // 创建进度文本
-    this.progressText = this.add.text(640, 400, '加载中... 0%', {
+    this.progressText = TextRenderer.createCenteredText(this, 640, 400, '加载中... 0%', {
       fontSize: '24px',
       color: '#ffffff'
     });
-    this.progressText.setOrigin(0.5);
 
     // 监听加载进度
     this.load.on('progress', (value: number) => {
@@ -46,62 +46,92 @@ export class PreloadScene extends Phaser.Scene {
   }
 
   private loadAssets(): void {
-    // 加载balcony场景图片
-    this.load.image('balcony_bg', 'assets/images/balcony_bg.png');
-    this.load.image('balcony_chair', 'assets/images/balcony_chair.png');
-    this.load.image('balcony_coat_hanger', 'assets/images/balcony_coat_hanger.png');
-    this.load.image('balcony_robot_cleaner', 'assets/images/balcony_robot_cleaner.png');
-
-    // 加载room_b场景图片
-    this.load.image('room_b_bg', 'assets/images/room_b_bg.png');
-    this.load.image('room_b_bed', 'assets/images/room_b_bed.png');
-    this.load.image('room_b_chair', 'assets/images/room_b_chair.png');
-    this.load.image('room_b_computer_screen', 'assets/images/room_b_computer_screen.png');
-    this.load.image('room_b_kettle', 'assets/images/room_b_kettle.png');
-    this.load.image('room_b_side_wall', 'assets/images/room_b_side_wall.png');
-
-    // 加载菜单按钮图片
-    this.load.image('menu_start_game', 'assets/images/menu/start_game.png');
-    this.load.image('menu_settings', 'assets/images/menu/settings.png');
-    this.load.image('menu_exit_game', 'assets/images/menu/exit_game.png');
-
-    // 批量加载PNG序列动画资源
+    // 动态加载所有图片资源
+    this.loadImageAssets();
+    
+    // 动态加载所有音频资源
+    this.loadAudioAssets();
+    
+    // 动态加载所有动画序列
     this.loadTweenSequences();
+  }
 
-    // 加载音频资源
-    this.load.audio('bgm_living_room', 'assets/audio/bgm_living_room.mp3');
+  private loadImageAssets(): void {
+    // 定义所有图片文件夹及其路径映射
+    const imageFolders = [
+      { path: 'assets/images/balcony', prefix: 'balcony' },
+      { path: 'assets/images/room_b', prefix: 'room_b' },
+      { path: 'assets/images/living_room_east', prefix: 'living_room_east' },
+      { path: 'assets/images/living_room_west_down', prefix: 'living_room_west_down' },
+      { path: 'assets/images/living_room_west_up', prefix: 'living_room_west_up' },
+      { path: 'assets/images/menu', prefix: 'menu' },
+      { path: 'assets/images/endings', prefix: 'endings' }
+    ];
+
+    // 定义每个文件夹中的文件列表（去掉重复的前缀）
+    const imageFiles = {
+      balcony: ['bg', 'chair', 'coat_hanger', 'robot_cleaner'],
+      room_b: ['bg', 'bed', 'chair', 'computer_screen', 'kettle', 'side_wall'],
+      living_room_east: ['bg', 'ball', 'cat_nest', 'cat_tree', 'cola', 'cord', 'dustbin', 'glass', 'milk', 'paper', 'pot', 'sofa', 'table', 'tv', 'tvtable'],
+      living_room_west_down: ['bg', 'basket', 'cage', 'cat_toilet', 'cat_villa', 'cord2', 'food', 'ice_maker', 'table'],
+      living_room_west_up: ['bg', 'cord', 'handset', 'table', 'umbrella'],
+      menu: ['start_game', 'settings', 'exit_game'],
+      endings: ['allies_of_two_legged_beast', 'husky', 'logistics_officer', 'playtime']
+    };
+
+    // 动态加载所有图片
+    imageFolders.forEach(folder => {
+      const files = imageFiles[folder.prefix as keyof typeof imageFiles] || [];
+      files.forEach(file => {
+        const key = `${folder.prefix}_${file}`;
+        const path = `${folder.path}/${file}.png`;
+        this.load.image(key, path);
+      });
+    });
+  }
+
+  private loadAudioAssets(): void {
+    // 定义音频文件列表
+    const audioFiles = [
+      { key: 'bgm_living_room', path: 'assets/audio/bgm_living_room.mp3' }
+    ];
+
+    // 动态加载所有音频
+    audioFiles.forEach(audio => {
+      this.load.audio(audio.key, audio.path);
+    });
   }
 
   private loadTweenSequences(): void {
-    // 定义所有动画序列
+    // 定义所有动画序列及其对应的帧数
     const tweenSequences = [
-      'cat_play',
-      'cat_kick', 
-      'cat_slap',
-      'cat_tap',
-      'cat_push',
-      'cat_grab_down_wall',
-      'cat_lick',
-      'cat_shock',
-      'cat_hit_laptop',
-      'cat_meow',
-      'cat_oars',
-      'cat_run',
-      'cat_sleep',
+      { name: 'cat_play', frameCount: 104 },
+      { name: 'cat_slap', frameCount: 76 },
+      { name: 'cat_kick', frameCount: 6 },
+      { name: 'cat_tap', frameCount: 11 },
+      { name: 'cat_push', frameCount: 7 },
+      { name: 'cat_grab_down_wall', frameCount: 55 },
+      { name: 'cat_lick', frameCount: 41 },
+      { name: 'cat_shock', frameCount: 41 },
+      { name: 'cat_hit_laptop', frameCount: 48 },
+      { name: 'cat_meow', frameCount: 11 },
+      { name: 'cat_oars', frameCount: 55 },
+      { name: 'cat_run', frameCount: 19 },
+      { name: 'cat_sleep', frameCount: 4 }
     ];
 
     // 为每个序列加载PNG文件
-    tweenSequences.forEach(sequenceName => {
+    tweenSequences.forEach(sequence => {
       // 加载第一帧作为默认纹理
-      this.load.image(sequenceName, `assets/tweens/${sequenceName}/${sequenceName}_001.png`);
+      this.load.image(sequence.name, `assets/tweens/${sequence.name}/${sequence.name}_001.png`);
       
-      // 加载所有帧（从001开始，最多到110）
-      for (let i = 1; i <= 110; i++) {
+      // 加载所有帧（从001开始，到实际帧数结束）
+      for (let i = 1; i <= sequence.frameCount; i++) {
         const frameNumber = String(i).padStart(3, '0');
-        const frameKey = `${sequenceName}_${frameNumber}`;
-        const framePath = `assets/tweens/${sequenceName}/${sequenceName}_${frameNumber}.png`;
+        const frameKey = `${sequence.name}_${frameNumber}`;
+        const framePath = `assets/tweens/${sequence.name}/${sequence.name}_${frameNumber}.png`;
         
-        // 尝试加载每一帧，如果文件不存在会自动跳过
+        // 加载每一帧
         this.load.image(frameKey, framePath);
       }
     });

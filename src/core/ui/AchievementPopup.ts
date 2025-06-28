@@ -1,4 +1,5 @@
 import { IUIComponent } from './IUIComponent';
+import { TextRenderer } from '../../utils/TextRenderer';
 
 export class AchievementPopup implements IUIComponent {
   private scene: Phaser.Scene | null = null;
@@ -20,19 +21,17 @@ export class AchievementPopup implements IUIComponent {
     background.setStrokeStyle(2, 0x000000);
     
     // 标题
-    const title = this.scene.add.text(0, -30, '成就解锁！', {
+    const title = TextRenderer.createCenteredText(this.scene, 0, -30, '成就解锁！', {
       fontSize: '20px',
       color: '#000000',
       fontStyle: 'bold'
     });
-    title.setOrigin(0.5);
 
     // 成就名称
-    this.achievementText = this.scene.add.text(0, 0, '', {
+    this.achievementText = TextRenderer.createCenteredText(this.scene, 0, 0, '', {
       fontSize: '16px',
       color: '#000000'
     });
-    this.achievementText.setOrigin(0.5);
 
     this.container.add([background, title, this.achievementText]);
     this.container.setDepth(1001);

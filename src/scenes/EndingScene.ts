@@ -1,6 +1,7 @@
 import { BaseScene } from './BaseScene';
 import { SceneKeys } from '../constants/SceneKeys';
 import { GameEvents } from '../constants/GameEvents';
+import { TextRenderer } from '../utils/TextRenderer';
 
 export class EndingScene extends BaseScene {
   constructor() {
@@ -53,17 +54,17 @@ export class EndingScene extends BaseScene {
     }
 
     // 显示结局标题
-    this.add.text(640, 200, title, {
+    TextRenderer.createCenteredText(this, 640, 200, title, {
       fontSize: '48px',
       color: `#${color.toString(16)}`,
       fontStyle: 'bold'
-    }).setOrigin(0.5);
+    });
 
     // 显示结局描述
-    this.add.text(640, 280, description, {
+    TextRenderer.createCenteredText(this, 640, 280, description, {
       fontSize: '24px',
       color: '#ffffff'
-    }).setOrigin(0.5);
+    });
 
     // 显示游戏统计
     this.showGameStats(gameState);
@@ -83,10 +84,10 @@ export class EndingScene extends BaseScene {
     ];
 
     stats.forEach((stat, index) => {
-      this.add.text(640, statsY + index * 30, stat, {
+      TextRenderer.createCenteredText(this, 640, statsY + index * 30, stat, {
         fontSize: '18px',
         color: '#cccccc'
-      }).setOrigin(0.5);
+      });
     });
   }
 
@@ -112,9 +113,9 @@ export class EndingScene extends BaseScene {
       button.setFillStyle(0x666666);
     });
 
-    this.add.text(640, 600, '重新开始', {
+    TextRenderer.createCenteredText(this, 640, 600, '重新开始', {
       fontSize: '20px',
       color: '#ffffff'
-    }).setOrigin(0.5);
+    });
   }
 } 

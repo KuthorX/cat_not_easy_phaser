@@ -10,11 +10,11 @@ export { AchievementPopup } from './AchievementPopup';
 export { GameEndScreen } from './GameEndScreen';
 export { TransitionPanel } from './TransitionPanel';
 export { TopRightButtons } from './TopRightButtons';
-export { LogPage } from './LogPage';
 export { TimeWastePanel } from './TimeWastePanel';
+export { SettingsPanel } from './SettingsPanel';
+export { LogPage } from './LogPage';
 export type { IUIComponent } from './IUIComponent';
 export type { Action } from './ActionMenu';
 export type { TransitionConfig } from './TransitionPanel';
 export type { TopRightButtonCallback } from './TopRightButtons';
 export type { TimeWasteCallback } from './TimeWastePanel';
-export * from './SettingsPanel'; // 导出 SettingsPanel

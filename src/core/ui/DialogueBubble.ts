@@ -1,5 +1,6 @@
 import { IUIComponent } from './IUIComponent';
 import { DialogueBubblePosition } from '../../types/GameState';
+import { TextRenderer } from '../../utils/TextRenderer';
 
 export class DialogueBubble implements IUIComponent {
   private scene: Phaser.Scene | null = null;
@@ -48,12 +49,11 @@ export class DialogueBubble implements IUIComponent {
     background.setStrokeStyle(2, 0x000000);
 
     // 创建文本
-    const textElement = this.scene.add.text(0, 0, text, {
+    const textElement = TextRenderer.createCenteredText(this.scene, 0, 0, text, {
       fontSize: '16px',
       color: textColor,
       wordWrap: { width: bubbleWidth - 20 }
     });
-    textElement.setOrigin(0.5);
 
     // 创建小尾巴（指向说话者），系统消息不显示尾巴
     let tail: Phaser.GameObjects.Graphics | null = null;
