@@ -40,6 +40,9 @@ export class LivingRoomNorthScene extends BaseScene {
       this.createExit(exit);
     });
 
+    // 创建扫地机器人
+    this.robotCleaner = new RobotCleaner(this, 0, 400);
+
     // 初始化UI
     if (this.uiManager) {
       this.uiManager.initialize(this);
@@ -63,9 +66,6 @@ export class LivingRoomNorthScene extends BaseScene {
 
     // 设置键盘快捷键
     this.setupKeyboardShortcuts();
-
-    // 创建扫地机器人
-    this.robotCleaner = new RobotCleaner(this, 0, 400);
   }
 
   private createExit(exit: RoomExit): void {
