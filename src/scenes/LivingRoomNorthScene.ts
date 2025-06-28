@@ -73,6 +73,8 @@ export class LivingRoomNorthScene extends BaseScene {
     // 设置键盘快捷键
     this.setupKeyboardShortcuts();
 
+    // 创建扫地机器人
+    this.robotCleaner = new RobotCleaner(this, 0, 400);
     // 检查是否有战斗结果需要处理
     this.checkBattleResult();
   }
