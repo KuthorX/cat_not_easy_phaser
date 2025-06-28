@@ -1,5 +1,6 @@
 import { IUIComponent } from './IUIComponent';
 import { DialogueBubblePosition, DialogueChoice } from '../../types/GameState';
+import { TextRenderer } from '../../utils/TextRenderer';
 
 export class DialogueChoices implements IUIComponent {
   private scene: Phaser.Scene | null = null;
@@ -31,11 +32,10 @@ export class DialogueChoices implements IUIComponent {
       const button = this.scene!.add.rectangle(0, index * 50, 200, 40, 0x4A4A4A, 0.8);
       button.setStrokeStyle(1, 0xFFFFFF);
       
-      const text = this.scene!.add.text(0, index * 50, choice.text, {
+      const text = TextRenderer.createCenteredText(this.scene!, 0, index * 50, choice.text, {
         fontSize: '14px',
         color: '#ffffff'
       });
-      text.setOrigin(0.5);
 
       button.setInteractive();
       button.on('pointerdown', (pointer: Phaser.Input.Pointer) => {

@@ -2,6 +2,7 @@ import { BaseScene } from '../BaseScene';
 import { SceneKeys } from '../../constants/SceneKeys';
 import { GameEvents } from '../../constants/GameEvents';
 import { BattleAction } from '../../types/GameState';
+import { TextRenderer } from '../../utils/TextRenderer';
 
 export class BattleScene extends BaseScene {
   private playerSprite!: Phaser.GameObjects.Sprite;
@@ -55,11 +56,11 @@ export class BattleScene extends BaseScene {
     this.add.rectangle(640, 360, 1280, 720, 0x000000); // 全黑背景
     
     // 添加战斗标题
-    this.add.text(640, 50, 'Fighting!', {
+    TextRenderer.createCenteredText(this, 640, 50, 'Fighting!', {
       fontSize: '32px',
       color: '#ffffff',
       fontStyle: 'bold'
-    }).setOrigin(0.5);
+    });
 
     // 初始化战斗动作
     this.initializeBattleActions();
@@ -74,11 +75,12 @@ export class BattleScene extends BaseScene {
     console.log('按钮创建完成，按钮数组长度:', this.actionButtons.length);
 
     // 创建结果显示文本
-    this.resultText = this.add.text(640, 300, '', {
+    this.resultText = TextRenderer.createCenteredText(this, 640, 300, '', {
       fontSize: '24px',
       color: '#ffffff',
       fontStyle: 'bold'
-    }).setOrigin(0.5).setVisible(false);
+    });
+    this.resultText.setVisible(false);
 
     // 设置输入事件
     this.setupInputEvents();
@@ -142,15 +144,15 @@ export class BattleScene extends BaseScene {
     this.enemySprite.setDepth(1000); // 设置深度
 
     // 添加角色标签
-    this.add.text(200, 400, '玩家', {
+    TextRenderer.createCenteredText(this, 200, 400, '玩家', {
       fontSize: '18px',
       color: '#ffffff'
-    }).setOrigin(0.5).setDepth(1000);
+    }).setDepth(1000);
 
-    this.add.text(1080, 400, '敌人', {
+    TextRenderer.createCenteredText(this, 1080, 400, '敌人', {
       fontSize: '18px',
       color: '#ffffff'
-    }).setOrigin(0.5).setDepth(1000);
+    }).setDepth(1000);
   }
 
   private createActionButtons(): void {
@@ -173,11 +175,11 @@ export class BattleScene extends BaseScene {
       buttonBg.setStrokeStyle(3, 0x000000); // 黑色边框
 
       // 创建按钮文本
-      const buttonText = this.add.text(0, 0, action.name, {
+      const buttonText = TextRenderer.createCenteredText(this, 0, 0, action.name, {
         fontSize: '24px', // 增大字体
         color: '#000000', // 黑色文字
         fontStyle: 'bold'
-      }).setOrigin(0.5);
+      });
 
       // 创建按钮容器
       const buttonContainer = this.add.container(x, y, [buttonBg, buttonText]);

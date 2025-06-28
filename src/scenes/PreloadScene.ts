@@ -1,4 +1,5 @@
 import { SceneKeys } from '../constants/SceneKeys';
+import { TextRenderer } from '../utils/TextRenderer';
 
 export class PreloadScene extends Phaser.Scene {
   private progressBar!: Phaser.GameObjects.Graphics;
@@ -19,11 +20,10 @@ export class PreloadScene extends Phaser.Scene {
     this.progressBar.setPosition(240, 360);
     
     // 创建进度文本
-    this.progressText = this.add.text(640, 400, '加载中... 0%', {
+    this.progressText = TextRenderer.createCenteredText(this, 640, 400, '加载中... 0%', {
       fontSize: '24px',
       color: '#ffffff'
     });
-    this.progressText.setOrigin(0.5);
 
     // 监听加载进度
     this.load.on('progress', (value: number) => {

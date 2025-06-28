@@ -1,4 +1,5 @@
 import { IUIComponent } from './IUIComponent';
+import { TextRenderer } from '../../utils/TextRenderer';
 
 export class GameEndScreen implements IUIComponent {
   private scene: Phaser.Scene | null = null;
@@ -19,18 +20,16 @@ export class GameEndScreen implements IUIComponent {
     
     const background = this.scene.add.rectangle(0, 0, 800, 600, 0x000000, 0.8);
     
-    const title = this.scene.add.text(0, -200, '游戏结束', {
+    const title = TextRenderer.createCenteredText(this.scene, 0, -200, '游戏结束', {
       fontSize: '48px',
       color: '#ffffff'
     });
-    title.setOrigin(0.5);
 
-    const endingText = this.scene.add.text(0, -100, this.getEndingText(endingType), {
+    const endingText = TextRenderer.createCenteredText(this.scene, 0, -100, this.getEndingText(endingType), {
       fontSize: '24px',
       color: '#ffffff',
       wordWrap: { width: 700 }
     });
-    endingText.setOrigin(0.5);
 
     const restartButton = this.scene.add.rectangle(0, 100, 200, 50, 0x4A4A4A);
     restartButton.setInteractive();
@@ -38,11 +37,10 @@ export class GameEndScreen implements IUIComponent {
       this.game!.scene.start('MenuScene');
     });
 
-    const restartText = this.scene.add.text(0, 100, '重新开始', {
+    const restartText = TextRenderer.createCenteredText(this.scene, 0, 100, '重新开始', {
       fontSize: '20px',
       color: '#ffffff'
     });
-    restartText.setOrigin(0.5);
 
     this.container.add([background, title, endingText, restartButton, restartText]);
     this.container.setDepth(1002);

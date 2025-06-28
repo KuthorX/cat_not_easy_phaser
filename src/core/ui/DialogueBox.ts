@@ -1,4 +1,5 @@
 import { IUIComponent } from './IUIComponent';
+import { TextRenderer } from '../../utils/TextRenderer';
 
 export class DialogueBox implements IUIComponent {
   private scene: Phaser.Scene | null = null;
@@ -19,12 +20,11 @@ export class DialogueBox implements IUIComponent {
     const background = this.scene.add.rectangle(0, 0, 800, 100, 0x000000, 0.8);
     
     // 文本
-    this.textElement = this.scene.add.text(0, 0, '', {
+    this.textElement = TextRenderer.createCenteredText(this.scene, 0, 0, '', {
       fontSize: '18px',
       color: '#ffffff',
       wordWrap: { width: 780 }
     });
-    this.textElement.setOrigin(0.5);
 
     this.container.add([background, this.textElement]);
     this.container.setDepth(1000);

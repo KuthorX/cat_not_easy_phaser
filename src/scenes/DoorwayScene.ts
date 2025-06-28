@@ -1,7 +1,8 @@
 import { BaseScene } from './BaseScene';
 import { SceneKeys } from '../constants/SceneKeys';
 import { RoomKeys } from '../constants/SceneKeys';
-import { InteractiveObject, RoomExit } from '../types/GameState';
+import { InteractiveObject, RoomExit, InteractiveObjectWithSprite } from '../types/GameState';
+import { TextRenderer } from '../utils/TextRenderer';
 
 export class DoorwayScene extends BaseScene {
   constructor() {
@@ -10,14 +11,14 @@ export class DoorwayScene extends BaseScene {
 
   protected initializeScene(): void {
     // 设置背景
-    this.add.rectangle(640, 360, 1280, 720, 0x87CEEB); // 天蓝色背景
+    this.add.rectangle(640, 360, 1280, 720, 0x8B7355); // 棕色背景
     
     // 添加房间标题
-    this.add.text(640, 50, '门口 - 通向自由', {
+    TextRenderer.createCenteredText(this, 640, 50, '门口 - 通向自由', {
       fontSize: '32px',
       color: '#000000',
       fontStyle: 'bold'
-    }).setOrigin(0.5);
+    });
 
     // 获取房间数据
     const roomData = this.sceneManager?.getRoomData(RoomKeys.DOORWAY);
@@ -74,12 +75,12 @@ export class DoorwayScene extends BaseScene {
     });
 
     // 添加出口标签
-    this.add.text(exit.x, exit.y, exit.name, {
+    TextRenderer.createCenteredText(this, exit.x, exit.y, exit.name, {
       fontSize: '14px',
       color: '#ffffff',
       backgroundColor: '#000000',
       padding: { x: 2, y: 1 }
-    }).setOrigin(0.5);
+    });
   }
 
   private setupKeyboardShortcuts(): void {

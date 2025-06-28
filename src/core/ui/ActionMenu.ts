@@ -1,4 +1,5 @@
 import { IUIComponent } from './IUIComponent';
+import { TextRenderer } from '../../utils/TextRenderer';
 
 export interface Action {
   id: string;
@@ -67,11 +68,10 @@ export class ActionMenu implements IUIComponent {
       const button = this.scene!.add.rectangle(0, index * 40, 280, 35, 0x4A4A4A, 0.8);
       button.setStrokeStyle(1, 0xFFFFFF);
       
-      const text = this.scene!.add.text(0, index * 40, action.name, {
+      const text = TextRenderer.createCenteredText(this.scene!, 0, index * 40, action.name, {
         fontSize: '14px',
         color: '#ffffff'
       });
-      text.setOrigin(0.5);
 
       button.setInteractive();
       button.on('pointerdown', () => {

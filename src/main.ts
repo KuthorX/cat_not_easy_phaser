@@ -8,6 +8,7 @@ import { VolumeManager } from './core/VolumeManager';
 import { BgmManager } from './core/BgmManager';
 import { AchievementRegistry } from './data/AchievementRegistry';
 import { SceneKeys } from './constants/SceneKeys';
+import { TextRenderer } from './utils/TextRenderer';
 
 // 导入场景
 import { BootScene } from './scenes/BootScene';
@@ -86,15 +87,15 @@ class CatGame extends Phaser.Game {
       }
       
       create(): void {
-        this.add.text(640, 360, `场景: ${this.scene.key}`, {
+        TextRenderer.createCenteredText(this, 640, 360, `场景: ${this.scene.key}`, {
           fontSize: '32px',
           color: '#ffffff'
-        }).setOrigin(0.5);
+        });
         
-        this.add.text(640, 400, '此场景正在开发中...', {
+        TextRenderer.createCenteredText(this, 640, 400, '此场景正在开发中...', {
           fontSize: '18px',
           color: '#cccccc'
-        }).setOrigin(0.5);
+        });
         
         // 返回按钮
         const backButton = this.add.rectangle(640, 500, 200, 50, 0x666666);
@@ -103,10 +104,10 @@ class CatGame extends Phaser.Game {
           this.scene.start(SceneKeys.LIVING_ROOM_NORTH);
         });
         
-        this.add.text(640, 500, '返回', {
+        TextRenderer.createCenteredText(this, 640, 500, '返回', {
           fontSize: '20px',
           color: '#ffffff'
-        }).setOrigin(0.5);
+        });
       }
     }
 

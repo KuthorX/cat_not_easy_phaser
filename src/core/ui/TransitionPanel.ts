@@ -1,4 +1,5 @@
 import { IUIComponent } from './IUIComponent';
+import { TextRenderer } from '../../utils/TextRenderer';
 
 export interface TransitionConfig {
   text: string;
@@ -54,7 +55,8 @@ export class TransitionPanel implements IUIComponent {
     );
 
     // 创建文本
-    this.text = this.scene.add.text(
+    this.text = TextRenderer.createCenteredText(
+      this.scene,
       width / 2,
       height / 2 - 100,
       this.config.text,
@@ -62,10 +64,9 @@ export class TransitionPanel implements IUIComponent {
         fontSize: '24px',
         color: `#${this.config.textColor!.toString(16).padStart(6, '0')}`,
         fontFamily: 'Arial',
-        align: 'center',
         wordWrap: { width: width - 200 }
       }
-    ).setOrigin(0.5);
+    );
 
     // 创建左按钮
     this.leftButton = this.createButton(
@@ -97,11 +98,11 @@ export class TransitionPanel implements IUIComponent {
     const buttonBg = this.scene.add.rectangle(0, 0, 200, 50, this.config.buttonColor!);
     
     // 按钮文本
-    const buttonText = this.scene.add.text(0, 0, text, {
+    const buttonText = TextRenderer.createCenteredText(this.scene, 0, 0, text, {
       fontSize: '18px',
       color: `#${this.config.buttonTextColor!.toString(16).padStart(6, '0')}`,
       fontFamily: 'Arial'
-    }).setOrigin(0.5);
+    });
 
     buttonContainer.add([buttonBg, buttonText]);
 
