@@ -1,7 +1,7 @@
 import { BaseScene } from './BaseScene';
 import { SceneKeys } from '../constants/SceneKeys';
 import { RoomKeys } from '../constants/SceneKeys';
-import { InteractiveObject, RoomExit } from '../types/GameState';
+import { InteractiveObject, InteractiveObjectWithSprite, RoomExit } from '../types/GameState';
 
 export class LivingRoomDoorScene extends BaseScene {
   constructor() {
@@ -24,7 +24,7 @@ export class LivingRoomDoorScene extends BaseScene {
     if (!roomData) return;
 
     // 创建交互对象
-    roomData.interactiveObjects.forEach((obj: InteractiveObject) => {
+    roomData.interactiveObjects.forEach((obj: InteractiveObject | InteractiveObjectWithSprite) => {
       this.createInteractiveObject(obj);
     });
 

@@ -1,7 +1,7 @@
 import { BaseScene } from './BaseScene';
 import { SceneKeys } from '../constants/SceneKeys';
 import { RoomKeys } from '../constants/SceneKeys';
-import { InteractiveObject, RoomExit } from '../types/GameState';
+import { InteractiveObject, InteractiveObjectWithSprite, RoomExit } from '../types/GameState';
 import { RobotCleaner } from '../objects/RobotCleaner';
 import { GameEvents } from '../constants/GameEvents';
 
@@ -30,8 +30,8 @@ export class LivingRoomNorthScene extends BaseScene {
     if (!roomData) return;
 
     // 创建交互对象
-    roomData.interactiveObjects.forEach((obj: InteractiveObject) => {
-      this.interactiveObjects.set(obj.id, obj);
+    roomData.interactiveObjects.forEach((obj: InteractiveObject | InteractiveObjectWithSprite) => {
+      this.interactiveObjects.set(obj.id, obj as InteractiveObject);
       const objSprite = this.createInteractiveObject(obj);
       this.interactiveObjectBodies.push(objSprite);
     });
@@ -40,9 +40,6 @@ export class LivingRoomNorthScene extends BaseScene {
     roomData.exits.forEach((exit: RoomExit) => {
       this.createExit(exit);
     });
-
-    // 创建扫地机器人
-    this.robotCleaner = new RobotCleaner(this, 0, 400);
 
     // 添加碰撞
     this.physics.add.collider(this.robotCleaner, this.interactiveObjectBodies);

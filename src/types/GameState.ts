@@ -120,23 +120,37 @@ export interface RoomData {
   id: string;
   name: string;
   background: string;
-  interactiveObjects: InteractiveObject[];
+  interactiveObjects: (InteractiveObject | InteractiveObjectWithSprite)[];
   exits: RoomExit[];
   requirements?: RoomRequirement[];
 }
 
-export interface InteractiveObject {
+export interface BaseObject {
+  type: string
   id: string;
   name: string;
   x: number;
   y: number;
+}
+
+// InteractiveObject without image or self hold image
+export interface InteractiveObjectWithSprite extends BaseObject {
+  type: 'InteractiveObjectWithSprite';
   width: number;
   height: number;
-  sprite?: string;
-  imageKey?: string;
   actions: string[];
+  spriteConstructor: (scene : Phaser.Scene, x: number, y: number)=> Phaser.Physics.Arcade.Sprite ;
+}
+
+export interface InteractiveObject extends BaseObject {
+  type: 'InteractiveObject';
+  imageKey?: string;
   state?: any;
   thought?: string;
+  width: number;
+  height: number;
+  actions: string[];
+  sprite? :string;
 }
 
 export interface RoomExit {
