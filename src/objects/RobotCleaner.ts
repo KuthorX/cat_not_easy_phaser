@@ -3,7 +3,7 @@ import Phaser from 'phaser';
 export class RobotCleaner extends Phaser.Physics.Arcade.Sprite {
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
-    super(scene, x, y, 'robot_cleaner');
+    super(scene, x, y, 'balcony_robot_cleaner');
 
     scene.add.existing(this);
     scene.physics.add.existing(this);

@@ -1,5 +1,6 @@
 import { RoomData } from '../types/GameState';
 import { RoomKeys } from '../constants/SceneKeys';
+import { RobotCleaner } from '@/objects/RobotCleaner';
 
 export class RoomRegistry {
   private rooms: Map<string, RoomData> = new Map();
@@ -17,6 +18,7 @@ export class RoomRegistry {
       background: 'living_room_north_bg',
       interactiveObjects: [
         {
+          type: 'InteractiveObject',
           id: 'window_north',
           name: '北窗',
           
@@ -28,6 +30,7 @@ export class RoomRegistry {
           actions: ['sunbathing', 'look_outside']
         },
         {
+          type: 'InteractiveObject',
           id: 'sofa_north',
           name: '沙发',
           
@@ -69,6 +72,7 @@ export class RoomRegistry {
       background: 'living_room_west_low_bg',
       interactiveObjects: [
         {
+          type: 'InteractiveObject',
           id: 'cat_cage',
           name: '笼子',
           
@@ -80,6 +84,7 @@ export class RoomRegistry {
           actions: ['attack_cage', 'jump_on_cage']
         },
         {
+          type: 'InteractiveObject',
           id: 'cat_litter_box',
           name: '猫厕所',
           
@@ -91,6 +96,7 @@ export class RoomRegistry {
           actions: ['use_litter_box']
         },
         {
+          type: 'InteractiveObject',
           id: 'cat_house',
           name: '猫别墅',
           
@@ -139,6 +145,7 @@ export class RoomRegistry {
       background: 'living_room_west_high_bg',
       interactiveObjects: [
         {
+          type: 'InteractiveObject',
           id: 'fish_treat',
           name: '长条硬皮鱼',
           
@@ -171,6 +178,7 @@ export class RoomRegistry {
       background: 'room_b_bg',
       interactiveObjects: [
         {
+          type: 'InteractiveObject',
           id: 'room_b_bed',
           name: '主人的床',
           
@@ -182,6 +190,7 @@ export class RoomRegistry {
           actions: ['sleep_on_bed', 'scratch_bed']
         },
         {
+          type: 'InteractiveObject',
           id: 'room_b_chair',
           name: '椅子',
           
@@ -193,6 +202,7 @@ export class RoomRegistry {
           actions: ['sit_on_chair', 'climb_chair']
         },
         {
+          type: 'InteractiveObject',
           id: 'room_b_computer_screen',
           name: '电脑屏幕',
           
@@ -204,6 +214,7 @@ export class RoomRegistry {
           actions: ['watch_screen', 'paw_screen']
         },
         {
+          type: 'InteractiveObject',
           id: 'room_b_kettle',
           name: '水壶',
           
@@ -215,9 +226,9 @@ export class RoomRegistry {
           actions: ['investigate_kettle', 'knock_over_kettle']
         },
         {
+          type: 'InteractiveObject',
           id: 'room_b_side_wall',
           name: '侧墙',
-          
           x: 1000,
           y: 360,
           width: 100,
@@ -276,6 +287,7 @@ export class RoomRegistry {
       background: 'living_room_east_bg',
       interactiveObjects: [
         {
+          type: 'InteractiveObject',
           id: 'chew_rope',
           name: '咬绳',
           thought: '我是不是该咬咬这个东西？',
@@ -287,6 +299,7 @@ export class RoomRegistry {
           actions: ['chew_rope']
         },
         {
+          type: 'InteractiveObject',
           id: 'chase_ball',
           name: '转球',
           thought: '这个球看起来很好玩！',
@@ -296,8 +309,9 @@ export class RoomRegistry {
           height: 80,
           sprite: 'chase_ball',
           actions: ['chase_ball']
-        },
+        }, 
         {
+          type: 'InteractiveObject',
           id: 'table',
           name: '桌子',
           thought: '堆满了不知道什么东西。',
@@ -309,6 +323,7 @@ export class RoomRegistry {
           actions: ['sweep_table']
         },
         {
+          type: 'InteractiveObject',
           id: 'tv',
           name: '电视',
           thought: '没有两脚兽的命令，这个大家伙寂静无声。',
@@ -320,6 +335,7 @@ export class RoomRegistry {
           actions: ['attack_tv']
         },
         {
+          type: 'InteractiveObject',
           id: 'cat_bed',
           name: '猫窝',
           thought: '哦，我的宝地。',
@@ -360,6 +376,7 @@ export class RoomRegistry {
       background: 'balcony_bg',
       interactiveObjects: [
         {
+          type: 'InteractiveObject',
           id: 'balcony_chair',
           name: '阳台椅子',
           x: 150,
@@ -370,6 +387,7 @@ export class RoomRegistry {
           actions: ['sit_on_chair', 'jump_on_chair']
         },
         {
+          type: 'InteractiveObject',
           id: 'balcony_coat_hanger',
           name: '衣架',
           x: 110,
@@ -380,14 +398,17 @@ export class RoomRegistry {
           actions: ['climb_hanger', 'play_with_clothes']
         },
         {
+          type: 'InteractiveObjectWithSprite',
           id: 'balcony_robot_cleaner',
           name: '扫地机器人',
           x: 900,
           y: 550,
           width: 120,
           height: 80,
-          imageKey: 'balcony_robot_cleaner',
-          actions: ['chase_robot', 'ride_robot']
+          spriteConstructor: (scene, x, y) => {
+            return new RobotCleaner(scene, x, y);
+          },
+          actions: []
         }
       ],
       exits: [
@@ -411,6 +432,7 @@ export class RoomRegistry {
       background: 'living_room_door_bg',
       interactiveObjects: [
         {
+          type: 'InteractiveObject',
           id: 'front_door',
           name: '前门',
           
@@ -459,6 +481,7 @@ export class RoomRegistry {
       background: 'doorway_bg',
       interactiveObjects: [
         {
+          type: 'InteractiveObject',
           id: 'freedom',
           name: '自由',
           

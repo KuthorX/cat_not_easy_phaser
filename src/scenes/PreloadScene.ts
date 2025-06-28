@@ -85,7 +85,6 @@ export class PreloadScene extends Phaser.Scene {
     this.load.image('fish_treat', 'assets/objects/fish_treat.png');
     this.load.image('toy_mouse', 'assets/objects/toy_mouse.png');
     this.load.image('computer_screen', 'assets/objects/computer_screen.png');
-    this.load.image('robot_cleaner', 'assets/objects/robot_cleaner.svg');
     this.load.image('owner_bed', 'assets/objects/owner_bed.png');
 
     // 加载音频资源 - 只保留存在的文件

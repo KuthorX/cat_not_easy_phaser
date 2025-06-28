@@ -1,5 +1,4 @@
 import { BaseScene } from './BaseScene';
-import { RobotCleaner } from '../objects/RobotCleaner';
 import { SceneKeys } from '../constants/SceneKeys';
 import { RoomKeys } from '../constants/SceneKeys';
 import { InteractiveObject, RoomExit } from '../types/GameState';
@@ -42,9 +41,6 @@ export class LivingRoomNorthScene extends BaseScene {
     roomData.exits.forEach((exit: RoomExit) => {
       this.createExit(exit);
     });
-
-    // 创建扫地机器人
-    this.robotCleaner = new RobotCleaner(this, 0, 400);
 
     // 添加碰撞
     this.physics.add.collider(this.robotCleaner, this.interactiveObjectBodies);

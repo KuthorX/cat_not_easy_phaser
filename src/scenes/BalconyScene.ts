@@ -1,7 +1,7 @@
 import { BaseScene } from './BaseScene';
 import { SceneKeys } from '../constants/SceneKeys';
 import { RoomKeys } from '../constants/SceneKeys';
-import { InteractiveObject, RoomExit } from '../types/GameState';
+import { InteractiveObject, RoomExit, InteractiveObjectWithSprite } from '../types/GameState';
 
 export class BalconyScene extends BaseScene {
   constructor() {
@@ -24,13 +24,20 @@ export class BalconyScene extends BaseScene {
     if (!roomData) return;
 
     // 添加图片对象并创建交互区域
-    roomData.interactiveObjects.forEach((obj: InteractiveObject) => {
-      if (obj.imageKey) {
-        // 创建交互对象
-        this.createInteractiveImageObject(obj, obj.imageKey);
-      } else {
-        // 创建传统的矩形交互对象
-        this.createInteractiveObject(obj);
+    roomData.interactiveObjects.forEach((obj) => {
+      switch (obj.type) {
+        case 'InteractiveObject':
+          if (obj.imageKey) {
+            // 创建交互对象
+            this.createInteractiveImageObject(obj, obj.imageKey);
+          } else {
+            // 创建传统的矩形交互对象
+            this.createInteractiveObject(obj);
+          }
+          break;
+        case 'InteractiveObjectWithSprite':
+          this.createInteractiveObjectsWithSprite(obj);
+          break;
       }
     });
 

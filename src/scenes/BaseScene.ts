@@ -3,6 +3,7 @@ import { GameManager } from '@/core/GameManager';
 import { SceneManager } from '@/core/SceneManager';
 import { UIManager } from '@/core/UIManager';
 import { AudioManager } from '@/core/AudioManager';
+import { InteractiveObjectWithSprite } from '@/types/GameState';
 
 export abstract class BaseScene extends Phaser.Scene {
   protected gameManager!: GameManager;
@@ -318,6 +319,13 @@ export abstract class BaseScene extends Phaser.Scene {
     });
 
     return image;
+  }
+
+  protected createInteractiveObjectsWithSprite(obj : InteractiveObjectWithSprite): void {
+    const sprite = obj.spriteConstructor(this, obj.x, obj.y);
+    sprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      this.onObjectClicked(obj, pointer);
+    });
   }
 
   // 显示物体描边 - 基于图片的实际形状
