@@ -15,7 +15,7 @@ export class ActionRegistry {
       name: '吃粮喝水',
       timeCost: GameConstants.BASIC_ACTION_COST,
       effects: [
-        { type: 'hunger', value: GameConstants.BASIC_HUNGER_RESTORE, operation: 'add' }
+        { type: 'hunger', value: GameConstants.BASIC_ENERGY_RESTORE, operation: 'add' }
       ],
       conditions: []
     });
@@ -144,7 +144,7 @@ export class ActionRegistry {
     this.registerAction({
       id: 'scratch_sofa',
       name: '抓沙发',
-      hungerCost: 1,
+      energyCost: 1,
       effects: [], // 效果在对话选项中选择后执行
       conditions: [],
       dialogueId: 'sofa_conversation',
@@ -189,7 +189,7 @@ export class ActionRegistry {
     this.registerAction({
       id: 'play_in_house',
       name: '在猫别墅里玩耍',
-      hungerCost: 1,
+      energyCost: 1,
       effects: [
         { type: 'story_flag', value: 'play_time', operation: 'set' }
       ],
@@ -200,8 +200,9 @@ export class ActionRegistry {
     this.registerAction({
       id: 'eat_fish_treat',
       name: '吃鱼干',
+      energyCost: 1,
       effects: [
-        { type: 'hunger', value: GameConstants.ADVANCED_HUNGER_RESTORE, operation: 'add' }
+        { type: 'story_flag', value: 'play_time', operation: 'set' }
       ],
       conditions: []
     });
@@ -209,7 +210,7 @@ export class ActionRegistry {
     this.registerAction({
       id: 'play_with_mouse',
       name: '和玩具老鼠玩耍',
-      hungerCost: 1,
+      energyCost: 1,
       effects: [
         { type: 'story_flag', value: 'play_time', operation: 'set' }
       ],
@@ -228,7 +229,6 @@ export class ActionRegistry {
     this.registerAction({
       id: 'destroy_screen',
       name: '破坏显示屏',
-      hungerCost: 1,
       energyCost: 3,
       effects: [
         { type: 'story_flag', value: 'screen_destroyed', operation: 'set' }
@@ -298,7 +298,7 @@ export class ActionRegistry {
     this.registerAction({
       id: 'play_with_clothes',
       name: '玩衣服',
-      hungerCost: 1,
+      energyCost: 1,
       effects: [
         { type: 'story_flag', value: 'clothes_played', operation: 'set' }
       ],
@@ -329,7 +329,7 @@ export class ActionRegistry {
     this.registerAction({
       id: 'scratch_bed',
       name: '抓床',
-      hungerCost: 1,
+      energyCost: 1,
       effects: [
         { type: 'story_flag', value: 'bed_scratched', operation: 'set' }
       ],
@@ -367,7 +367,7 @@ export class ActionRegistry {
     this.registerAction({
       id: 'paw_screen',
       name: '用爪子拍屏幕',
-      hungerCost: 1,
+      energyCost: 1,
       effects: [
         { type: 'story_flag', value: 'screen_pawed', operation: 'set' }
       ],
@@ -406,7 +406,7 @@ export class ActionRegistry {
     this.registerAction({
       id: 'scratch_wall',
       name: '抓墙',
-      hungerCost: 1,
+      energyCost: 1,
       effects: [
         { type: 'story_flag', value: 'wall_scratched', operation: 'set' }
       ],
@@ -434,11 +434,6 @@ export class ActionRegistry {
   public canExecuteAction(actionId: string, gameState: any): boolean {
     const action = this.getAction(actionId);
     if (!action) return false;
-
-    // 检查饥饿值要求
-    if (action.hungerRequirement && gameState.hunger < action.hungerRequirement) {
-      return false;
-    }
 
     // 检查精力值要求
     if (action.energyRequirement && gameState.energy < action.energyRequirement) {

@@ -86,9 +86,7 @@ export interface Action {
   id: string;
   name: string;
   timeCost?: number;
-  hungerCost?: number;
   energyCost?: number;
-  hungerRequirement?: number;
   energyRequirement?: number;
   roomRequirement?: string;
   itemRequirement?: string;
