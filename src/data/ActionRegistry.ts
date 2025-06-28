@@ -70,6 +70,21 @@ export class ActionRegistry {
     });
 
     this.registerAction({
+      id: 'sweep_table',
+      name: '扫落',
+      timeCost: 60,
+      effects: [],
+      conditions: []
+    });
+
+    this.registerAction({
+      id: 'attack_tv',
+      name: '攻击',
+      effects: [],
+      conditions: []
+    });
+
+    this.registerAction({
       id: 'grinding_claws',
       name: '磨爪',
       timeCost: 60,
@@ -78,66 +93,74 @@ export class ActionRegistry {
     });
 
     this.registerAction({
-      id: 'chew_rope',
-      name: '啃咬',
-      timeCost: GameConstants.ADVANCED_ACTION_COST,
-      effects: [
-        { type: 'story_flag', value: 'chew_rope_completed', operation: 'set' }
-      ],
+      id: 'jumping',
+      name: '跳跃',
+      effects: [],
+      conditions: []
+    });
+
+    //客厅门口
+    this.registerAction({
+      id: 'rummage',
+      name: '翻找',
+      timeCost: 60,
+      effects: [],
       conditions: []
     });
 
     this.registerAction({
-      id: 'chase_ball',
-      name: '追逐',
-      timeCost: GameConstants.ADVANCED_ACTION_COST,
-      effects: [
-        { type: 'story_flag', value: 'chase_ball_completed', operation: 'set' }
-      ],
-      conditions: [],
-      playTweens: {
-        tweenKey: 'cat_play',
-        x: 400,
-        y: 300,
-      }
+      id: 'pounce',
+      name: '扑击',
+      timeCost: 60,
+      effects: [],
+      conditions: []
     });
 
     this.registerAction({
-      id: 'sweep_table',
-      name: '扫落',
-      timeCost: 1,
-      effects: [
-        { type: 'story_flag', value: 'table_swept', operation: 'set' }
-      ],
-      conditions: [],
-      playTweens: {
-        tweenKey: 'cat_slap',
-        x: 400,
-        y: 300,
-      }
+      id: 'rummage_water',
+      name: '翻找',
+      timeCost: 60,
+      effects: [],
+      conditions: []
+    });
+
+    //过道
+    this.registerAction({
+      id: 'unlock',
+      name: '解锁',
+      effects: [],
+      conditions: []
     });
 
     this.registerAction({
-      id: 'attack_tv',
-      name: '攻击',
-      timeCost: GameConstants.ADVANCED_ACTION_COST,
-      energyCost: 1,
-      effects: [
-        { type: 'story_flag', value: 'tv_destroyed', operation: 'set' }
-      ],
-      conditions: [
-        { type: 'story_flag', value: 'on_cat_bed', operator: 'eq' }
-      ],
-      playTweens: {
-        tweenKey: 'cat_kick',
-        x: 400,
-        y: 300,
-      },
-      specialCondition: {
-        type: 'position_check',
-        value: 'cat_bed',
-        failureMessage: '我够不到它！'
-      }
+      id: 'enter',
+      name: '进入',
+      effects: [],
+      conditions: []
+    });
+
+    this.registerAction({
+      id: 'jump_on',
+      name: '跳上',
+      effects: [],
+      conditions: []
+    });
+
+    this.registerAction({
+      id: 'jump_on_big',
+      name: '跳上',
+      energyRequirement: 2,
+      effects: [],
+      conditions: []
+    });
+
+    this.registerAction({
+      id: 'eat',
+      name: '进食',
+      energyRequirement: 1,
+      timeCost: 60,
+      effects: [],
+      conditions: []
     });
 
     // 主人房间动作
@@ -233,9 +256,7 @@ export class ActionRegistry {
       id: 'jump_on_cage',
       name: '踩跳',
       effects: [], // 效果在对话选项中选择后执行
-      conditions: [
-        { type: 'story_flag', operator: 'eq', value: 'cage_damaged' }
-      ],
+      conditions: [],
       dialogueId: 'cage_conversation',
       triggerDialogue: true
     });
@@ -246,9 +267,7 @@ export class ActionRegistry {
       name: '使用猫厕所',
       effects: [], // 效果在对话选项中选择后执行
       energyRequirement: 1,
-      conditions: [
-        { type: 'hunger', operator: 'gte', value: 4 }
-      ],
+      conditions: [],
       dialogueId: 'litter_box_conversation',
       triggerDialogue: true
     });
@@ -259,9 +278,7 @@ export class ActionRegistry {
       name: '在猫别墅里玩耍',
       timeCost: 60,
       energyCost: 1,
-      effects: [
-        { type: 'story_flag', value: 'play_time', operation: 'set' }
-      ],
+      effects: [],
       conditions: []
     });
 
@@ -271,9 +288,7 @@ export class ActionRegistry {
       name: '吃鱼干',
       timeCost: 60,
       energyRequirement: 1,
-      effects: [
-        { type: 'story_flag', value: 'play_time', operation: 'set' }
-      ],
+      effects: [],
       conditions: []
     });
 
@@ -358,65 +373,95 @@ export class ActionRegistry {
 
     // 阳台相关动作
     this.registerAction({
-      id: 'sit_on_chair',
-      name: '坐在椅子上',
-      effects: [
-        { type: 'energy', value: GameConstants.BASIC_ENERGY_RESTORE, operation: 'add' }
-      ],
+      id: 'reinforce',
+      name: '加固',
+      effects: [],
+      conditions: [],
+    });
+
+    this.registerAction({
+      id: 'inspect',
+      name: '检阅',
+      timeCost: 60,
+      effects: [],
       conditions: []
     });
 
     this.registerAction({
-      id: 'jump_on_chair',
-      name: '跳到椅子上',
-      energyCost: 1,
-      effects: [
-        { type: 'story_flag', value: 'chair_jumped', operation: 'set' }
-      ],
-      conditions: []
+      id: 'interact',
+      name: '互动',
+      timeCost: 60,
+      effects: [],
+      conditions: [],
     });
 
     this.registerAction({
-      id: 'climb_hanger',
-      name: '爬上衣架',
-      energyCost: 1,
-      effects: [
-        { type: 'story_flag', value: 'hanger_climbed', operation: 'set' }
-      ],
-      conditions: []
+      id: 'revenge',
+      name: '报复',
+      timeCost: 60,
+      effects: [],
+      conditions: [],
+      thought: '狠狠的对着小圆拳打脚踢，真是愉快！'
     });
 
     this.registerAction({
-      id: 'play_with_clothes',
-      name: '玩衣服',
-      energyCost: 1,
-      effects: [
-        { type: 'story_flag', value: 'clothes_played', operation: 'set' }
-      ],
-      conditions: []
-    });
-
-    this.registerAction({
-      id: 'chase_robot',
-      name: '追扫地机器人',
-      energyCost: 2,
-      effects: [
-        { type: 'story_flag', value: 'robot_chased', operation: 'set' }
-      ],
-      conditions: []
-    });
-
-    this.registerAction({
-      id: 'ride_robot',
-      name: '骑扫地机器人',
-      energyCost: 1,
-      effects: [
-        { type: 'story_flag', value: 'robot_ridden', operation: 'set' }
-      ],
-      conditions: []
+      id: 'ride',
+      name: '骑上',
+      timeCost: 60,
+      effects: [],
+      conditions: [],
     });
 
     // 房间B相关动作
+    this.registerAction({
+      id: 'play',
+      name: '玩耍',
+      energyRequirement: 1,
+      timeCost: 60,
+      effects: [],
+      conditions: []
+    });
+    
+    this.registerAction({
+      id: 'carry',
+      name: '叼走',
+      effects: [],
+      conditions: []
+    });
+
+    this.registerAction({
+      id: 'drink_carry',
+      name: '叼走',
+      effects: [],
+      conditions: []
+    });
+
+    this.registerAction({
+      id: 'destroy',
+      name: '破坏',
+      energyRequirement: 3,
+      timeCost: 120,
+      effects: [],
+      conditions: []
+    });
+
+    this.registerAction({
+      id: 'hide',
+      name: '钻进去',
+      energyRequirement: 1,
+      timeCost: 60,
+      effects: [],
+      conditions: []
+    });
+
+    this.registerAction({
+      id: 'pee',
+      name: '尿床',
+      timeCost: 60,
+      effects: [],
+      conditions: []
+    });
+
     this.registerAction({
       id: 'scratch_bed',
       name: '抓床',

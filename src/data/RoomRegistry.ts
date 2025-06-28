@@ -10,60 +10,6 @@ export class RoomRegistry {
   }
 
   private initializeRooms(): void {
-    // 客厅-向北看
-    this.registerRoom({
-      id: RoomKeys.LIVING_ROOM_NORTH,
-      name: '客厅-向北看',
-      
-      background: 'living_room_north_bg',
-      interactiveObjects: [
-        {
-          type: 'InteractiveObject',
-          id: 'window_north',
-          name: '北窗',
-          
-          x: 640,
-          y: 200,
-          width: 200,
-          height: 150,
-          sprite: 'window_north',
-          actions: ['sunbathing', 'look_outside']
-        },
-        {
-          type: 'InteractiveObject',
-          id: 'sofa_north',
-          name: '沙发',
-          
-          x: 400,
-          y: 400,
-          width: 300,
-          height: 200,
-          sprite: 'sofa',
-          actions: ['sleep_on_sofa', 'scratch_sofa']
-        }
-      ],
-      exits: [
-        {
-          id: 'exit_to_east',
-          name: '向东',
-          targetRoom: RoomKeys.LIVING_ROOM_EAST,
-          x: 1200,
-          y: 300,
-          width: 80,
-          height: 120
-        },
-        {
-          id: 'exit_to_west_low',
-          name: '向西',
-          targetRoom: RoomKeys.LIVING_ROOM_WEST_LOW,
-          x: 0,
-          y: 300,
-          width: 80,
-          height: 120
-        }
-      ]
-    });
-
     // 客厅-向西看（低处）
     this.registerRoom({
       id: RoomKeys.LIVING_ROOM_WEST_LOW,
@@ -92,7 +38,7 @@ export class RoomRegistry {
           y: 500,
           width: 100,
           height: 80,
-          sprite: 'litter_box',
+          sprite: 'cat_litter_box',
           actions: ['use_litter_box']
         },
         {
@@ -203,16 +149,64 @@ export class RoomRegistry {
       interactiveObjects: [
         {
           type: 'InteractiveObject',
-          id: 'room_b_bed',
-          name: '主人的床',
-          
+          id: 'squeaky_toy_mouse',
+          name: '发声玩具老鼠',
+          thought: '我的劲敌。一只怎么也咬不死，叫声尖锐的老鼠。某次夜里我们殊死搏斗后，它就被两脚兽带走了。原来躲藏在这里。',
+          x: 150,
+          y: 250,
+          width: 30,
+          height: 30,
+          sprite: 'squeaky_toy_mouse',
+          actions: ['play', 'carry']
+        },
+        {
+          type: 'InteractiveObject',
+          id: 'drink',
+          name: '饮料',
+          thought: '花花绿绿的水源，两脚兽喜欢饮用。唉，两脚兽真是愚蠢的生物。不知道这种水往往有毒吗？',
           x: 300,
           y: 400,
-          width: 200,
-          height: 150,
-          imageKey: 'room_b_bed',
-          actions: ['sleep_on_bed', 'scratch_bed']
+          width: 20,
+          height: 20,
+          sprite: 'drink',
+          actions: ['drink_carry']
         },
+        {
+          type: 'InteractiveObject',
+          id: 'display',
+          name: '显示屏',
+          thought: '大又扁的光滑抓板。有时候黑漆漆，有时候亮闪闪。两脚兽每天都会盯着它看很久，可能是某种捕猎训练。',
+          x: 450,
+          y: 300,
+          width: 100,
+          height: 50,
+          sprite: 'display',
+          actions: ['destroy']
+        },       
+        {
+          type: 'InteractiveObject',
+          id: 'wardrobe',
+          name: '衣柜',
+          thought: '很多质感和气味都不正常的草叶。两脚兽每天都会穿在身上。',
+          x: 600,
+          y: 200,
+          width: 80,
+          height: 150,
+          sprite: 'wardrobe',
+          actions: ['hide']
+        },
+        {
+          type: 'InteractiveObject',
+          id: 'human_bed',
+          name: '两脚兽的窝（床）',
+          thought: '两脚兽每次睡觉都睡很久，很容易让猫误会是已经死掉了。',
+          x: 700,
+          y: 400,
+          width: 120,
+          height: 80,
+          sprite: 'human_bed',
+          actions: ['pee']
+        }, 
         {
           type: 'InteractiveObject',
           id: 'room_b_chair',
@@ -280,7 +274,80 @@ export class RoomRegistry {
       name: '过道',
       
       background: 'hallway_bg',
-      interactiveObjects: [],
+      interactiveObjects: [
+        {
+          type: 'InteractiveObject',
+          id: 'closed_door',
+          name: '关闭的房门（主卧）',
+          thought: '两脚兽的巢穴，它每天打猎归来就会回到这里。它不在的时候我很难进去。',
+          x: 300,
+          y: 200,
+          width: 50,
+          height: 80,
+          sprite: 'closed_door',
+          actions: ['unlock', 'enter']
+        },
+        {
+          type: 'InteractiveObject',
+          id: 'small_shelf',
+          name: '小架子',
+          thought: '放了几个形态各异的小两脚兽雕像。也许是某种祭祀用具。',
+          x: 150,
+          y: 250,
+          width: 60,
+          height: 30,
+          sprite: 'small_shelf',
+          actions: ['jump_on']
+        },
+        {
+          type: 'InteractiveObject',
+          id: 'bookshelf',
+          name: '书架',
+          thought: '大架子，小册子。两脚兽会往上放很多东西，但很少再拿下来。真奇怪。',
+          x: 400,
+          y: 300,
+          width: 100,
+          height: 200,
+          sprite: 'bookshelf',
+          actions: ['jump_on_big']
+        },
+        {
+          type: 'InteractiveObject',
+          id: 'food_bowl',
+          name: '粮盆与水碗',
+          thought: '定时涌现食物和净水的神奇地带。感谢大自然的馈赠！',
+          x: 500,
+          y: 400,
+          width: 40,
+          height: 40,
+          sprite: 'food_bowl',
+          actions: ['eat']
+        },
+        {
+          type: 'InteractiveObject',
+          id: 'sealed_cat_food',
+          name: '封口猫粮',
+          thought: '好像有食物的气味。不过懒得管了。',
+          x: 600,
+          y: 400,
+          width: 30,
+          height: 30,
+          sprite: 'sealed_cat_food',
+          actions: []
+        },
+        {
+          type: 'InteractiveObject',
+          id: 'robot',
+          name: '小圆（扫地机器人）',
+          thought: '小圆好像不喜欢这个架子，撞了它几下后就继续冬眠了。',
+          x: 700,
+          y: 500,
+          width: 50,
+          height: 50,
+          sprite: 'robot',
+          actions: []
+        }
+      ],
       exits: [
         {
           id: 'exit_to_room_b',
@@ -319,38 +386,38 @@ export class RoomRegistry {
           y: 450,
           width: 80,
           height: 40,
-          sprite: 'balcony',
+          sprite: 'going_balcony',
           actions: ['conversating', 'opening']
         },
         {
           type: 'InteractiveObject',
-          id: 'chew_rope',
-          name: '咬绳',
-          thought: '我是不是该咬咬这个东西？',
-          x: 300,
-          y: 400,
-          width: 100,
-          height: 80,
-          sprite: 'chew_rope',
-          actions: ['chew_rope']
+          id: 'cat_toys_under_the_table',
+          name: '桌下的猫玩具',
+          thought: '圆溜溜的，会滚动的神奇小球。我练习捕猎的伙伴之一。最近它似乎有小脾气，躲起来不愿意见我。',
+          x: 400,
+          y: 450,
+          width: 80,
+          height: 40,
+          sprite: 'cat_toys_under_the_table',
+          actions: ['catching', 'shaking_bite_rope']
         },
         {
           type: 'InteractiveObject',
-          id: 'chase_ball',
-          name: '转球',
-          thought: '这个球看起来很好玩！',
-          x: 500,
-          y: 400,
+          id: 'sofa',
+          name: '沙发',
+          thought: '两脚兽的另一个窝，它坐在这里进食的时候，对面的黑漆漆经常变得亮闪闪，还发出怪声。',
+          x: 400,
+          y: 450,
           width: 80,
-          height: 80,
-          sprite: 'chase_ball',
-          actions: ['chase_ball']
-        }, 
+          height: 40,
+          sprite: 'sofa',
+          actions: ['sleeping']
+        },
         {
           type: 'InteractiveObject',
           id: 'table',
           name: '桌子',
-          thought: '堆满了不知道什么东西。',
+          thought: '堆满了不知道什么东西。猜测是两脚兽堆垃圾的地方。',
           x: 700,
           y: 350,
           width: 200,
@@ -372,15 +439,27 @@ export class RoomRegistry {
         },
         {
           type: 'InteractiveObject',
+          id: 'cat_scratcher',
+          name: '猫抓板',
+          thought: '爪子的最重要的狩猎工具，需要常常养护。所以...看抓喵嗷！',
+          x: 400,
+          y: 500,
+          width: 120,
+          height: 100,
+          sprite: 'cat_scratcher',
+          actions: ['grinding_claws']
+        },
+        {
+          type: 'InteractiveObject',
           id: 'cat_bed',
           name: '猫窝',
-          thought: '哦，我的宝地。',
+          thought: '两脚兽每次看到我趴在这上面，表情都很奇特。',
           x: 400,
           y: 500,
           width: 120,
           height: 100,
           sprite: 'cat_bed',
-          actions: ['sleep_in_cat_bed']
+          actions: ['sleeping','jumping']
         }
       ],
       exits: [
@@ -413,38 +492,39 @@ export class RoomRegistry {
       interactiveObjects: [
         {
           type: 'InteractiveObject',
-          id: 'balcony_chair',
-          name: '阳台椅子',
-          x: 150,
-          y: 244,
-          width: 150,
+          id: 'fortress',
+          name: '堡垒',
+          thought: '两脚兽搭建的防御设施，封印着隔壁的敌猫。最近有些年久失修，希望别出什么问题。',
+          x: 200,
+          y: 300,
+          width: 100,
           height: 100,
-          imageKey: 'balcony_chair',
-          actions: ['sit_on_chair', 'jump_on_chair']
+          sprite: 'fortress',
+          actions: ['reinforce', 'inspect']
+        },        
+        {
+          type: 'InteractiveObject',
+          id: 'black_hand',
+          name: '黑手',
+          thought: '通过堡垒缝隙出现的劲敌！它动作灵敏，我赢不过。可恶，看来必须要想办法让两脚兽意识到它得加固堡垒防线了。',
+          x: 250,
+          y: 350,
+          width: 50,
+          height: 50,
+          sprite: 'black_hand',
+          actions: ['interact']
         },
         {
           type: 'InteractiveObject',
-          id: 'balcony_coat_hanger',
-          name: '衣架',
-          x: 110,
-          y: 550,
-          width: 100,
-          height: 80,
-          imageKey: 'balcony_coat_hanger',
-          actions: ['climb_hanger', 'play_with_clothes']
-        },
-        {
-          type: 'InteractiveObjectWithSprite',
-          id: 'balcony_robot_cleaner',
+          id: 'robot',
           name: '扫地机器人',
-          x: 900,
-          y: 550,
-          width: 120,
-          height: 80,
-          spriteConstructor: (scene, x, y) => {
-            return new RobotCleaner(scene, x, y);
-          },
-          actions: []
+          thought: '这是小圆，家里的恶霸。它一直在冬眠，睡醒就会张牙舞爪横冲直撞，经过的地方都湿乎乎的。是令人恐惧的对手！',
+          x: 400,
+          y: 500,
+          width: 60,
+          height: 60,
+          sprite: 'robot',
+          actions: ['revenge', 'ride']
         }
       ],
       exits: [
@@ -469,15 +549,37 @@ export class RoomRegistry {
       interactiveObjects: [
         {
           type: 'InteractiveObject',
-          id: 'front_door',
-          name: '前门',
-          
+          id: 'debris_pile',
+          name: '杂物堆(快递)',
+          thought: '两脚兽从门口拿来的小箱子，随手就扔在这里，都堆成小山了。',
           x: 640,
           y: 400,
           width: 200,
           height: 300,
-          sprite: 'front_door',
-          actions: ['look_outside']
+          sprite: 'debris_pile',
+          actions: ['rummage']
+        },
+        {
+          type: 'InteractiveObject',
+          id: 'router',
+          name: '路由器（荧光两角虫）',
+          x: 640,
+          y: 400,
+          width: 200,
+          height: 300,
+          sprite: 'router',
+          actions: ['pounce']
+        },
+        {
+          type: 'InteractiveObject',
+          id: 'buckets_water',
+          name: '大桶水',
+          x: 640,
+          y: 400,
+          width: 200,
+          height: 300,
+          sprite: 'buckets_water',
+          actions: ['rummage_water']
         }
       ],
       exits: [
@@ -508,80 +610,10 @@ export class RoomRegistry {
         }
       ]
     });
-
-    // 门口
-    this.registerRoom({
-      id: RoomKeys.DOORWAY,
-      name: '门口',
-      
-      background: 'doorway_bg',
-      interactiveObjects: [
-        {
-          type: 'InteractiveObject',
-          id: 'freedom',
-          name: '自由',
-          
-          x: 640,
-          y: 360,
-          width: 400,
-          height: 200,
-          sprite: 'freedom',
-          actions: ['escape']
-        }
-      ],
-      exits: [
-        {
-          id: 'exit_to_living_room_door',
-          name: '返回屋内',
-          targetRoom: RoomKeys.LIVING_ROOM_DOOR,
-          x: 640,
-          y: 0,
-          width: 200,
-          height: 20
-        }
-      ]
-    });
-
-    // 房间A（备用房间）
-    this.registerRoom({
-      id: RoomKeys.ROOM_A,
-      name: '房间A',
-      
-      background: 'room_a_bg',
-      interactiveObjects: [],
-      exits: [
-        {
-          id: 'exit_to_hallway',
-          name: '过道',
-          targetRoom: RoomKeys.HALLWAY,
-          x: 1200,
-          y: 300,
-          width: 80,
-          height: 120
-        }
-      ]
-    });
-
-    // 房间C（备用房间）
-    this.registerRoom({
-      id: RoomKeys.ROOM_C,
-      name: '房间C',
-      
-      background: 'room_c_bg',
-      interactiveObjects: [],
-      exits: [
-        {
-          id: 'exit_to_hallway',
-          name: '过道',
-          targetRoom: RoomKeys.HALLWAY,
-          x: 0,
-          y: 300,
-          width: 80,
-          height: 120
-        }
-      ]
-    });
   }
+
+
+  
 
   public registerRoom(room: RoomData): void {
     this.rooms.set(room.id, room);
