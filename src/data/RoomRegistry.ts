@@ -75,7 +75,7 @@ export class RoomRegistry {
           type: 'InteractiveObject',
           id: 'cat_cage',
           name: '笼子',
-          
+          thought: '一个恶毒的陷阱，两脚兽有时会用这个囚禁我，带我去到钢铁巨兽腹中。无论最后是见到白袍祭司，还是暴雨之女，都是不好的回忆。',
           x: 200,
           y: 400,
           width: 150,
@@ -87,7 +87,7 @@ export class RoomRegistry {
           type: 'InteractiveObject',
           id: 'cat_litter_box',
           name: '猫厕所',
-          
+          thought:'我的排泄处。沙土的质感和野外不太一样，但掩盖气味的能力优秀。毕竟从来没有天敌循着气味来攻击我。',
           x: 400,
           y: 500,
           width: 100,
@@ -99,7 +99,7 @@ export class RoomRegistry {
           type: 'InteractiveObject',
           id: 'cat_house',
           name: '猫别墅',
-          
+          thought:'自从门坏了之后，就变成我的游乐园了。',
           x: 600,
           y: 450,
           width: 120,
@@ -148,13 +148,37 @@ export class RoomRegistry {
           type: 'InteractiveObject',
           id: 'fish_treat',
           name: '长条硬皮鱼',
-          
+          thought: '皮特别坚韧，但肉是浆糊状，非常美味。两脚兽隔很久才会给我吃一条，但很多第一次见的两脚兽会慷慨地多给我几根。',
           x: 300,
           y: 350,
           width: 80,
           height: 40,
           sprite: 'fish_treat',
           actions: ['eat_fish_treat']
+        },
+        {
+          type: 'InteractiveObject',
+          id: 'cat_bites_rope',
+          name: '猫咬绳',
+          thought: '长条粗麻绳，摇晃起来有声音，总感觉在挑衅我。',
+          x: 400,
+          y: 450,
+          width: 80,
+          height: 40,
+          sprite: 'cat_bites_rope',
+          actions: ['bites_rope']
+        },
+        {
+          type: 'InteractiveObject',
+          id: 'cat_bites_air',
+          name: '咬空气',
+          thought: '神秘的小黑盒子，两脚兽有时候会拿起来摩擦两下就放下。',
+          x: 450,
+          y: 550,
+          width: 80,
+          height: 40,
+          sprite: 'cat_bites_air',
+          actions: ['bites_air']
         }
       ],
       exits: [
@@ -286,6 +310,18 @@ export class RoomRegistry {
       
       background: 'living_room_east_bg',
       interactiveObjects: [
+        {
+          type: 'InteractiveObject',
+          id: 'going_balcony',
+          name: '前往阳台',
+          thought: '神秘的禁制，两脚兽不触摸也能打开，想必是和它达成了什么交易。',
+          x: 400,
+          y: 450,
+          width: 80,
+          height: 40,
+          sprite: 'balcony',
+          actions: ['conversating', 'opening']
+        },
         {
           type: 'InteractiveObject',
           id: 'chew_rope',

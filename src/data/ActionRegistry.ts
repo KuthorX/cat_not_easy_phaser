@@ -32,6 +32,52 @@ export class ActionRegistry {
 
     // 客厅-向东看场景动作
     this.registerAction({
+      id: 'conversating',
+      name: '对话',
+      effects: [],
+      conditions: []
+    });
+
+    this.registerAction({
+      id: 'opening',
+      name: '打开',
+      effects: [],
+      conditions: []
+    });
+
+    this.registerAction({
+      id: 'catching',
+      name: '抓出来',
+      effects: [],
+      conditions: []
+    });
+
+    this.registerAction({
+      id: 'shaking_bite_rope',
+      name: '甩动咬绳',
+      timeCost: 60,
+      effects: [],
+      conditions: []
+    });
+
+    this.registerAction({
+      id: 'sleeping',
+      name: '睡大觉',
+      energyRequirement: 1,
+      timeCost: 60,
+      effects: [],
+      conditions: []
+    });
+
+    this.registerAction({
+      id: 'grinding_claws',
+      name: '磨爪',
+      timeCost: 60,
+      effects: [],
+      conditions: []
+    });
+
+    this.registerAction({
       id: 'chew_rope',
       name: '啃咬',
       timeCost: GameConstants.ADVANCED_ACTION_COST,
@@ -54,7 +100,7 @@ export class ActionRegistry {
     this.registerAction({
       id: 'sweep_table',
       name: '扫落',
-      timeCost: GameConstants.ADVANCED_ACTION_COST,
+      timeCost: 1,
       effects: [
         { type: 'story_flag', value: 'table_swept', operation: 'set' }
       ],
@@ -156,6 +202,7 @@ export class ActionRegistry {
       id: 'attack_cage',
       name: '攻击笼子',
       energyCost: 1,
+      timeCost: 60,
       effects: [], // 效果在对话选项中选择后执行
       conditions: [],
       dialogueId: 'cage_conversation',
@@ -178,6 +225,7 @@ export class ActionRegistry {
       id: 'use_litter_box',
       name: '使用猫厕所',
       effects: [], // 效果在对话选项中选择后执行
+      energyRequirement: 1,
       conditions: [
         { type: 'hunger', operator: 'gte', value: 4 }
       ],
@@ -189,7 +237,8 @@ export class ActionRegistry {
     this.registerAction({
       id: 'play_in_house',
       name: '在猫别墅里玩耍',
-      hungerCost: 1,
+      timeCost: 60,
+      energyCost: 1,
       effects: [
         { type: 'story_flag', value: 'play_time', operation: 'set' }
       ],
@@ -200,10 +249,28 @@ export class ActionRegistry {
     this.registerAction({
       id: 'eat_fish_treat',
       name: '吃鱼干',
+      timeCost: 60,
+      energyRequirement: 1,
       effects: [
         { type: 'hunger', value: GameConstants.ADVANCED_HUNGER_RESTORE, operation: 'add' }
       ],
       conditions: []
+    });
+
+    // 叼走绳子
+    this.registerAction({
+      id: 'bites_rope',
+      name: '叼走',
+      effects:[],
+      conditions:[]
+    });
+
+    // 叼走空气
+    this.registerAction({
+      id: 'bites_air',
+      name: '叼走',
+      effects:[],
+      conditions:[]
     });
 
     this.registerAction({
