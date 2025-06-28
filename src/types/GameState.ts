@@ -44,7 +44,7 @@ export interface Dialogue {
 
 export interface DialogueStep {
   id: string;
-  speaker: 'object' | 'cat' | 'system';
+  speaker: 'object' | 'cat' | 'system' | 'thought';
   text: string;
   choices?: DialogueChoice[];
   autoNext?: boolean;
@@ -107,6 +107,7 @@ export interface Action {
     value: any;
     failureMessage: string;
   };
+  thought?: string;
 }
 
 export interface ActionEffect {

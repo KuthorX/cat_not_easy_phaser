@@ -13,7 +13,7 @@ export class DialogueBubble implements IUIComponent {
     bubbleId: string,
     text: string,
     position: DialogueBubblePosition,
-    speaker: 'object' | 'cat' | 'system',
+    speaker: 'object' | 'cat' | 'system' | 'thought',
     duration: number = 0
   ): void {
     if (!this.scene) return;

@@ -3,9 +3,10 @@ import { DialogueBubble } from './DialogueBubble';
 import { DialogueChoices } from './DialogueChoices';
 import { DialogueBubblePosition } from '../../types/GameState';
 import { DialogueManager as CoreDialogueManager } from '../DialogueManager';
+import { BaseScene } from '../../scenes/BaseScene';
 
 export class DialogueUIManager implements IUIComponent {
-  private scene: Phaser.Scene | null = null;
+  private scene: BaseScene | null = null;
   private dialogueBubble: DialogueBubble;
   private dialogueChoices: DialogueChoices;
   private coreDialogueManager: CoreDialogueManager | null = null;
@@ -15,7 +16,7 @@ export class DialogueUIManager implements IUIComponent {
     this.dialogueChoices = new DialogueChoices();
   }
 
-  initialize(scene: Phaser.Scene): void {
+  initialize(scene: BaseScene): void {
     this.scene = scene;
     this.dialogueBubble.initialize(scene);
     this.dialogueChoices.initialize(scene);
@@ -92,7 +93,7 @@ export class DialogueUIManager implements IUIComponent {
       // 更新对话状态中的最后一个气泡位置
       currentState.lastBubblePosition = systemBubblePosition;
       
-    } else {
+    } else if (currentStep.speaker === 'cat') {
       // 猫的对话气泡
       const catPosition = { x: 640, y: 600 }; // 猫的默认位置
       const catBubblePosition = this.coreDialogueManager.calculateBubblePosition(
@@ -105,6 +106,14 @@ export class DialogueUIManager implements IUIComponent {
       
       // 更新对话状态中的最后一个气泡位置
       currentState.lastBubblePosition = catBubblePosition;
+    } else if (currentStep.speaker === 'thought') {
+      // 猫的想法气泡
+      const thoughtId = `thought_${currentState.objectId || 'unknown'}`;
+      const x = 1280 - 200; // 右下角位置
+      const y = 720 - 100;
+      const uiManager = (this.scene as any)?.uiManager;
+      console.log('uiManager', uiManager);
+      uiManager.showThought(thoughtId, currentStep.text, x, y, 3000);
     }
 
     // 检查当前步骤是否有选项需要显示
