@@ -1,4 +1,5 @@
 import { BaseScene } from './BaseScene';
+import { RobotCleaner } from '../objects/RobotCleaner';
 import { SceneKeys } from '../constants/SceneKeys';
 import { RoomKeys } from '../constants/SceneKeys';
 import { InteractiveObject, RoomExit } from '../types/GameState';
@@ -7,6 +8,7 @@ import { runTransitionTests } from '../test/TransitionSceneTest';
 
 export class LivingRoomNorthScene extends BaseScene {
   private interactiveObjects: Map<string, InteractiveObject> = new Map();
+  private robotCleaner!: RobotCleaner;
 
   constructor() {
     super(SceneKeys.LIVING_ROOM_NORTH);
@@ -61,6 +63,9 @@ export class LivingRoomNorthScene extends BaseScene {
 
     // 设置键盘快捷键
     this.setupKeyboardShortcuts();
+
+    // 创建扫地机器人
+    this.robotCleaner = new RobotCleaner(this, 0, 400);
   }
 
   private createExit(exit: RoomExit): void {
@@ -264,4 +269,4 @@ export class LivingRoomNorthScene extends BaseScene {
     
     return transitionTexts[exitName] || `你走向${exitName}...`;
   }
-} 
+}
