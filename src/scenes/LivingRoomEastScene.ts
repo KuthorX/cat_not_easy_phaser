@@ -62,7 +62,8 @@ export class LivingRoomEastScene extends BaseScene {
     exitRect.setInteractive();
     
     exitRect.on('pointerdown', () => {
-      this.switchToRoom(exit.targetRoom);
+      console.log('LivingRoomEastScene: 点击出口', exit.name, '目标房间:', exit.targetRoom);
+      this.switchToRoomWithTransition(exit.targetRoom, exit.name);
     });
 
     exitRect.on('pointerover', () => {

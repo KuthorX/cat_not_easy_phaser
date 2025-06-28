@@ -54,7 +54,7 @@ export class SceneManager {
   }
 
   // 获取房间对应的场景键
-  private getSceneKeyForRoom(roomKey: string): string | null {
+  public getSceneKeyForRoom(roomKey: string): string | null {
     const roomToSceneMap: Record<string, string> = {
       [RoomKeys.LIVING_ROOM_NORTH]: SceneKeys.LIVING_ROOM_NORTH,
       [RoomKeys.LIVING_ROOM_EAST]: SceneKeys.LIVING_ROOM_EAST,
@@ -68,6 +68,10 @@ export class SceneManager {
       [RoomKeys.ROOM_C]: SceneKeys.ROOM_C,
       [RoomKeys.DOORWAY]: SceneKeys.DOORWAY
     };
+
+    console.log('roomToSceneMap', roomToSceneMap);
+    console.log('roomKey', roomKey);
+    console.log('roomToSceneMap[roomKey]', roomToSceneMap[roomKey]);
     
     return roomToSceneMap[roomKey] || null;
   }

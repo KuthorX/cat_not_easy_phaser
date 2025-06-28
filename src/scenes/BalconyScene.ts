@@ -71,7 +71,7 @@ export class BalconyScene extends BaseScene {
     
     exitRect.on('pointerdown', () => {
       console.log('点击出口:', exit.name, '切换到房间:', exit.targetRoom);
-      this.switchToRoom(exit.targetRoom);
+      this.switchToRoomWithTransition(exit.targetRoom, exit.name);
     });
 
     exitRect.on('pointerover', () => {

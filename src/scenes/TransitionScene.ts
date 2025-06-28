@@ -1,5 +1,4 @@
-import { BaseScene } from './BaseScene';
-import { TransitionPanel, TransitionConfig } from '@/core/ui/TransitionPanel';
+import { TransitionPanel, TransitionConfig } from '../core/ui/TransitionPanel';
 
 export interface TransitionSceneData {
   config: TransitionConfig;
@@ -7,7 +6,7 @@ export interface TransitionSceneData {
   nextSceneData?: any;
 }
 
-export class TransitionScene extends BaseScene {
+export class TransitionScene extends Phaser.Scene {
   private static transitionPanel?: TransitionPanel;
   private sceneData?: TransitionSceneData;
 
@@ -15,11 +14,16 @@ export class TransitionScene extends BaseScene {
     super('TransitionScene');
   }
 
-  init(data?: TransitionSceneData): void {
-    this.sceneData = data;
+  create(): void {
+    this.init();
   }
 
-  protected initializeScene(): void {
+  init(data?: TransitionSceneData): void {
+    this.sceneData = data;
+    this.initializeScene();
+  }
+
+  private initializeScene(): void {
     if (!this.sceneData?.config) {
       console.error('TransitionScene: No config provided');
       return;
@@ -31,11 +35,6 @@ export class TransitionScene extends BaseScene {
 
     // 显示过渡面板
     TransitionScene.transitionPanel.show();
-  }
-
-  protected setupEventListeners(): void {
-    // 继承父类的事件监听
-    super.setupEventListeners();
   }
 
   // 切换到下一个场景

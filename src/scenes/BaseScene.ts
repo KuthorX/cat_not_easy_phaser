@@ -1,46 +1,44 @@
 import { GameEvents } from '../constants/GameEvents';
-import { GameManager } from '@/core/GameManager';
-import { SceneManager } from '@/core/SceneManager';
-import { UIManager } from '@/core/UIManager';
-import { AudioManager } from '@/core/AudioManager';
+import { GameManager } from '../core/GameManager';
+import { SceneManager } from '../core/SceneManager';
+import { UIManager } from '../core/UIManager';
+import { AudioManager } from '../core/AudioManager';
+import { OutlineRenderer } from '../utils/OutlineRenderer';
+import { TransitionHelper } from '../utils/TransitionHelper';
+import { SceneKeys, RoomKeys } from '../constants/SceneKeys';
 
 export abstract class BaseScene extends Phaser.Scene {
   protected gameManager!: GameManager;
   protected sceneManager!: SceneManager;
   protected audioManager!: AudioManager;
   protected uiManager!: UIManager;
+  protected outlineRenderer!: OutlineRenderer;
 
   constructor(key: string) {
     super(key);
   }
 
   create(): void {
-    // 获取全局游戏实例和管理器
+    // 初始化管理器
     const game = (window as any).game;
-    if (game) {
-      this.gameManager = game.gameManager;
-      this.sceneManager = game.sceneManager;
-      this.audioManager = game.audioManager;
-      this.uiManager = game.uiManager;
-    }
+    this.gameManager = game.gameManager;
+    this.sceneManager = game.sceneManager;
+    this.audioManager = game.audioManager;
+    this.uiManager = game.uiManager;
 
     // 设置当前场景
-    if (this.sceneManager) {
-      this.sceneManager.setCurrentScene(this);
-    }
+    this.sceneManager.setCurrentScene(this);
 
-    // 设置UIManager的对话管理器
-    if (this.uiManager && this.gameManager) {
-      this.uiManager.setDialogueManager(this.gameManager.getDialogueManager());
-    }
+    // 初始化描边渲染器
+    this.outlineRenderer = new OutlineRenderer(this);
+
+    // 设置事件监听
+    this.setupEventListeners();
 
     // 初始化场景
     this.initializeScene();
-    
-    // 设置事件监听
-    this.setupEventListeners();
-    
-    // 添加点击空白区域隐藏对话选项的功能
+
+    // 设置点击外部处理
     this.setupClickOutsideHandler();
   }
 
@@ -253,6 +251,8 @@ export abstract class BaseScene extends Phaser.Scene {
   // 切换到其他房间
   protected switchToRoom(roomKey: string): void {
     console.log('BaseScene.switchToRoom 被调用，目标房间:', roomKey);
+    console.log('当前场景:', this.scene.key);
+    console.log('SceneManager 存在:', !!this.sceneManager);
     if (this.sceneManager) {
       console.log('SceneManager 存在，调用 switchToRoom');
       this.sceneManager.switchToRoom(roomKey);
@@ -262,6 +262,54 @@ export abstract class BaseScene extends Phaser.Scene {
     } else {
       console.error('SceneManager 不存在！');
     }
+  }
+
+  // 带过渡效果的房间切换方法
+  protected switchToRoomWithTransition(roomKey: string, exitName: string): void {
+    const sceneKey = this.sceneManager?.getSceneKeyForRoom(roomKey);
+    if (!sceneKey) {
+      console.error(`Unknown room key: ${roomKey}`);
+      return;
+    }
+
+    // 根据出口名称生成过渡文本
+    const transitionText = this.getTransitionTextForExit(exitName);
+    
+    TransitionHelper.createTransition(
+      this,
+      {
+        text: transitionText,
+        leftButtonText: '返回',
+        rightButtonText: '进入',
+        backgroundColor: 0x1a1a2e,
+        textColor: 0xf0f0f0,
+        buttonColor: 0x16213e,
+        buttonTextColor: 0xffffff
+      },
+      sceneKey
+    );
+  }
+
+  // 根据出口名称生成过渡文本
+  protected getTransitionTextForExit(exitName: string): string {
+    const transitionTexts: Record<string, string> = {
+      '向东': '你转向东边，准备探索客厅的另一侧...',
+      '向西': '你向西边走去，那里似乎有什么有趣的东西...',
+      '向南': '你回到客厅的中央区域...',
+      '向北': '你向北边走去，寻找新的发现...',
+      '走廊': '你走向走廊，准备探索房子的其他部分...',
+      '阳台': '你走向阳台，想要呼吸一些新鲜空气...',
+      '房间A': '你准备进入房间A，不知道里面有什么...',
+      '房间B': '你走向房间B，心中充满好奇...',
+      '房间C': '你准备探索房间C...',
+      '门口': '你走向门口，准备离开这个房间...',
+      '返回客厅': '你回到客厅的中央区域...',
+      '返回屋内': '你回到屋内，继续探索...',
+      '过道': '你走向过道，准备探索房子的其他部分...',
+      '主人房间': '你走向主人的房间，心中充满好奇...'
+    };
+    
+    return transitionTexts[exitName] || `你走向${exitName}...`;
   }
 
   // 创建交互对象
@@ -294,123 +342,15 @@ export abstract class BaseScene extends Phaser.Scene {
     const interactiveArea = this.add.rectangle(obj.x, obj.y, obj.width, obj.height, 0x000000, 0);
     interactiveArea.setInteractive();
     
-    // 创建描边效果（初始隐藏）
-    const outline = this.add.graphics();
-    outline.setDepth(image.depth + 1); // 确保描边在图片上方
-    
-    // 存储引用关系
-    (interactiveArea as any).outline = outline;
-    (interactiveArea as any).targetImage = image;
+    // 使用新的描边渲染器创建交互式描边
+    this.outlineRenderer.createInteractiveOutline(image, interactiveArea, 0x000000, 3);
     
     // 点击事件
     interactiveArea.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
       this.onObjectClicked(obj, pointer);
     });
 
-    // 鼠标悬停事件 - 显示描边
-    interactiveArea.on('pointerover', () => {
-      this.showObjectOutline(interactiveArea, 0x000000, 3);
-    });
-
-    // 鼠标离开事件 - 隐藏描边
-    interactiveArea.on('pointerout', () => {
-      this.hideObjectOutline(interactiveArea);
-    });
-
     return image;
-  }
-
-  // 显示物体描边 - 基于图片的实际形状
-  private showObjectOutline(interactiveArea: Phaser.GameObjects.Rectangle, color: number, thickness: number = 3): void {
-    const outline = (interactiveArea as any).outline;
-    const targetImage = (interactiveArea as any).targetImage;
-    
-    if (!outline || !targetImage) return;
-
-    outline.clear();
-    outline.lineStyle(thickness, color, 1);
-    
-    // 获取图片的实际边界（去除透明区域）
-    const bounds = this.getImageNonTransparentBounds(targetImage);
-    if (bounds) {
-      outline.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
-    }
-  }
-
-  // 获取图片的非透明区域边界
-  private getImageNonTransparentBounds(image: Phaser.GameObjects.Image): { x: number; y: number; width: number; height: number } | null {
-    try {
-      // 获取图片的纹理
-      const texture = image.texture;
-      const source = texture.getSourceImage() as HTMLImageElement;
-      
-      if (!source || !source.complete) {
-        // 如果图片还没加载完成，使用默认边界
-        const bounds = image.getBounds();
-        return bounds;
-      }
-
-      // 创建canvas来分析图片的透明区域
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return null;
-
-      canvas.width = source.width;
-      canvas.height = source.height;
-      ctx.drawImage(source, 0, 0);
-
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const data = imageData.data;
-
-      let minX = canvas.width;
-      let minY = canvas.height;
-      let maxX = 0;
-      let maxY = 0;
-      let hasNonTransparentPixel = false;
-
-      // 扫描图片找到非透明像素的边界
-      for (let y = 0; y < canvas.height; y++) {
-        for (let x = 0; x < canvas.width; x++) {
-          const index = (y * canvas.width + x) * 4;
-          const alpha = data[index + 3]; // 透明度通道
-          
-          if (alpha > 0) { // 非透明像素
-            hasNonTransparentPixel = true;
-            minX = Math.min(minX, x);
-            minY = Math.min(minY, y);
-            maxX = Math.max(maxX, x);
-            maxY = Math.max(maxY, y);
-          }
-        }
-      }
-
-      if (!hasNonTransparentPixel) {
-        return null;
-      }
-
-      // 计算实际边界
-      const imageBounds = image.getBounds();
-      const scaleX = imageBounds.width / canvas.width;
-      const scaleY = imageBounds.height / canvas.height;
-      
-      return {
-        x: imageBounds.x + minX * scaleX,
-        y: imageBounds.y + minY * scaleY,
-        width: (maxX - minX + 1) * scaleX,
-        height: (maxY - minY + 1) * scaleY
-      };
-    } catch (error) {
-      console.warn('无法分析图片透明区域，使用默认边界:', error);
-      return image.getBounds();
-    }
-  }
-
-  // 隐藏物体描边
-  private hideObjectOutline(interactiveArea: Phaser.GameObjects.Rectangle): void {
-    const outline = (interactiveArea as any).outline;
-    if (outline) {
-      outline.clear();
-    }
   }
 
   protected onObjectClicked(obj: any, pointer?: Phaser.Input.Pointer): void {
@@ -478,6 +418,11 @@ export abstract class BaseScene extends Phaser.Scene {
       this.gameManager.off(GameEvents.INVENTORY_CHANGED, this.onInventoryChanged.bind(this));
       this.gameManager.off(GameEvents.ACHIEVEMENT_UNLOCKED, this.onAchievementUnlocked.bind(this));
       this.gameManager.off(GameEvents.GAME_ENDED, this.onGameEnded.bind(this));
+    }
+
+    // 清理描边渲染器
+    if (this.outlineRenderer) {
+      this.outlineRenderer.destroy();
     }
   }
 

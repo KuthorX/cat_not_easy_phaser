@@ -70,7 +70,7 @@ export class RoomBScene extends BaseScene {
     exitRect.setInteractive();
     
     exitRect.on('pointerdown', () => {
-      this.switchToRoom(exit.targetRoom);
+      this.switchToRoomWithTransition(exit.targetRoom, exit.name);
     });
 
     exitRect.on('pointerover', () => {
