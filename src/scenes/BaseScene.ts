@@ -243,6 +243,7 @@ export abstract class BaseScene extends Phaser.Scene {
   // 创建交互对象
   protected createInteractiveObject(obj: any): Phaser.GameObjects.Rectangle {
     const rect = this.add.rectangle(obj.x, obj.y, obj.width, obj.height, 0x00ff00, 0.3);
+    this.physics.add.existing(rect, true);
     rect.setInteractive();
     
     rect.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
@@ -324,4 +325,4 @@ export abstract class BaseScene extends Phaser.Scene {
   private setupClickOutsideHandler(): void {
 
   }
-} 
+}

@@ -8,6 +8,7 @@ import { runTransitionTests } from '../test/TransitionSceneTest';
 
 export class LivingRoomNorthScene extends BaseScene {
   private interactiveObjects: Map<string, InteractiveObject> = new Map();
+  private interactiveObjectBodies: Phaser.GameObjects.Rectangle[] = [];
   private robotCleaner!: RobotCleaner;
 
   constructor() {
@@ -32,7 +33,8 @@ export class LivingRoomNorthScene extends BaseScene {
     // 创建交互对象
     roomData.interactiveObjects.forEach((obj: InteractiveObject) => {
       this.interactiveObjects.set(obj.id, obj);
-      this.createInteractiveObject(obj);
+      const objSprite = this.createInteractiveObject(obj);
+      this.interactiveObjectBodies.push(objSprite);
     });
 
     // 创建出口
@@ -42,6 +44,9 @@ export class LivingRoomNorthScene extends BaseScene {
 
     // 创建扫地机器人
     this.robotCleaner = new RobotCleaner(this, 0, 400);
+
+    // 添加碰撞
+    this.physics.add.collider(this.robotCleaner, this.interactiveObjectBodies);
 
     // 初始化UI
     if (this.uiManager) {
