@@ -2,6 +2,8 @@ import { BaseScene } from './BaseScene';
 import { SceneKeys } from '../constants/SceneKeys';
 import { RoomKeys } from '../constants/SceneKeys';
 import { InteractiveObject, RoomExit } from '../types/GameState';
+import { TransitionScene } from './TransitionScene';
+import { runTransitionTests } from '../test/TransitionSceneTest';
 
 export class LivingRoomNorthScene extends BaseScene {
   private interactiveObjects: Map<string, InteractiveObject> = new Map();
@@ -66,7 +68,7 @@ export class LivingRoomNorthScene extends BaseScene {
     exitRect.setInteractive();
     
     exitRect.on('pointerdown', () => {
-      this.switchToRoom(exit.targetRoom);
+      this.switchToRoomWithTransition(exit.targetRoom, exit.name);
     });
 
     exitRect.on('pointerover', () => {
@@ -113,6 +115,30 @@ export class LivingRoomNorthScene extends BaseScene {
 
     this.input.keyboard?.on('keydown-THREE', () => {
       this.executeAction('scratch_sofa');
+    });
+
+    // 测试过渡场景的快捷键
+    this.input.keyboard?.on('keydown-T', () => {
+      console.log('按下了T键，启动过渡场景测试...');
+      runTransitionTests(this);
+    });
+
+    // 快速测试过渡场景
+    this.input.keyboard?.on('keydown-Y', () => {
+      console.log('快速测试过渡场景...');
+      TransitionScene.createTransition(
+        this,
+        {
+          text: '这是一个快速测试！\n按Y键触发的过渡场景。',
+          leftButtonText: '取消',
+          rightButtonText: '继续',
+          backgroundColor: 0x8b4513,
+          textColor: 0xffd700,
+          buttonColor: 0x654321,
+          buttonTextColor: 0xffffff
+        },
+        'LivingRoomNorthScene'
+      );
     });
   }
 
@@ -175,5 +201,67 @@ export class LivingRoomNorthScene extends BaseScene {
     };
     
     return actionToObjectMap[actionId] || null;
+  }
+
+  // 新增：带过渡效果的房间切换方法
+  private switchToRoomWithTransition(roomKey: string, exitName: string): void {
+    const sceneKey = this.getSceneKeyForRoom(roomKey);
+    if (!sceneKey) {
+      console.error(`Unknown room key: ${roomKey}`);
+      return;
+    }
+
+    // 根据出口名称生成过渡文本
+    const transitionText = this.getTransitionTextForExit(exitName);
+    
+    TransitionScene.createTransition(
+      this,
+      {
+        text: transitionText,
+        leftButtonText: '返回',
+        rightButtonText: '进入',
+        backgroundColor: 0x1a1a2e,
+        textColor: 0xf0f0f0,
+        buttonColor: 0x16213e,
+        buttonTextColor: 0xffffff
+      },
+      sceneKey
+    );
+  }
+
+  // 新增：根据房间键获取场景键
+  private getSceneKeyForRoom(roomKey: string): string | null {
+    const roomToSceneMap: Record<string, string> = {
+      [RoomKeys.LIVING_ROOM_EAST]: SceneKeys.LIVING_ROOM_EAST,
+      [RoomKeys.LIVING_ROOM_WEST_LOW]: SceneKeys.LIVING_ROOM_WEST_LOW,
+      [RoomKeys.LIVING_ROOM_WEST_HIGH]: SceneKeys.LIVING_ROOM_WEST_HIGH,
+      [RoomKeys.LIVING_ROOM_DOOR]: SceneKeys.LIVING_ROOM_DOOR,
+      [RoomKeys.HALLWAY]: SceneKeys.HALLWAY,
+      [RoomKeys.BALCONY]: SceneKeys.BALCONY,
+      [RoomKeys.ROOM_A]: SceneKeys.ROOM_A,
+      [RoomKeys.ROOM_B]: SceneKeys.ROOM_B,
+      [RoomKeys.ROOM_C]: SceneKeys.ROOM_C,
+      [RoomKeys.DOORWAY]: SceneKeys.DOORWAY
+    };
+    
+    return roomToSceneMap[roomKey] || null;
+  }
+
+  // 新增：根据出口名称生成过渡文本
+  private getTransitionTextForExit(exitName: string): string {
+    const transitionTexts: Record<string, string> = {
+      '向东': '你转向东边，准备探索客厅的另一侧...',
+      '向西': '你向西边走去，那里似乎有什么有趣的东西...',
+      '向南': '你回到客厅的中央区域...',
+      '向北': '你向北边走去，寻找新的发现...',
+      '走廊': '你走向走廊，准备探索房子的其他部分...',
+      '阳台': '你走向阳台，想要呼吸一些新鲜空气...',
+      '房间A': '你准备进入房间A，不知道里面有什么...',
+      '房间B': '你走向房间B，心中充满好奇...',
+      '房间C': '你准备探索房间C...',
+      '门口': '你走向门口，准备离开这个房间...'
+    };
+    
+    return transitionTexts[exitName] || `你走向${exitName}...`;
   }
 } 

@@ -8,4 +8,6 @@ export { AchievementPopup } from './AchievementPopup';
 export { DialogueBubble } from './DialogueBubble';
 export { DialogueChoices } from './DialogueChoices';
 export { DialogueUIManager } from './DialogueManager';
-export { GameEndScreen } from './GameEndScreen'; 
+export { GameEndScreen } from './GameEndScreen';
+export { TransitionPanel } from './TransitionPanel';
+export type { TransitionConfig } from './TransitionPanel'; 

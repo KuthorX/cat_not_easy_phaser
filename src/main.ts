@@ -22,6 +22,7 @@ import { RoomBScene } from './scenes/RoomBScene';
 import { HallwayScene } from './scenes/HallwayScene';
 import { DoorwayScene } from './scenes/DoorwayScene';
 import { EndingScene } from './scenes/EndingScene';
+import { TransitionScene } from './scenes/TransitionScene';
 
 class CatGame extends Phaser.Game {
   public gameManager: GameManager;
@@ -63,6 +64,7 @@ class CatGame extends Phaser.Game {
     this.scene.add(SceneKeys.HALLWAY, HallwayScene, false);
     this.scene.add(SceneKeys.DOORWAY, DoorwayScene, false);
     this.scene.add(SceneKeys.ENDING, EndingScene, false);
+    this.scene.add(SceneKeys.TRANSITION, TransitionScene, false);
     
     // 注册其他房间场景（暂时使用占位符）
     this.registerPlaceholderScenes();
