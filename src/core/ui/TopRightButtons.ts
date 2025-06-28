@@ -28,38 +28,38 @@ export class TopRightButtons implements IUIComponent {
     // 消磨时间按钮
     this.timeWasteButton = this.scene.add.text(0, 0, '💤', {
       fontSize: '24px',
-      backgroundColor: '#333333',
+      backgroundColor: '#00000000',
       padding: { x: 8, y: 4 },
       color: '#ffffff'
     });
     this.timeWasteButton.setInteractive();
     this.timeWasteButton.on('pointerdown', () => this.onTimeWasteClick());
-    this.timeWasteButton.on('pointerover', () => this.timeWasteButton?.setStyle({ backgroundColor: '#555555' }));
-    this.timeWasteButton.on('pointerout', () => this.timeWasteButton?.setStyle({ backgroundColor: '#333333' }));
+    this.timeWasteButton.on('pointerover', () => this.timeWasteButton?.setStyle({ backgroundColor: '#33333333' }));
+    this.timeWasteButton.on('pointerout', () => this.timeWasteButton?.setStyle({ backgroundColor: '#00000000' }));
 
     // 日志页按钮
-    this.logButton = this.scene.add.text(0, 40, '📖', {
+    this.logButton = this.scene.add.text(50, 0, '📖', {
       fontSize: '24px',
-      backgroundColor: '#333333',
+      backgroundColor: '#00000000',
       padding: { x: 8, y: 4 },
       color: '#ffffff'
     });
     this.logButton.setInteractive();
     this.logButton.on('pointerdown', () => this.onLogClick());
-    this.logButton.on('pointerover', () => this.logButton?.setStyle({ backgroundColor: '#555555' }));
-    this.logButton.on('pointerout', () => this.logButton?.setStyle({ backgroundColor: '#333333' }));
+    this.logButton.on('pointerover', () => this.logButton?.setStyle({ backgroundColor: '#33333333' }));
+    this.logButton.on('pointerout', () => this.logButton?.setStyle({ backgroundColor: '#00000000' }));
 
     // 设置按钮
-    this.settingsButton = this.scene.add.text(0, 80, '⚙️', {
+    this.settingsButton = this.scene.add.text(100, 0, '⚙️', {
       fontSize: '24px',
-      backgroundColor: '#333333',
+      backgroundColor: '#00000000',
       padding: { x: 8, y: 4 },
       color: '#ffffff'
     });
     this.settingsButton.setInteractive();
     this.settingsButton.on('pointerdown', () => this.onSettingsClick());
-    this.settingsButton.on('pointerover', () => this.settingsButton?.setStyle({ backgroundColor: '#555555' }));
-    this.settingsButton.on('pointerout', () => this.settingsButton?.setStyle({ backgroundColor: '#333333' }));
+    this.settingsButton.on('pointerover', () => this.settingsButton?.setStyle({ backgroundColor: '#33333333' }));
+    this.settingsButton.on('pointerout', () => this.settingsButton?.setStyle({ backgroundColor: '#00000000' }));
 
     this.container.add([this.timeWasteButton, this.logButton, this.settingsButton]);
     this.container.setDepth(1000);
@@ -110,4 +110,4 @@ export class TopRightButtons implements IUIComponent {
       this.settingsButton = null;
     }
   }
-} 
+}
