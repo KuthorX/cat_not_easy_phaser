@@ -4,12 +4,14 @@ import { GameManager } from './core/GameManager';
 import { SceneManager } from './core/SceneManager';
 import { AudioManager } from './core/AudioManager';
 import { UIManager } from './core/UIManager';
+import { VolumeManager } from './core/VolumeManager';
 import { SceneKeys } from './constants/SceneKeys';
 
 // 导入场景
 import { BootScene } from './scenes/BootScene';
 import { PreloadScene } from './scenes/PreloadScene';
 import { MenuScene } from './scenes/MenuScene';
+import { SettingScene } from './scenes/SettingScene';
 import { LivingRoomNorthScene } from './scenes/LivingRoomNorthScene';
 import { LivingRoomWestLowScene } from './scenes/LivingRoomWestLowScene';
 import { LivingRoomWestHighScene } from './scenes/LivingRoomWestHighScene';
@@ -26,11 +28,13 @@ class CatGame extends Phaser.Game {
   public sceneManager: SceneManager;
   public audioManager: AudioManager;
   public uiManager: UIManager;
+  public volumeManager: VolumeManager;
 
   constructor() {
     super(GameConfig);
     
     // 初始化核心管理器
+    this.volumeManager = VolumeManager.getInstance();
     this.gameManager = new GameManager(this);
     this.sceneManager = new SceneManager(this);
     this.audioManager = new AudioManager(this);
@@ -48,6 +52,7 @@ class CatGame extends Phaser.Game {
     this.scene.add(SceneKeys.BOOT, BootScene, true);
     this.scene.add(SceneKeys.PRELOAD, PreloadScene, false);
     this.scene.add(SceneKeys.MENU, MenuScene, false);
+    this.scene.add(SceneKeys.SETTINGS, SettingScene, false);
     this.scene.add(SceneKeys.LIVING_ROOM_NORTH, LivingRoomNorthScene, false);
     this.scene.add(SceneKeys.LIVING_ROOM_WEST_LOW, LivingRoomWestLowScene, false);
     this.scene.add(SceneKeys.LIVING_ROOM_WEST_HIGH, LivingRoomWestHighScene, false);

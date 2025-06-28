@@ -2,6 +2,7 @@ export enum SceneKeys {
   BOOT = 'BootScene',
   PRELOAD = 'PreloadScene',
   MENU = 'MenuScene',
+  SETTINGS = 'SettingScene',
   GAME = 'GameScene',
   LIVING_ROOM_NORTH = 'LivingRoomNorthScene',
   LIVING_ROOM_EAST = 'LivingRoomEastScene',

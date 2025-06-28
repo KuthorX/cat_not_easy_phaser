@@ -73,22 +73,8 @@ export class PreloadScene extends Phaser.Scene {
     this.load.image('computer_screen', 'assets/objects/computer_screen.png');
     this.load.image('owner_bed', 'assets/objects/owner_bed.png');
 
-    // 加载音频资源
+    // 加载音频资源 - 只保留存在的文件
     this.load.audio('bgm_living_room', 'assets/audio/bgm_living_room.mp3');
-    this.load.audio('bgm_owner_room', 'assets/audio/bgm_owner_room.mp3');
-    this.load.audio('bgm_hallway', 'assets/audio/bgm_hallway.mp3');
-    
-    this.load.audio('sfx_cat_meow', 'assets/audio/sfx_cat_meow.mp3');
-    this.load.audio('sfx_cat_purr', 'assets/audio/sfx_cat_purr.mp3');
-    this.load.audio('sfx_cat_scratch', 'assets/audio/sfx_cat_scratch.mp3');
-    this.load.audio('sfx_cat_eat', 'assets/audio/sfx_cat_eat.mp3');
-    this.load.audio('sfx_cat_sleep', 'assets/audio/sfx_cat_sleep.mp3');
-    this.load.audio('sfx_door_open', 'assets/audio/sfx_door_open.mp3');
-    this.load.audio('sfx_door_close', 'assets/audio/sfx_door_close.mp3');
-    this.load.audio('sfx_item_pickup', 'assets/audio/sfx_item_pickup.mp3');
-    this.load.audio('sfx_item_destroy', 'assets/audio/sfx_item_destroy.mp3');
-    this.load.audio('sfx_achievement', 'assets/audio/sfx_achievement.mp3');
-    this.load.audio('sfx_time_advance', 'assets/audio/sfx_time_advance.mp3');
   }
 
   create(): void {

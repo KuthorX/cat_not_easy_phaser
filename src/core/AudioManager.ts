@@ -1,54 +1,37 @@
+import { VolumeManager } from './VolumeManager';
+
 export class AudioManager {
   private game: Phaser.Game;
   private sounds: Map<string, Phaser.Sound.BaseSound> = new Map();
   private music: Phaser.Sound.BaseSound | null = null;
-  private volume: number = 0.5;
-  private musicVolume: number = 0.3;
+  private volumeManager: VolumeManager;
 
   constructor(game: Phaser.Game) {
     this.game = game;
+    this.volumeManager = VolumeManager.getInstance();
+    
+    // 监听音量变化事件
+    this.volumeManager.onMusicVolumeChanged((volume) => {
+      this.updateMusicVolume(volume);
+    });
+    
+    this.volumeManager.onSoundVolumeChanged((volume) => {
+      this.updateSoundVolume(volume);
+    });
   }
 
   // 预加载音频
   public preload(scene: Phaser.Scene): void {
     // 背景音乐
     scene.load.audio('bgm_living_room', 'assets/audio/bgm_living_room.mp3');
-    scene.load.audio('bgm_owner_room', 'assets/audio/bgm_owner_room.mp3');
-    scene.load.audio('bgm_hallway', 'assets/audio/bgm_hallway.mp3');
-    
-    // 音效
-    scene.load.audio('sfx_cat_meow', 'assets/audio/sfx_cat_meow.mp3');
-    scene.load.audio('sfx_cat_purr', 'assets/audio/sfx_cat_purr.mp3');
-    scene.load.audio('sfx_cat_scratch', 'assets/audio/sfx_cat_scratch.mp3');
-    scene.load.audio('sfx_cat_eat', 'assets/audio/sfx_cat_eat.mp3');
-    scene.load.audio('sfx_cat_sleep', 'assets/audio/sfx_cat_sleep.mp3');
-    scene.load.audio('sfx_door_open', 'assets/audio/sfx_door_open.mp3');
-    scene.load.audio('sfx_door_close', 'assets/audio/sfx_door_close.mp3');
-    scene.load.audio('sfx_item_pickup', 'assets/audio/sfx_item_pickup.mp3');
-    scene.load.audio('sfx_item_destroy', 'assets/audio/sfx_item_destroy.mp3');
-    scene.load.audio('sfx_achievement', 'assets/audio/sfx_achievement.mp3');
-    scene.load.audio('sfx_time_advance', 'assets/audio/sfx_time_advance.mp3');
   }
 
   // 创建音频
   public create(scene: Phaser.Scene): void {
-    // 创建音效
-    this.sounds.set('cat_meow', scene.sound.add('sfx_cat_meow'));
-    this.sounds.set('cat_purr', scene.sound.add('sfx_cat_purr'));
-    this.sounds.set('cat_scratch', scene.sound.add('sfx_cat_scratch'));
-    this.sounds.set('cat_eat', scene.sound.add('sfx_cat_eat'));
-    this.sounds.set('cat_sleep', scene.sound.add('sfx_cat_sleep'));
-    this.sounds.set('door_open', scene.sound.add('sfx_door_open'));
-    this.sounds.set('door_close', scene.sound.add('sfx_door_close'));
-    this.sounds.set('item_pickup', scene.sound.add('sfx_item_pickup'));
-    this.sounds.set('item_destroy', scene.sound.add('sfx_item_destroy'));
-    this.sounds.set('achievement', scene.sound.add('sfx_achievement'));
-    this.sounds.set('time_advance', scene.sound.add('sfx_time_advance'));
-
     // 设置音量
     this.sounds.forEach(sound => {
       if (sound instanceof Phaser.Sound.WebAudioSound) {
-        sound.setVolume(this.volume);
+        sound.setVolume(this.volumeManager.getSoundVolume());
       }
     });
   }
@@ -62,13 +45,14 @@ export class AudioManager {
   }
 
   // 播放背景音乐
-  public playMusic(musicKey: string, loop: boolean = true): void {
+  public playMusic(musicKey: string, scene?: Phaser.Scene, loop: boolean = true): void {
     this.stopMusic();
     
-    const scene = this.game.scene.getScene('GameScene');
-    if (scene) {
-      this.music = scene.sound.add(musicKey, {
-        volume: this.musicVolume,
+    // 如果没有传入场景，尝试获取当前活跃场景
+    const targetScene = scene || this.game.scene.getScene('MENU');
+    if (targetScene) {
+      this.music = targetScene.sound.add(musicKey, {
+        volume: this.volumeManager.getMusicVolume(),
         loop: loop
       });
       this.music.play();
@@ -98,85 +82,57 @@ export class AudioManager {
     }
   }
 
-  // 设置音效音量
-  public setSoundVolume(volume: number): void {
-    this.volume = Math.max(0, Math.min(1, volume));
+  // 更新音乐音量（内部方法，由VolumeManager调用）
+  private updateMusicVolume(volume: number): void {
+    if (this.music && this.music instanceof Phaser.Sound.WebAudioSound) {
+      this.music.setVolume(volume);
+    }
+  }
+
+  // 更新音效音量（内部方法，由VolumeManager调用）
+  private updateSoundVolume(volume: number): void {
     this.sounds.forEach(sound => {
       if (sound instanceof Phaser.Sound.WebAudioSound) {
-        sound.setVolume(this.volume);
+        sound.setVolume(volume);
       }
     });
   }
 
-  // 设置音乐音量
-  public setMusicVolume(volume: number): void {
-    this.musicVolume = Math.max(0, Math.min(1, volume));
-    if (this.music && this.music instanceof Phaser.Sound.WebAudioSound) {
-      this.music.setVolume(this.musicVolume);
-    }
-  }
-
-  // 获取音效音量
-  public getSoundVolume(): number {
-    return this.volume;
-  }
-
-  // 获取音乐音量
-  public getMusicVolume(): number {
-    return this.musicVolume;
-  }
-
   // 播放房间背景音乐
-  public playRoomMusic(roomKey: string): void {
+  public playRoomMusic(roomKey: string, scene?: Phaser.Scene): void {
     const musicMap: Record<string, string> = {
       'living_room_north': 'bgm_living_room',
       'living_room_east': 'bgm_living_room',
       'living_room_west_low': 'bgm_living_room',
       'living_room_west_high': 'bgm_living_room',
       'living_room_door': 'bgm_living_room',
-      'room_b': 'bgm_owner_room',
-      'hallway': 'bgm_hallway'
+      'room_b': 'bgm_living_room',
+      'hallway': 'bgm_living_room'
     };
 
     const musicKey = musicMap[roomKey];
     if (musicKey) {
-      this.playMusic(musicKey);
+      this.playMusic(musicKey, scene);
     }
   }
 
   // 播放动作相关音效
   public playActionSound(actionId: string): void {
-    const soundMap: Record<string, string> = {
-      'sunbathing': 'cat_purr',
-      'sleep_on_sofa': 'cat_sleep',
-      'sleep_on_bed': 'cat_sleep',
-      'scratch_sofa': 'cat_scratch',
-      'attack_cage': 'cat_scratch',
-      'play_in_house': 'cat_meow',
-      'play_with_mouse': 'cat_meow',
-      'eat_fish_treat': 'cat_eat',
-      'carry_mouse': 'item_pickup',
-      'destroy_screen': 'item_destroy'
-    };
-
-    const soundKey = soundMap[actionId];
-    if (soundKey) {
-      this.playSound(soundKey);
-    }
+    // 暂时不播放音效，因为音效文件不存在
   }
 
   // 播放成就音效
   public playAchievementSound(): void {
-    this.playSound('achievement');
+    // 暂时不播放音效，因为音效文件不存在
   }
 
   // 播放时间推进音效
   public playTimeAdvanceSound(): void {
-    this.playSound('time_advance');
+    // 暂时不播放音效，因为音效文件不存在
   }
 
   // 播放房间切换音效
   public playRoomChangeSound(): void {
-    this.playSound('door_open');
+    // 暂时不播放音效，因为音效文件不存在
   }
 } 

@@ -199,4 +199,4 @@ export class UIManager {
   public updateDialogueDisplay(): void {
     this.dialogueUIManager.updateDialogueDisplay();
   }
-} 
+}

@@ -1,4 +1,5 @@
 import { SceneKeys } from '../constants/SceneKeys';
+import { TextRenderer } from '../utils/TextRenderer';
 
 export class MenuScene extends Phaser.Scene {
   constructor() {
@@ -9,37 +10,39 @@ export class MenuScene extends Phaser.Scene {
     // 设置背景
     this.add.rectangle(640, 360, 1280, 720, 0x87CEEB);
     
-    // 游戏标题
-    this.add.text(640, 150, '猫咪的一天', {
-      fontSize: '64px',
-      color: '#000000',
-      fontStyle: 'bold'
-    }).setOrigin(0.5);
+    // 播放背景音乐
+    const game = (window as any).game;
+    if (game && game.audioManager) {
+      game.audioManager.playMusic('bgm_living_room', this);
+    }
+    
+    // 游戏标题 - 使用优化的文字渲染
+    TextRenderer.createTitleText(this, 640, 150, '我的一天');
 
-    this.add.text(640, 220, 'A Cat\'s Day', {
+    TextRenderer.createCenteredText(this, 640, 220, 'My Day', {
       fontSize: '32px',
       color: '#666666',
       fontStyle: 'italic'
-    }).setOrigin(0.5);
+    });
 
     // 创建按钮
-    this.createButton('开始新游戏', 640, 320, () => {
+    this.createButton('睡醒！', 640, 320, () => {
       this.startNewGame();
     });
 
-    this.createButton('设置', 640, 440, () => {
+    this.createButton('这是什么', 640, 440, () => {
       this.showSettings();
     });
 
-    this.createButton('退出', 640, 500, () => {
+    this.createButton('不玩了！', 640, 500, () => {
       this.quitGame();
     });
 
     // 版本信息
-    this.add.text(640, 650, '版本 1.0.0', {
+    TextRenderer.createCenteredText(this, 640, 650, '🐈', {
       fontSize: '16px',
       color: '#666666'
-    }).setOrigin(0.5);
+    });
   }
 
   private createButton(text: string, x: number, y: number, callback: () => void): void {
@@ -48,12 +51,8 @@ export class MenuScene extends Phaser.Scene {
     button.setStrokeStyle(2, 0xFFFFFF);
     button.setInteractive();
 
-    // 按钮文本
-    const buttonText = this.add.text(x, y, text, {
-      fontSize: '24px',
-      color: '#FFFFFF'
-    });
-    buttonText.setOrigin(0.5);
+    // 按钮文本 - 使用优化的文字渲染
+    const buttonText = TextRenderer.createButtonText(this, x, y, text);
 
     // 鼠标悬停效果
     button.on('pointerover', () => {
@@ -95,39 +94,8 @@ export class MenuScene extends Phaser.Scene {
   }
 
   private showSettings(): void {
-    // 创建设置面板
-    const settingsPanel = this.add.rectangle(640, 360, 600, 400, 0x000000, 0.9);
-    settingsPanel.setStrokeStyle(2, 0xFFFFFF);
-
-    // 设置标题
-    this.add.text(640, 200, '设置', {
-      fontSize: '32px',
-      color: '#FFFFFF'
-    }).setOrigin(0.5);
-
-    // 音效音量设置
-    this.add.text(400, 280, '音效音量:', {
-      fontSize: '20px',
-      color: '#FFFFFF'
-    });
-
-    // 音乐音量设置
-    this.add.text(400, 320, '音乐音量:', {
-      fontSize: '20px',
-      color: '#FFFFFF'
-    });
-
-    // 关闭按钮
-    const closeButton = this.add.rectangle(640, 480, 100, 40, 0x666666);
-    closeButton.setInteractive();
-    closeButton.on('pointerdown', () => {
-      settingsPanel.destroy();
-    });
-
-    this.add.text(640, 480, '关闭', {
-      fontSize: '18px',
-      color: '#FFFFFF'
-    }).setOrigin(0.5);
+    // 跳转到设置场景
+    this.scene.start(SceneKeys.SETTINGS);
   }
 
   private quitGame(): void {
