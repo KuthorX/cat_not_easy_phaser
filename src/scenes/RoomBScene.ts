@@ -9,8 +9,8 @@ export class RoomBScene extends BaseScene {
   }
 
   protected initializeScene(): void {
-    // 设置背景
-    this.add.rectangle(640, 360, 1280, 720, 0xF5F5DC); // 米色背景
+    // 设置背景图片
+    this.add.image(640, 360, 'room_b_bg');
     
     // 添加房间标题
     this.add.text(640, 50, '主人房间', {
@@ -23,9 +23,17 @@ export class RoomBScene extends BaseScene {
     const roomData = this.sceneManager?.getRoomData(RoomKeys.ROOM_B);
     if (!roomData) return;
 
-    // 创建交互对象
+    // 添加图片对象并创建交互区域
     roomData.interactiveObjects.forEach((obj: InteractiveObject) => {
-      this.createInteractiveObject(obj);
+      if (obj.imageKey) {
+        // 添加图片对象
+        this.add.image(obj.x, obj.y, obj.imageKey);
+        // 创建交互对象
+        this.createInteractiveImageObject(obj, obj.imageKey);
+      } else {
+        // 创建传统的矩形交互对象
+        this.createInteractiveObject(obj);
+      }
     });
 
     // 创建出口

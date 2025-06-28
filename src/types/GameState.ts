@@ -86,7 +86,6 @@ export interface DialogueBubblePosition {
 export interface Action {
   id: string;
   name: string;
-  description: string;
   timeCost?: number;
   hungerCost?: number;
   energyCost?: number;
@@ -115,7 +114,6 @@ export interface ActionCondition {
 export interface RoomData {
   id: string;
   name: string;
-  description: string;
   background: string;
   interactiveObjects: InteractiveObject[];
   exits: RoomExit[];
@@ -125,12 +123,12 @@ export interface RoomData {
 export interface InteractiveObject {
   id: string;
   name: string;
-  description: string;
   x: number;
   y: number;
   width: number;
   height: number;
   sprite?: string;
+  imageKey?: string;
   actions: string[];
   state?: any;
 }

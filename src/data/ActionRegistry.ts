@@ -13,7 +13,6 @@ export class ActionRegistry {
     this.registerAction({
       id: 'eat_food_water',
       name: '吃粮喝水',
-      description: '吃猫粮和喝水，恢复饥饿值。',
       effects: [
         { type: 'hunger', value: GameConstants.BASIC_HUNGER_RESTORE, operation: 'add' }
       ],
@@ -24,7 +23,6 @@ export class ActionRegistry {
     this.registerAction({
       id: 'sunbathing',
       name: '晒太阳',
-      description: '在温暖的阳光下晒太阳，恢复精力。',
       effects: [], // 效果在对话选项中选择后执行
       conditions: [],
       dialogueId: 'window_conversation',
@@ -34,7 +32,6 @@ export class ActionRegistry {
     this.registerAction({
       id: 'look_outside',
       name: '看外面',
-      description: '透过门缝看外面的世界。',
       effects: [], // 效果在对话选项中选择后执行
       conditions: [],
       dialogueId: 'window_conversation',
@@ -45,7 +42,6 @@ export class ActionRegistry {
     this.registerAction({
       id: 'sleep_on_sofa',
       name: '在沙发上睡觉',
-      description: '在柔软的沙发上小憩。',
       effects: [], // 效果在对话选项中选择后执行
       conditions: [],
       dialogueId: 'sofa_conversation',
@@ -55,7 +51,6 @@ export class ActionRegistry {
     this.registerAction({
       id: 'scratch_sofa',
       name: '抓沙发',
-      description: '用爪子抓沙发，感觉很爽。',
       hungerCost: 1,
       effects: [], // 效果在对话选项中选择后执行
       conditions: [],
@@ -67,7 +62,6 @@ export class ActionRegistry {
     this.registerAction({
       id: 'attack_cage',
       name: '攻击笼子',
-      description: '用爪子攻击笼子，试图破坏它。',
       energyCost: 1,
       effects: [], // 效果在对话选项中选择后执行
       conditions: [],
@@ -78,7 +72,6 @@ export class ActionRegistry {
     this.registerAction({
       id: 'jump_on_cage',
       name: '踩跳',
-      description: '跳到笼子上，解锁高处地图。',
       effects: [], // 效果在对话选项中选择后执行
       conditions: [
         { type: 'story_flag', operator: 'eq', value: 'cage_damaged' }
@@ -91,7 +84,6 @@ export class ActionRegistry {
     this.registerAction({
       id: 'use_litter_box',
       name: '使用猫厕所',
-      description: '在猫厕所里方便。',
       effects: [], // 效果在对话选项中选择后执行
       conditions: [
         { type: 'hunger', operator: 'gte', value: 4 }
@@ -104,7 +96,6 @@ export class ActionRegistry {
     this.registerAction({
       id: 'play_in_house',
       name: '在猫别墅里玩耍',
-      description: '在猫别墅里玩耍，消耗饥饿值。',
       hungerCost: 1,
       effects: [
         { type: 'story_flag', value: 'play_time', operation: 'set' }
@@ -116,7 +107,6 @@ export class ActionRegistry {
     this.registerAction({
       id: 'eat_fish_treat',
       name: '吃鱼干',
-      description: '享用美味的鱼干。',
       effects: [
         { type: 'hunger', value: GameConstants.ADVANCED_HUNGER_RESTORE, operation: 'add' }
       ],
@@ -127,7 +117,6 @@ export class ActionRegistry {
     this.registerAction({
       id: 'play_with_mouse',
       name: '和玩具老鼠玩耍',
-      description: '和玩具老鼠玩耍，消耗饥饿值。',
       hungerCost: 1,
       effects: [
         { type: 'story_flag', value: 'play_time', operation: 'set' }
@@ -138,7 +127,6 @@ export class ActionRegistry {
     this.registerAction({
       id: 'carry_mouse',
       name: '叼走玩具老鼠',
-      description: '把玩具老鼠叼走。',
       effects: [
         { type: 'inventory', value: 'toy_mouse', operation: 'add' }
       ],
@@ -148,7 +136,6 @@ export class ActionRegistry {
     this.registerAction({
       id: 'destroy_screen',
       name: '破坏显示屏',
-      description: '破坏主人的显示屏。',
       hungerCost: 1,
       energyCost: 3,
       effects: [
@@ -160,7 +147,6 @@ export class ActionRegistry {
     this.registerAction({
       id: 'sleep_on_bed',
       name: '在床上睡觉',
-      description: '在主人的床上睡觉，恢复更多精力。',
       effects: [
         { type: 'energy', value: GameConstants.ADVANCED_ENERGY_RESTORE, operation: 'add' }
       ],
@@ -171,7 +157,6 @@ export class ActionRegistry {
     this.registerAction({
       id: 'house_parkour',
       name: '全屋跑酷',
-      description: '在整个房子里跑酷，消耗大量精力。',
       energyCost: 3,
       effects: [
         { type: 'story_flag', value: 'parkour_completed', operation: 'set' }
@@ -182,7 +167,6 @@ export class ActionRegistry {
     this.registerAction({
       id: 'climb_wardrobe',
       name: '钻进衣柜',
-      description: '钻进衣柜探索。',
       effects: [
         { type: 'story_flag', value: 'wardrobe_explored', operation: 'set' }
       ],
@@ -192,7 +176,6 @@ export class ActionRegistry {
     this.registerAction({
       id: 'sleep_hammock',
       name: '睡猫吊床',
-      description: '在猫吊床上睡觉。',
       effects: [
         { type: 'energy', value: GameConstants.BASIC_ENERGY_RESTORE, operation: 'add' }
       ],
@@ -203,10 +186,157 @@ export class ActionRegistry {
     this.registerAction({
       id: 'escape',
       name: '逃跑',
-      description: '逃离这个房子，获得自由！',
       effects: [
         { type: 'story_flag', value: 'escaped', operation: 'set' },
         { type: 'achievement', value: 'freedom_achieved', operation: 'add' }
+      ],
+      conditions: []
+    });
+
+    // 阳台相关动作
+    this.registerAction({
+      id: 'sit_on_chair',
+      name: '坐在椅子上',
+      effects: [
+        { type: 'energy', value: GameConstants.BASIC_ENERGY_RESTORE, operation: 'add' }
+      ],
+      conditions: []
+    });
+
+    this.registerAction({
+      id: 'jump_on_chair',
+      name: '跳到椅子上',
+      energyCost: 1,
+      effects: [
+        { type: 'story_flag', value: 'chair_jumped', operation: 'set' }
+      ],
+      conditions: []
+    });
+
+    this.registerAction({
+      id: 'climb_hanger',
+      name: '爬上衣架',
+      energyCost: 1,
+      effects: [
+        { type: 'story_flag', value: 'hanger_climbed', operation: 'set' }
+      ],
+      conditions: []
+    });
+
+    this.registerAction({
+      id: 'play_with_clothes',
+      name: '玩衣服',
+      hungerCost: 1,
+      effects: [
+        { type: 'story_flag', value: 'clothes_played', operation: 'set' }
+      ],
+      conditions: []
+    });
+
+    this.registerAction({
+      id: 'chase_robot',
+      name: '追扫地机器人',
+      energyCost: 2,
+      effects: [
+        { type: 'story_flag', value: 'robot_chased', operation: 'set' }
+      ],
+      conditions: []
+    });
+
+    this.registerAction({
+      id: 'ride_robot',
+      name: '骑扫地机器人',
+      energyCost: 1,
+      effects: [
+        { type: 'story_flag', value: 'robot_ridden', operation: 'set' }
+      ],
+      conditions: []
+    });
+
+    // 房间B相关动作
+    this.registerAction({
+      id: 'scratch_bed',
+      name: '抓床',
+      hungerCost: 1,
+      effects: [
+        { type: 'story_flag', value: 'bed_scratched', operation: 'set' }
+      ],
+      conditions: []
+    });
+
+    this.registerAction({
+      id: 'sit_on_chair',
+      name: '坐在椅子上',
+      effects: [
+        { type: 'energy', value: GameConstants.BASIC_ENERGY_RESTORE, operation: 'add' }
+      ],
+      conditions: []
+    });
+
+    this.registerAction({
+      id: 'climb_chair',
+      name: '爬上椅子',
+      energyCost: 1,
+      effects: [
+        { type: 'story_flag', value: 'chair_climbed', operation: 'set' }
+      ],
+      conditions: []
+    });
+
+    this.registerAction({
+      id: 'watch_screen',
+      name: '看屏幕',
+      effects: [
+        { type: 'story_flag', value: 'screen_watched', operation: 'set' }
+      ],
+      conditions: []
+    });
+
+    this.registerAction({
+      id: 'paw_screen',
+      name: '用爪子拍屏幕',
+      hungerCost: 1,
+      effects: [
+        { type: 'story_flag', value: 'screen_pawed', operation: 'set' }
+      ],
+      conditions: []
+    });
+
+    this.registerAction({
+      id: 'investigate_kettle',
+      name: '调查水壶',
+      effects: [
+        { type: 'story_flag', value: 'kettle_investigated', operation: 'set' }
+      ],
+      conditions: []
+    });
+
+    this.registerAction({
+      id: 'knock_over_kettle',
+      name: '推倒水壶',
+      energyCost: 1,
+      effects: [
+        { type: 'story_flag', value: 'kettle_knocked', operation: 'set' }
+      ],
+      conditions: []
+    });
+
+    this.registerAction({
+      id: 'climb_wall',
+      name: '爬墙',
+      energyCost: 2,
+      effects: [
+        { type: 'story_flag', value: 'wall_climbed', operation: 'set' }
+      ],
+      conditions: []
+    });
+
+    this.registerAction({
+      id: 'scratch_wall',
+      name: '抓墙',
+      hungerCost: 1,
+      effects: [
+        { type: 'story_flag', value: 'wall_scratched', operation: 'set' }
       ],
       conditions: []
     });

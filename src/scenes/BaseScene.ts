@@ -261,6 +261,134 @@ export abstract class BaseScene extends Phaser.Scene {
     return rect;
   }
 
+  // 创建带描边效果的图片交互对象
+  protected createInteractiveImageObject(obj: any, imageKey: string): Phaser.GameObjects.Image {
+    // 创建图片对象
+    const image = this.add.image(obj.x, obj.y, imageKey);
+    
+    // 创建不可见的交互区域
+    const interactiveArea = this.add.rectangle(obj.x, obj.y, obj.width, obj.height, 0x000000, 0);
+    interactiveArea.setInteractive();
+    
+    // 创建描边效果（初始隐藏）
+    const outline = this.add.graphics();
+    outline.setDepth(image.depth + 1); // 确保描边在图片上方
+    
+    // 存储引用关系
+    (interactiveArea as any).outline = outline;
+    (interactiveArea as any).targetImage = image;
+    
+    // 点击事件
+    interactiveArea.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      this.onObjectClicked(obj, pointer);
+    });
+
+    // 鼠标悬停事件 - 显示描边
+    interactiveArea.on('pointerover', () => {
+      this.showObjectOutline(interactiveArea, 0x000000, 3);
+    });
+
+    // 鼠标离开事件 - 隐藏描边
+    interactiveArea.on('pointerout', () => {
+      this.hideObjectOutline(interactiveArea);
+    });
+
+    return image;
+  }
+
+  // 显示物体描边 - 基于图片的实际形状
+  private showObjectOutline(interactiveArea: Phaser.GameObjects.Rectangle, color: number, thickness: number = 3): void {
+    const outline = (interactiveArea as any).outline;
+    const targetImage = (interactiveArea as any).targetImage;
+    
+    if (!outline || !targetImage) return;
+
+    outline.clear();
+    outline.lineStyle(thickness, color, 1);
+    
+    // 获取图片的实际边界（去除透明区域）
+    const bounds = this.getImageNonTransparentBounds(targetImage);
+    if (bounds) {
+      outline.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
+    }
+  }
+
+  // 获取图片的非透明区域边界
+  private getImageNonTransparentBounds(image: Phaser.GameObjects.Image): { x: number; y: number; width: number; height: number } | null {
+    try {
+      // 获取图片的纹理
+      const texture = image.texture;
+      const source = texture.getSourceImage() as HTMLImageElement;
+      
+      if (!source || !source.complete) {
+        // 如果图片还没加载完成，使用默认边界
+        const bounds = image.getBounds();
+        return bounds;
+      }
+
+      // 创建canvas来分析图片的透明区域
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return null;
+
+      canvas.width = source.width;
+      canvas.height = source.height;
+      ctx.drawImage(source, 0, 0);
+
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imageData.data;
+
+      let minX = canvas.width;
+      let minY = canvas.height;
+      let maxX = 0;
+      let maxY = 0;
+      let hasNonTransparentPixel = false;
+
+      // 扫描图片找到非透明像素的边界
+      for (let y = 0; y < canvas.height; y++) {
+        for (let x = 0; x < canvas.width; x++) {
+          const index = (y * canvas.width + x) * 4;
+          const alpha = data[index + 3]; // 透明度通道
+          
+          if (alpha > 0) { // 非透明像素
+            hasNonTransparentPixel = true;
+            minX = Math.min(minX, x);
+            minY = Math.min(minY, y);
+            maxX = Math.max(maxX, x);
+            maxY = Math.max(maxY, y);
+          }
+        }
+      }
+
+      if (!hasNonTransparentPixel) {
+        return null;
+      }
+
+      // 计算实际边界
+      const imageBounds = image.getBounds();
+      const scaleX = imageBounds.width / canvas.width;
+      const scaleY = imageBounds.height / canvas.height;
+      
+      return {
+        x: imageBounds.x + minX * scaleX,
+        y: imageBounds.y + minY * scaleY,
+        width: (maxX - minX + 1) * scaleX,
+        height: (maxY - minY + 1) * scaleY
+      };
+    } catch (error) {
+      console.warn('无法分析图片透明区域，使用默认边界:', error);
+      return image.getBounds();
+    }
+  }
+
+  // 隐藏物体描边
+  private hideObjectOutline(interactiveArea: Phaser.GameObjects.Rectangle): void {
+    const outline = (interactiveArea as any).outline;
+    if (outline) {
+      outline.clear();
+    }
+  }
+
   protected onObjectClicked(obj: any, pointer?: Phaser.Input.Pointer): void {
     if (!this.gameManager) return;
 
