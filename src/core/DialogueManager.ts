@@ -82,6 +82,7 @@ export class DialogueManager {
     } else if (currentStep.autoNext && currentStep.nextStep) {
       // 自动跳转到下一步
       const nextStepIndex = this.currentDialogueState.currentDialogue.steps.findIndex(s => s.id === currentStep.nextStep);
+      console.log('nextStepIndex', nextStepIndex);
       if (nextStepIndex !== -1) {
         this.currentDialogueState.currentStep = nextStepIndex;
       }
@@ -89,6 +90,7 @@ export class DialogueManager {
 
     // 获取新的当前步骤
     const newCurrentStep = this.getCurrentStep();
+    console.log('newCurrentStep', newCurrentStep);
     if (!newCurrentStep) return false;
 
     // 处理特殊动作（在步骤更新后）
@@ -205,8 +207,6 @@ export class DialogueManager {
   public checkDialogueConditions(conditions: DialogueCondition[], gameState: GameState): boolean {
     return conditions.every(condition => {
       switch (condition.type) {
-        case 'hunger':
-          return this.checkCondition(gameState.hunger, condition.operator, condition.value);
         case 'energy':
           return this.checkCondition(gameState.energy, condition.operator, condition.value);
         case 'inventory':
