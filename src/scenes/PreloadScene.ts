@@ -46,22 +46,6 @@ export class PreloadScene extends Phaser.Scene {
   }
 
   private loadAssets(): void {
-    // 加载UI资源
-    this.load.image('button_bg', 'assets/ui/button_bg.png');
-    this.load.image('panel_bg', 'assets/ui/panel_bg.png');
-    this.load.image('icon_hunger', 'assets/ui/icon_hunger.png');
-    this.load.image('icon_energy', 'assets/ui/icon_energy.png');
-    this.load.image('icon_time', 'assets/ui/icon_time.png');
-
-    // 加载房间背景
-    this.load.image('living_room_north_bg', 'assets/rooms/living_room_north_bg.png');
-    this.load.image('living_room_east_bg', 'assets/rooms/living_room_east_bg.png');
-    this.load.image('living_room_west_low_bg', 'assets/rooms/living_room_west_low_bg.png');
-    this.load.image('living_room_west_high_bg', 'assets/rooms/living_room_west_high_bg.png');
-    this.load.image('living_room_door_bg', 'assets/rooms/living_room_door_bg.png');
-    this.load.image('hallway_bg', 'assets/rooms/hallway_bg.png');
-    this.load.image('room_b_bg', 'assets/rooms/room_b_bg.png');
-
     // 加载balcony场景图片
     this.load.image('balcony_bg', 'assets/images/balcony_bg.png');
     this.load.image('balcony_chair', 'assets/images/balcony_chair.png');
@@ -76,19 +60,41 @@ export class PreloadScene extends Phaser.Scene {
     this.load.image('room_b_kettle', 'assets/images/room_b_kettle.png');
     this.load.image('room_b_side_wall', 'assets/images/room_b_side_wall.png');
 
-    // 加载物品精灵
-    this.load.image('window_north', 'assets/objects/window_north.png');
-    this.load.image('sofa', 'assets/objects/sofa.png');
-    this.load.image('cat_cage', 'assets/objects/cat_cage.png');
-    this.load.image('litter_box', 'assets/objects/litter_box.png');
-    this.load.image('cat_house', 'assets/objects/cat_house.png');
-    this.load.image('fish_treat', 'assets/objects/fish_treat.png');
-    this.load.image('toy_mouse', 'assets/objects/toy_mouse.png');
-    this.load.image('computer_screen', 'assets/objects/computer_screen.png');
-    this.load.image('owner_bed', 'assets/objects/owner_bed.png');
+    // 批量加载PNG序列动画资源
+    this.loadTweenSequences();
 
-    // 加载音频资源 - 只保留存在的文件
+    // 加载音频资源
     this.load.audio('bgm_living_room', 'assets/audio/bgm_living_room.mp3');
+  }
+
+  private loadTweenSequences(): void {
+    // 定义所有动画序列
+    const tweenSequences = [
+      'cat_play',
+      'cat_kick', 
+      'cat_slap',
+      'cat_tap',
+      'cat_push',
+      'cat_grab_down_wall',
+      'cat_lick',
+      'cat_shock',
+    ];
+
+    // 为每个序列加载PNG文件
+    tweenSequences.forEach(sequenceName => {
+      // 加载第一帧作为默认纹理
+      this.load.image(sequenceName, `assets/tweens/${sequenceName}/${sequenceName}_001.png`);
+      
+      // 加载所有帧（从001开始，最多到999）
+      for (let i = 1; i <= 999; i++) {
+        const frameNumber = String(i).padStart(3, '0');
+        const frameKey = `${sequenceName}_${frameNumber}`;
+        const framePath = `assets/tweens/${sequenceName}/${sequenceName}_${frameNumber}.png`;
+        
+        // 尝试加载每一帧，如果文件不存在会自动跳过
+        this.load.image(frameKey, framePath);
+      }
+    });
   }
 
   create(): void {

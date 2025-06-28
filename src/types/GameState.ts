@@ -94,6 +94,14 @@ export interface Action {
   conditions: ActionCondition[];
   dialogueId?: string;
   triggerDialogue?: boolean;
+  playTweens?: {
+    tweenKey: string;
+    x: number;
+    y: number;
+    scale?: number;
+    fps?: number;
+    loop?: boolean;
+  };
   specialCondition?: {
     type: string;
     value: any;

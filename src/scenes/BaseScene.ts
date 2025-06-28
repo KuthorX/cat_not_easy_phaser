@@ -3,6 +3,7 @@ import { GameManager } from '@/core/GameManager';
 import { SceneManager } from '@/core/SceneManager';
 import { UIManager } from '@/core/UIManager';
 import { AudioManager } from '@/core/AudioManager';
+import { TweenManager } from '@/core/TweenManager';
 import { InteractiveObject, InteractiveObjectWithSprite } from '@/types/GameState';
 import { OutlineRenderer } from '../utils/OutlineRenderer';
 import { TransitionHelper } from '../utils/TransitionHelper';
@@ -12,6 +13,7 @@ export abstract class BaseScene extends Phaser.Scene {
   protected sceneManager!: SceneManager;
   protected audioManager!: AudioManager;
   protected uiManager!: UIManager;
+  protected tweenManager!: TweenManager;
   protected outlineRenderer!: OutlineRenderer;
 
   constructor(key: string) {
@@ -25,6 +27,9 @@ export abstract class BaseScene extends Phaser.Scene {
     this.sceneManager = game.sceneManager;
     this.audioManager = game.audioManager;
     this.uiManager = game.uiManager;
+
+    // 初始化TweenManager
+    this.tweenManager = new TweenManager(this);
 
     // 设置当前场景
     this.sceneManager.setCurrentScene(this);
@@ -121,6 +126,18 @@ export abstract class BaseScene extends Phaser.Scene {
 
     // 执行动作效果
     this.applyActionEffects(action, gameState);
+
+    // 播放PNG序列动画
+    if (action.playTweens && this.tweenManager) {
+      this.tweenManager.playTween({
+        tweenKey: action.playTweens.tweenKey,
+        x: action.playTweens.x,
+        y: action.playTweens.y,
+        scale: action.playTweens.scale,
+        fps: action.playTweens.fps,
+        loop: action.playTweens.loop
+      });
+    }
 
     // 播放音效
     if (this.audioManager) {
@@ -514,6 +531,11 @@ export abstract class BaseScene extends Phaser.Scene {
       this.gameManager.off(GameEvents.INVENTORY_CHANGED, this.onInventoryChanged.bind(this));
       this.gameManager.off(GameEvents.ACHIEVEMENT_UNLOCKED, this.onAchievementUnlocked.bind(this));
       this.gameManager.off(GameEvents.GAME_ENDED, this.onGameEnded.bind(this));
+    }
+
+    // 清理TweenManager
+    if (this.tweenManager) {
+      this.tweenManager.destroy();
     }
 
     // 清理描边渲染器

@@ -48,7 +48,12 @@ export class ActionRegistry {
       effects: [
         { type: 'story_flag', value: 'chase_ball_completed', operation: 'set' }
       ],
-      conditions: []
+      conditions: [],
+      playTweens: {
+        tweenKey: 'cat_play',
+        x: 400,
+        y: 300,
+      }
     });
 
     this.registerAction({
@@ -58,7 +63,12 @@ export class ActionRegistry {
       effects: [
         { type: 'story_flag', value: 'table_swept', operation: 'set' }
       ],
-      conditions: []
+      conditions: [],
+      playTweens: {
+        tweenKey: 'cat_slap',
+        x: 400,
+        y: 300,
+      }
     });
 
     this.registerAction({
@@ -72,6 +82,11 @@ export class ActionRegistry {
       conditions: [
         { type: 'story_flag', value: 'on_cat_bed', operator: 'eq' }
       ],
+      playTweens: {
+        tweenKey: 'cat_kick',
+        x: 400,
+        y: 300,
+      },
       specialCondition: {
         type: 'position_check',
         value: 'cat_bed',
@@ -109,7 +124,12 @@ export class ActionRegistry {
       effects: [
         { type: 'story_flag', value: 'parkour_completed', operation: 'set' }
       ],
-      conditions: []
+      conditions: [],
+      playTweens: {
+        tweenKey: 'cat_play',
+        x: 400,
+        y: 300,
+      }
     });
 
     // 窗户对话动作 - 纯对话触发
@@ -214,7 +234,12 @@ export class ActionRegistry {
       effects: [
         { type: 'story_flag', value: 'play_time', operation: 'set' }
       ],
-      conditions: []
+      conditions: [],
+      playTweens: {
+        tweenKey: 'cat_tap',
+        x: 400,
+        y: 300,
+      }
     });
 
     this.registerAction({
