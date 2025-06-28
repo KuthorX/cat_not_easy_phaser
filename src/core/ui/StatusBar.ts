@@ -5,7 +5,6 @@ export class StatusBar implements IUIComponent {
   private scene: Phaser.Scene | null = null;
   private container: Phaser.GameObjects.Container | null = null;
   private timeText: Phaser.GameObjects.Text | null = null;
-  private hungerText: Phaser.GameObjects.Text | null = null;
   private energyText: Phaser.GameObjects.Text | null = null;
 
   initialize(scene: Phaser.Scene): void {
@@ -26,28 +25,20 @@ export class StatusBar implements IUIComponent {
       padding: { x: 5, y: 2 }
     });
 
-    // 饥饿值显示
-    this.hungerText = this.scene.add.text(0, 30, '饥饿: 1/5', {
-      fontSize: '16px',
-      color: '#ffffff',
-      backgroundColor: '#8B4513',
-      padding: { x: 5, y: 2 }
-    });
-
     // 精力值显示
-    this.energyText = this.scene.add.text(0, 60, '精力: 1/5', {
+    this.energyText = this.scene.add.text(0, 30, '精力: 1/5', {
       fontSize: '16px',
       color: '#ffffff',
       backgroundColor: '#4169E1',
       padding: { x: 5, y: 2 }
     });
 
-    this.container.add([this.timeText, this.hungerText, this.energyText]);
+    this.container.add([this.timeText, this.energyText]);
     this.container.setDepth(1000);
   }
 
-  update(time: number, hunger: number, energy: number): void {
-    if (!this.timeText || !this.hungerText || !this.energyText) return;
+  update(time: number, energy: number): void {
+    if (!this.timeText || !this.energyText) return;
 
     // 获取格式化的时间字符串
     const game = (window as any).game;
@@ -62,7 +53,6 @@ export class StatusBar implements IUIComponent {
     }
     
     this.timeText.setText(`时间: ${formattedTime}`);
-    this.hungerText.setText(`饥饿: ${hunger}/${GameConstants.MAX_HUNGER}`);
     this.energyText.setText(`精力: ${energy}/${GameConstants.MAX_ENERGY}`);
   }
 
@@ -83,7 +73,6 @@ export class StatusBar implements IUIComponent {
       this.container.destroy();
       this.container = null;
       this.timeText = null;
-      this.hungerText = null;
       this.energyText = null;
     }
   }

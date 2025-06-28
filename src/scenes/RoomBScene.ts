@@ -46,7 +46,7 @@ export class RoomBScene extends BaseScene {
       this.uiManager.initialize(this);
       const state = this.gameManager?.getState();
       if (state) {
-        this.uiManager.updateStatusBar(state.currentTime, state.hunger, state.energy);
+        this.uiManager.updateStatusBar(state.currentTime, state.energy);
         this.uiManager.updateInventory(state.inventory);
       }
     }

@@ -9,7 +9,12 @@ import {
   DialogueUIManager,
   GameEndScreen,
   ThoughtBubble,
-  type Action
+  TopRightButtons,
+  LogPage,
+  TimeWastePanel,
+  type Action,
+  type TopRightButtonCallback,
+  type TimeWasteCallback
 } from './ui';
 
 export class UIManager {
@@ -25,6 +30,9 @@ export class UIManager {
   private dialogueUIManager: DialogueUIManager;
   private gameEndScreen: GameEndScreen;
   private thoughtBubble: ThoughtBubble;
+  private topRightButtons: TopRightButtons;
+  private logPage: LogPage;
+  private timeWastePanel: TimeWastePanel;
   
   // 对话管理器
   private dialogueManager: DialogueManager | null = null;
@@ -41,6 +49,9 @@ export class UIManager {
     this.dialogueUIManager = new DialogueUIManager();
     this.gameEndScreen = new GameEndScreen();
     this.thoughtBubble = new ThoughtBubble();
+    this.topRightButtons = new TopRightButtons();
+    this.logPage = new LogPage();
+    this.timeWastePanel = new TimeWastePanel();
   }
 
   // 设置对话管理器
@@ -62,6 +73,9 @@ export class UIManager {
     this.dialogueUIManager.initialize(scene);
     this.gameEndScreen.initialize(scene);
     this.thoughtBubble.initialize(scene);
+    this.topRightButtons.initialize(scene);
+    this.logPage.initialize(scene);
+    this.timeWastePanel.initialize(scene);
     
     // 设置动作菜单回调
     this.actionMenu.setActionCallback((actionId: string) => {
@@ -120,8 +134,8 @@ export class UIManager {
   }
 
   // 更新状态栏
-  public updateStatusBar(time: number, hunger: number, energy: number): void {
-    this.statusBar.update(time, hunger, energy);
+  public updateStatusBar(time: number, energy: number): void {
+    this.statusBar.update(time, energy);
   }
 
   // 显示动作菜单
@@ -212,5 +226,31 @@ export class UIManager {
   // 隐藏想法气泡
   public hideThought(thoughtId: string): void {
     this.thoughtBubble.hideThought(thoughtId);
+  }
+
+  // 设置右上角按钮回调
+  public setupTopRightButtons(callback: TopRightButtonCallback): void {
+    this.topRightButtons.setCallback(callback);
+  }
+
+  // 设置消磨时间面板回调
+  public setupTimeWastePanel(callback: TimeWasteCallback): void {
+    this.timeWastePanel.setCallback(callback);
+  }
+
+  // 设置日志页数据
+  public setupLogPage(achievementRegistry: any, gameState: any): void {
+    this.logPage.setAchievementRegistry(achievementRegistry);
+    this.logPage.setGameState(gameState);
+  }
+
+  // 显示消磨时间面板
+  public showTimeWastePanel(): void {
+    this.timeWastePanel.show();
+  }
+
+  // 显示日志页
+  public showLogPage(): void {
+    this.logPage.show();
   }
 }

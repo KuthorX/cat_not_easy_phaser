@@ -1,6 +1,5 @@
 export interface GameState {
   currentTime: number;
-  hunger: number;
   energy: number;
   inventory: string[];
   achievements: string[];

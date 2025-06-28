@@ -50,8 +50,46 @@ export class LivingRoomNorthScene extends BaseScene {
       this.uiManager.setDialogueManager(this.gameManager?.getDialogueManager() || null);
       const state = this.gameManager?.getState();
       if (state) {
-        this.uiManager.updateStatusBar(state.currentTime, state.hunger, state.energy);
+        this.uiManager.updateStatusBar(state.currentTime, state.energy);
         this.uiManager.updateInventory(state.inventory);
+      }
+      
+      // 设置右上角按钮回调
+      this.uiManager.setupTopRightButtons({
+        onTimeWaste: () => {
+          this.uiManager?.showTimeWastePanel();
+        },
+        onOpenLog: () => {
+          this.uiManager?.showLogPage();
+        },
+        onOpenSettings: () => {
+          console.log('打开设置');
+        }
+      });
+      
+      // 设置消磨时间面板回调
+      this.uiManager.setupTimeWastePanel({
+        onCancel: () => {
+          console.log('取消消磨时间');
+        },
+        onWasteOneHour: () => {
+          if (this.gameManager) {
+            this.gameManager.advanceTime(60); // 前进1小时
+            console.log('消磨了一小时');
+          }
+        },
+        onWasteOneDay: () => {
+          if (this.gameManager) {
+            this.gameManager.advanceTime(720); // 前进12小时
+            console.log('消磨了一整天');
+          }
+        }
+      });
+      
+      // 设置日志页数据
+      const game = (window as any).game;
+      if (game && game.achievementRegistry) {
+        this.uiManager.setupLogPage(game.achievementRegistry, this.gameManager?.getState());
       }
     }
 

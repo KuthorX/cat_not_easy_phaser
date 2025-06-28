@@ -37,18 +37,14 @@ export const GameConstants = {
   TIME_UNIT: 30,      // 最小时间单位30分钟
   
   // 状态相关
-  MAX_HUNGER: 5,
   MAX_ENERGY: 5,
-  INITIAL_HUNGER: 1,
   INITIAL_ENERGY: 1,
   
-  // 交互消耗
-  BASIC_ACTION_COST: 30,  // 基础交互30分钟
-  ADVANCED_ACTION_COST: 60, // 高级交互60分钟
+  // 交互消耗（翻倍）
+  BASIC_ACTION_COST: 60,  // 基础交互60分钟（原30分钟）
+  ADVANCED_ACTION_COST: 120, // 高级交互120分钟（原60分钟）
   
   // 恢复数值
-  BASIC_HUNGER_RESTORE: 2,
-  ADVANCED_HUNGER_RESTORE: 4,
   BASIC_ENERGY_RESTORE: 2,
   ADVANCED_ENERGY_RESTORE: 4,
   

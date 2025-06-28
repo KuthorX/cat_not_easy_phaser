@@ -48,7 +48,6 @@ export abstract class BaseScene extends Phaser.Scene {
     // 监听游戏状态变化
     if (this.gameManager) {
       this.gameManager.on(GameEvents.TIME_CHANGED, this.onTimeChanged.bind(this));
-      this.gameManager.on(GameEvents.HUNGER_CHANGED, this.onHungerChanged.bind(this));
       this.gameManager.on(GameEvents.ENERGY_CHANGED, this.onEnergyChanged.bind(this));
       this.gameManager.on(GameEvents.INVENTORY_CHANGED, this.onInventoryChanged.bind(this));
       this.gameManager.on(GameEvents.ACHIEVEMENT_UNLOCKED, this.onAchievementUnlocked.bind(this));
@@ -60,23 +59,14 @@ export abstract class BaseScene extends Phaser.Scene {
   protected onTimeChanged(data: { time: number }): void {
     if (this.uiManager) {
       const state = this.gameManager.getState();
-      // 使用GameManager的格式化时间
-      const formattedTime = this.gameManager.getFormattedTime();
-      this.uiManager.updateStatusBar(data.time, state.hunger, state.energy);
-    }
-  }
-
-  protected onHungerChanged(data: { hunger: number }): void {
-    if (this.uiManager) {
-      const state = this.gameManager.getState();
-      this.uiManager.updateStatusBar(state.currentTime, data.hunger, state.energy);
+      this.uiManager.updateStatusBar(data.time, state.energy);
     }
   }
 
   protected onEnergyChanged(data: { energy: number }): void {
     if (this.uiManager) {
       const state = this.gameManager.getState();
-      this.uiManager.updateStatusBar(state.currentTime, state.hunger, data.energy);
+      this.uiManager.updateStatusBar(state.currentTime, data.energy);
     }
   }
 
@@ -154,11 +144,6 @@ export abstract class BaseScene extends Phaser.Scene {
   }
 
   protected checkActionRequirements(action: any, gameState: any): boolean {
-    // 检查饥饿值要求
-    if (action.hungerRequirement && gameState.hunger < action.hungerRequirement) {
-      return false;
-    }
-
     // 检查精力值要求
     if (action.energyRequirement && gameState.energy < action.energyRequirement) {
       return false;
@@ -176,9 +161,6 @@ export abstract class BaseScene extends Phaser.Scene {
     // 如果是对话动作，不立即应用效果，让效果在对话选项中选择后执行
     if (action.triggerDialogue && action.dialogueId) {
       // 只应用消耗，不应用效果
-      if (action.hungerCost) {
-        this.gameManager.modifyHunger(-action.hungerCost);
-      }
       if (action.energyCost) {
         this.gameManager.modifyEnergy(-action.energyCost);
       }
@@ -193,11 +175,6 @@ export abstract class BaseScene extends Phaser.Scene {
       this.gameManager.advanceTime(action.timeCost);
     }
 
-    // 消耗饥饿值
-    if (action.hungerCost) {
-      this.gameManager.modifyHunger(-action.hungerCost);
-    }
-
     // 消耗精力值
     if (action.energyCost) {
       this.gameManager.modifyEnergy(-action.energyCost);
@@ -206,11 +183,6 @@ export abstract class BaseScene extends Phaser.Scene {
     // 应用效果
     action.effects.forEach((effect: any) => {
       switch (effect.type) {
-        case 'hunger':
-          if (effect.operation === 'add') {
-            this.gameManager.modifyHunger(effect.value);
-          }
-          break;
         case 'energy':
           if (effect.operation === 'add') {
             this.gameManager.modifyEnergy(effect.value);
@@ -513,7 +485,6 @@ export abstract class BaseScene extends Phaser.Scene {
   shutdown(): void {
     if (this.gameManager) {
       this.gameManager.off(GameEvents.TIME_CHANGED, this.onTimeChanged.bind(this));
-      this.gameManager.off(GameEvents.HUNGER_CHANGED, this.onHungerChanged.bind(this));
       this.gameManager.off(GameEvents.ENERGY_CHANGED, this.onEnergyChanged.bind(this));
       this.gameManager.off(GameEvents.INVENTORY_CHANGED, this.onInventoryChanged.bind(this));
       this.gameManager.off(GameEvents.ACHIEVEMENT_UNLOCKED, this.onAchievementUnlocked.bind(this));
