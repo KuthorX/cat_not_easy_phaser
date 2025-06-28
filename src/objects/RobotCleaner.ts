@@ -14,6 +14,9 @@ export class RobotCleaner extends Phaser.Physics.Arcade.Sprite {
     this.setDamping(true);
     this.setDrag(0.7);
 
+    this.body?.setSize(this.width, this.height * 0.9)
+    this.body?.setOffset(0, this.height * 0.15);
+
     this.setInteractive();
     this.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
       const angle = Phaser.Math.FloatBetween(0, Math.PI * 2);
