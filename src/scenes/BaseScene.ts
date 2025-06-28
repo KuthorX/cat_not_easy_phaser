@@ -127,6 +127,49 @@ export abstract class BaseScene extends Phaser.Scene {
     // 执行动作效果
     this.applyActionEffects(action, gameState);
 
+    // 播放音效
+    if (this.audioManager) {
+      this.audioManager.playActionSound(actionId);
+    }
+
+    // 播放PNG序列动画并处理thought时序
+    this.handleActionAnimationAndThought(action, actionId);
+
+    // 处理对话或显示描述
+    if (action.triggerDialogue && action.dialogueId && this.uiManager) {
+      console.log('BaseScene.executeAction: 触发对话', { actionId, dialogueId: action.dialogueId });
+      
+      // 获取物体位置：优先使用传入的位置，然后尝试从物体映射获取，最后使用默认位置
+      let objectPosition = initialPosition;
+      if (!objectPosition) {
+        const objectId = this.getObjectIdForAction(actionId);
+        if (objectId) {
+          const object = this.getInteractiveObject(objectId);
+          objectPosition = object ? { x: object.x, y: object.y } : { x: 640, y: 360 };
+        } else {
+          objectPosition = { x: 640, y: 360 }; // 默认位置
+        }
+      }
+      
+      // 启动对话系统
+      this.gameManager.startDialogue(action.dialogueId, action.id, action.name, objectPosition);
+    }
+
+    return true;
+  }
+
+  // 子类可以重写此方法来提供动作ID到物体ID的映射
+  protected getObjectIdForAction(actionId: string): string | null {
+    return null; // 默认返回null，表示没有映射
+  }
+
+  // 子类可以重写此方法来获取交互对象
+  protected getInteractiveObject(objectId: string): any {
+    return null; // 默认返回null，子类需要重写
+  }
+
+  // 统一处理动作动画和想法气泡的时序关系
+  protected handleActionAnimationAndThought(action: any, actionId: string): void {
     // 播放PNG序列动画
     if (action.playTweens && this.tweenManager) {
       this.tweenManager.playTween({
@@ -136,28 +179,41 @@ export abstract class BaseScene extends Phaser.Scene {
         scale: action.playTweens.scale,
         fps: action.playTweens.fps,
         loop: action.playTweens.loop
+      }, () => {
+        console.log('action.thought', action.thought);
+        if (action.thought && this.uiManager) {
+          const thoughtId = `thought_${actionId}`;
+          const x = 1280 - 200; // 右下角位置
+          const y = 720 - 100;
+          this.uiManager.showThought(thoughtId, action.thought, x, y, 3000);
+        }
       });
+    } else {
+      // 如果没有动画，立即显示想法气泡（如果有的话）
+      if (action.thought && this.uiManager) {
+        const thoughtId = `thought_${actionId}`;
+        const x = 1280 - 200; // 右下角位置
+        const y = 720 - 100;
+        this.uiManager.showThought(thoughtId, action.thought, x, y, 3000);
+      }
     }
+  }
 
-    // 播放音效
-    if (this.audioManager) {
-      this.audioManager.playActionSound(actionId);
-    }
-
-    // 处理对话或显示描述
-    if (action.triggerDialogue && action.dialogueId && this.uiManager) {
-      console.log('BaseScene.executeAction: 触发对话', { actionId, dialogueId: action.dialogueId });
-      // 启动对话系统
-      const objectPosition = initialPosition || { x: 640, y: 360 }; // 使用传入的位置或默认位置
-      // 使用动作ID作为objectId，因为对话系统需要知道是哪个物体在说话
-      this.gameManager.startDialogue(action.dialogueId, action.id, action.name, objectPosition);
-    } else if (this.uiManager) {
-      console.log('BaseScene.executeAction: 显示传统对话框', action.description);
-      // 显示传统对话框
-      this.uiManager.showDialogue(action.description, 2000);
-    }
-
-    return true;
+  // 获取动画的帧数
+  protected getTweenFrameCount(tweenKey: string): number {
+    // 根据tweenKey返回对应的帧数
+    const frameCountMap: Record<string, number> = {
+      'cat_play': 104,
+      'cat_slap': 7,
+      'cat_kick': 6,
+      'cat_tap': 11,
+      'cat_grab_down_wall': 55,
+      'cat_lick': 41,
+      'cat_shock': 41,
+      'cat_push': 7
+    };
+    
+    return frameCountMap[tweenKey] || 24; // 默认24帧
   }
 
   protected checkActionRequirements(action: any, gameState: any): boolean {
@@ -477,14 +533,6 @@ export abstract class BaseScene extends Phaser.Scene {
     }
 
     const gameState = this.gameManager.getState();
-    
-    // 如果有thought，先显示想法气泡（会自动替换当前的气泡）
-    if (obj.thought && this.uiManager) {
-      const thoughtId = `thought_${obj.id}`;
-      const x = 1280 - 200; // 右下角位置
-      const y = 720 - 100;
-      this.uiManager.showThought(thoughtId, obj.thought, x, y, 3000);
-    }
     
     // 检查是否有对话动作
     const dialogueActions = obj.actions

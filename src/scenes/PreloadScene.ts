@@ -85,8 +85,8 @@ export class PreloadScene extends Phaser.Scene {
       // 加载第一帧作为默认纹理
       this.load.image(sequenceName, `assets/tweens/${sequenceName}/${sequenceName}_001.png`);
       
-      // 加载所有帧（从001开始，最多到100）
-      for (let i = 1; i <= 100; i++) {
+      // 加载所有帧（从001开始，最多到110）
+      for (let i = 1; i <= 110; i++) {
         const frameNumber = String(i).padStart(3, '0');
         const frameKey = `${sequenceName}_${frameNumber}`;
         const framePath = `assets/tweens/${sequenceName}/${sequenceName}_${frameNumber}.png`;

@@ -15,6 +15,7 @@ export class TweenManager {
   private activeTweens: Map<string, Phaser.GameObjects.Sprite> = new Map();
   private tweenTimers: Map<string, Phaser.Time.TimerEvent> = new Map();
   private frameTimers: Map<string, Phaser.Time.TimerEvent> = new Map();
+  private endCallbacks: Map<string, (() => void) | undefined> = new Map();
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
@@ -24,7 +25,7 @@ export class TweenManager {
    * 播放PNG序列动画
    * 通过定时器来模拟动画效果
    */
-  public playTween(options: TweenPlayOptions): void {
+  public playTween(options: TweenPlayOptions, endCallback?: () => void): void {
     const { 
       tweenKey, 
       x, 
@@ -51,6 +52,9 @@ export class TweenManager {
     // 存储活跃的动画
     this.activeTweens.set(tweenKey, sprite);
 
+    // 存储回调函数
+    this.endCallbacks.set(tweenKey, endCallback);
+
     // 计算动画持续时间（基于帧数和FPS）
     const frameCount = this.getFrameCount(tweenKey);
     const duration = (frameCount / fps) * 1000; // 转换为毫秒
@@ -66,12 +70,9 @@ export class TweenManager {
       });
       this.tweenTimers.set(tweenKey, timer);
     } else {
-      // 如果不循环，设置定时器停止
+      // 如果不循环，设置定时器停止（但不调用回调，让帧动画结束时调用）
       const timer = this.scene.time.delayedCall(duration, () => {
         this.stopTween(tweenKey);
-        if (onComplete) {
-          onComplete();
-        }
       });
       this.tweenTimers.set(tweenKey, timer);
     }
@@ -101,6 +102,7 @@ export class TweenManager {
    * 开始帧动画
    */
   private startFrameAnimation(tweenKey: string, fps: number, frameCount: number): void {
+    console.log('startFrameAnimation', tweenKey, fps, frameCount);
     const sprite = this.activeTweens.get(tweenKey);
     if (!sprite) return;
 
@@ -110,13 +112,22 @@ export class TweenManager {
     const frameTimer = this.scene.time.addEvent({
       delay: frameDelay,
       callback: () => {
-        if (currentFrame <= frameCount) {
+        if (currentFrame <= frameCount - 2) {
           const frameNumber = String(currentFrame).padStart(3, '0');
           const frameKey = `${tweenKey}_${frameNumber}`;
           if (this.scene.textures.exists(frameKey)) {
             sprite.setTexture(frameKey);
           }
           currentFrame++;
+        } else {
+          // 动画播放完毕，调用回调函数
+          console.log('动画播放完毕，调用回调函数');
+          const callback = this.endCallbacks.get(tweenKey);
+          if (callback) {
+            callback();
+          }
+          // 停止动画
+          this.stopTween(tweenKey);
         }
       },
       loop: true
@@ -160,6 +171,9 @@ export class TweenManager {
       frameTimer.destroy();
       this.frameTimers.delete(tweenKey);
     }
+
+    // 清理回调函数
+    this.endCallbacks.delete(tweenKey);
   }
 
   /**
@@ -193,5 +207,6 @@ export class TweenManager {
     this.activeTweens.clear();
     this.tweenTimers.clear();
     this.frameTimers.clear();
+    this.endCallbacks.clear();
   }
 } 

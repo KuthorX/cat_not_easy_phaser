@@ -31,7 +31,7 @@ export class LivingRoomNorthScene extends BaseScene {
     roomData.interactiveObjects.forEach((obj: InteractiveObject | InteractiveObjectWithSprite) => {
       this.interactiveObjects.set(obj.id, obj as InteractiveObject);
       const objSprite = this.addInteractiveObjecrs(obj);
-      this.interactiveObjectBodies.push(objSprite);
+      this.interactiveObjectBodies.push(objSprite.second);
     });
 
     // 创建出口
@@ -180,56 +180,8 @@ export class LivingRoomNorthScene extends BaseScene {
     });
   }
 
-  // 重写executeAction方法以支持对话系统
-  protected executeAction(actionId: string): boolean {
-    if (!this.gameManager) return false;
-
-    const action = this.sceneManager.getAction(actionId);
-    if (!action) return false;
-
-    const gameState = this.gameManager.getState();
-    
-    // 检查是否可以执行动作
-    if (!this.sceneManager.canAccessRoom(gameState.currentRoom, gameState)) {
-      return false;
-    }
-
-    // 检查动作要求
-    if (!this.checkActionRequirements(action, gameState)) {
-      return false;
-    }
-
-    // 执行动作效果
-    this.applyActionEffects(action, gameState);
-
-    // 播放音效
-    if (this.audioManager) {
-      this.audioManager.playActionSound(actionId);
-    }
-
-    // 处理对话或显示描述
-    if (action.triggerDialogue && action.dialogueId && this.uiManager) {
-      console.log('LivingRoomNorthScene.executeAction: 触发对话', { actionId, dialogueId: action.dialogueId });
-      // 获取物体位置
-      const objectId = this.getObjectIdForAction(actionId);
-      const object = objectId ? this.interactiveObjects.get(objectId) : null;
-      const objectPosition = object ? { x: object.x, y: object.y } : { x: 640, y: 360 };
-      
-      console.log('物体信息:', { objectId, object, objectPosition });
-      
-      // 启动对话系统
-      this.gameManager.startDialogue(action.dialogueId, objectId || actionId, action.name, objectPosition);
-    } else if (this.uiManager) {
-      console.log('LivingRoomNorthScene.executeAction: 显示传统对话框', action.description);
-      // 显示传统对话框
-      this.uiManager.showDialogue(action.description, 2000);
-    }
-
-    return true;
-  }
-
   // 根据动作ID获取对应的物体ID
-  private getObjectIdForAction(actionId: string): string | null {
+  protected getObjectIdForAction(actionId: string): string | null {
     const actionToObjectMap: Record<string, string> = {
       'sleep_on_sofa': 'sofa_north',
       'scratch_sofa': 'sofa_north',
@@ -239,6 +191,11 @@ export class LivingRoomNorthScene extends BaseScene {
     };
     
     return actionToObjectMap[actionId] || null;
+  }
+
+  // 获取交互对象
+  protected getInteractiveObject(objectId: string): any {
+    return this.interactiveObjects.get(objectId) || null;
   }
 
   protected setupEventListeners(): void {
