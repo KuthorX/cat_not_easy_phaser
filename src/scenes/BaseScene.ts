@@ -3,7 +3,8 @@ import { GameManager } from '@/core/GameManager';
 import { SceneManager } from '@/core/SceneManager';
 import { UIManager } from '@/core/UIManager';
 import { AudioManager } from '@/core/AudioManager';
-import { InteractiveObjectWithSprite } from '@/types/GameState';
+import { TweenManager } from '@/core/TweenManager';
+import { InteractiveObject, InteractiveObjectWithSprite } from '@/types/GameState';
 import { OutlineRenderer } from '../utils/OutlineRenderer';
 import { TransitionHelper } from '../utils/TransitionHelper';
 
@@ -12,6 +13,7 @@ export abstract class BaseScene extends Phaser.Scene {
   protected sceneManager!: SceneManager;
   protected audioManager!: AudioManager;
   protected uiManager!: UIManager;
+  protected tweenManager!: TweenManager;
   protected outlineRenderer!: OutlineRenderer;
 
   constructor(key: string) {
@@ -25,6 +27,9 @@ export abstract class BaseScene extends Phaser.Scene {
     this.sceneManager = game.sceneManager;
     this.audioManager = game.audioManager;
     this.uiManager = game.uiManager;
+
+    // 初始化TweenManager
+    this.tweenManager = new TweenManager(this);
 
     // 设置当前场景
     this.sceneManager.setCurrentScene(this);
@@ -48,7 +53,6 @@ export abstract class BaseScene extends Phaser.Scene {
     // 监听游戏状态变化
     if (this.gameManager) {
       this.gameManager.on(GameEvents.TIME_CHANGED, this.onTimeChanged.bind(this));
-      this.gameManager.on(GameEvents.HUNGER_CHANGED, this.onHungerChanged.bind(this));
       this.gameManager.on(GameEvents.ENERGY_CHANGED, this.onEnergyChanged.bind(this));
       this.gameManager.on(GameEvents.INVENTORY_CHANGED, this.onInventoryChanged.bind(this));
       this.gameManager.on(GameEvents.ACHIEVEMENT_UNLOCKED, this.onAchievementUnlocked.bind(this));
@@ -60,23 +64,14 @@ export abstract class BaseScene extends Phaser.Scene {
   protected onTimeChanged(data: { time: number }): void {
     if (this.uiManager) {
       const state = this.gameManager.getState();
-      // 使用GameManager的格式化时间
-      const formattedTime = this.gameManager.getFormattedTime();
-      this.uiManager.updateStatusBar(data.time, state.hunger, state.energy);
-    }
-  }
-
-  protected onHungerChanged(data: { hunger: number }): void {
-    if (this.uiManager) {
-      const state = this.gameManager.getState();
-      this.uiManager.updateStatusBar(state.currentTime, data.hunger, state.energy);
+      this.uiManager.updateStatusBar(data.time, state.energy);
     }
   }
 
   protected onEnergyChanged(data: { energy: number }): void {
     if (this.uiManager) {
       const state = this.gameManager.getState();
-      this.uiManager.updateStatusBar(state.currentTime, state.hunger, data.energy);
+      this.uiManager.updateStatusBar(state.currentTime, data.energy);
     }
   }
 
@@ -132,6 +127,18 @@ export abstract class BaseScene extends Phaser.Scene {
     // 执行动作效果
     this.applyActionEffects(action, gameState);
 
+    // 播放PNG序列动画
+    if (action.playTweens && this.tweenManager) {
+      this.tweenManager.playTween({
+        tweenKey: action.playTweens.tweenKey,
+        x: action.playTweens.x,
+        y: action.playTweens.y,
+        scale: action.playTweens.scale,
+        fps: action.playTweens.fps,
+        loop: action.playTweens.loop
+      });
+    }
+
     // 播放音效
     if (this.audioManager) {
       this.audioManager.playActionSound(actionId);
@@ -154,11 +161,6 @@ export abstract class BaseScene extends Phaser.Scene {
   }
 
   protected checkActionRequirements(action: any, gameState: any): boolean {
-    // 检查饥饿值要求
-    if (action.hungerRequirement && gameState.hunger < action.hungerRequirement) {
-      return false;
-    }
-
     // 检查精力值要求
     if (action.energyRequirement && gameState.energy < action.energyRequirement) {
       return false;
@@ -176,9 +178,6 @@ export abstract class BaseScene extends Phaser.Scene {
     // 如果是对话动作，不立即应用效果，让效果在对话选项中选择后执行
     if (action.triggerDialogue && action.dialogueId) {
       // 只应用消耗，不应用效果
-      if (action.hungerCost) {
-        this.gameManager.modifyHunger(-action.hungerCost);
-      }
       if (action.energyCost) {
         this.gameManager.modifyEnergy(-action.energyCost);
       }
@@ -193,11 +192,6 @@ export abstract class BaseScene extends Phaser.Scene {
       this.gameManager.advanceTime(action.timeCost);
     }
 
-    // 消耗饥饿值
-    if (action.hungerCost) {
-      this.gameManager.modifyHunger(-action.hungerCost);
-    }
-
     // 消耗精力值
     if (action.energyCost) {
       this.gameManager.modifyEnergy(-action.energyCost);
@@ -206,11 +200,6 @@ export abstract class BaseScene extends Phaser.Scene {
     // 应用效果
     action.effects.forEach((effect: any) => {
       switch (effect.type) {
-        case 'hunger':
-          if (effect.operation === 'add') {
-            this.gameManager.modifyHunger(effect.value);
-          }
-          break;
         case 'energy':
           if (effect.operation === 'add') {
             this.gameManager.modifyEnergy(effect.value);
@@ -312,8 +301,27 @@ export abstract class BaseScene extends Phaser.Scene {
     return transitionTexts[exitName] || `你走向${exitName}...`;
   }
 
+  protected addInteractiveObjecrs(obj : InteractiveObject | InteractiveObjectWithSprite) : { first: string; second: Phaser.GameObjects.GameObject } {
+    let gameObject: Phaser.GameObjects.GameObject;
+    switch (obj.type) {
+      case 'InteractiveObject':
+        if (obj.imageKey) {
+          // Create interactive object
+          gameObject = this.createInteractiveImageObject(obj, obj.imageKey);
+        } else {
+          // Create traditional rectangular interactive object
+          gameObject = this.createInteractiveObject(obj);
+        }
+        break;
+      case 'InteractiveObjectWithSprite':
+        gameObject = this.createInteractiveObjectsWithSprite(obj);
+        break;
+    }
+    return { first: obj.id, second: gameObject };
+  }
+
   // 创建交互对象
-  protected createInteractiveObject(obj: any): Phaser.GameObjects.Rectangle {
+  private createInteractiveObject(obj: any): Phaser.GameObjects.Rectangle {
     const rect = this.add.rectangle(obj.x, obj.y, obj.width, obj.height, 0x00ff00, 0.3);
     this.physics.add.existing(rect, true);
     rect.setInteractive();
@@ -334,9 +342,14 @@ export abstract class BaseScene extends Phaser.Scene {
   }
 
   // 创建带描边效果的图片交互对象
-  protected createInteractiveImageObject(obj: any, imageKey: string): Phaser.GameObjects.Image {
+  private createInteractiveImageObject(obj: any, imageKey: string): Phaser.GameObjects.Image {
     // 创建图片对象
     const image = this.add.image(obj.x, obj.y, imageKey);
+    this.physics.add.existing(image, true); // true使其成为静态物理体
+
+    // 设置物理体的大小以匹配交互区域
+    const body = image.body as Phaser.Physics.Arcade.StaticBody;
+    body.setSize(obj.width, obj.height);
     
     // 创建不可见的交互区域
     const interactiveArea = this.add.rectangle(obj.x, obj.y, obj.width, obj.height, 0x000000, 0);
@@ -353,11 +366,12 @@ export abstract class BaseScene extends Phaser.Scene {
     return image;
   }
 
-  protected createInteractiveObjectsWithSprite(obj : InteractiveObjectWithSprite): void {
+  private createInteractiveObjectsWithSprite(obj : InteractiveObjectWithSprite): Phaser.GameObjects.Sprite {
     const sprite = obj.spriteConstructor(this, obj.x, obj.y);
     sprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
       this.onObjectClicked(obj, pointer);
     });
+    return sprite;
   }
 
   // 显示物体描边 - 基于图片的实际形状
@@ -513,11 +527,15 @@ export abstract class BaseScene extends Phaser.Scene {
   shutdown(): void {
     if (this.gameManager) {
       this.gameManager.off(GameEvents.TIME_CHANGED, this.onTimeChanged.bind(this));
-      this.gameManager.off(GameEvents.HUNGER_CHANGED, this.onHungerChanged.bind(this));
       this.gameManager.off(GameEvents.ENERGY_CHANGED, this.onEnergyChanged.bind(this));
       this.gameManager.off(GameEvents.INVENTORY_CHANGED, this.onInventoryChanged.bind(this));
       this.gameManager.off(GameEvents.ACHIEVEMENT_UNLOCKED, this.onAchievementUnlocked.bind(this));
       this.gameManager.off(GameEvents.GAME_ENDED, this.onGameEnded.bind(this));
+    }
+
+    // 清理TweenManager
+    if (this.tweenManager) {
+      this.tweenManager.destroy();
     }
 
     // 清理描边渲染器

@@ -15,7 +15,7 @@ export class ActionRegistry {
       name: '吃粮喝水',
       timeCost: GameConstants.BASIC_ACTION_COST,
       effects: [
-        { type: 'hunger', value: GameConstants.BASIC_HUNGER_RESTORE, operation: 'add' }
+        { type: 'hunger', value: GameConstants.BASIC_ENERGY_RESTORE, operation: 'add' }
       ],
       conditions: []
     });
@@ -94,7 +94,12 @@ export class ActionRegistry {
       effects: [
         { type: 'story_flag', value: 'chase_ball_completed', operation: 'set' }
       ],
-      conditions: []
+      conditions: [],
+      playTweens: {
+        tweenKey: 'cat_play',
+        x: 400,
+        y: 300,
+      }
     });
 
     this.registerAction({
@@ -104,7 +109,12 @@ export class ActionRegistry {
       effects: [
         { type: 'story_flag', value: 'table_swept', operation: 'set' }
       ],
-      conditions: []
+      conditions: [],
+      playTweens: {
+        tweenKey: 'cat_slap',
+        x: 400,
+        y: 300,
+      }
     });
 
     this.registerAction({
@@ -118,6 +128,11 @@ export class ActionRegistry {
       conditions: [
         { type: 'story_flag', value: 'on_cat_bed', operator: 'eq' }
       ],
+      playTweens: {
+        tweenKey: 'cat_kick',
+        x: 400,
+        y: 300,
+      },
       specialCondition: {
         type: 'position_check',
         value: 'cat_bed',
@@ -155,7 +170,12 @@ export class ActionRegistry {
       effects: [
         { type: 'story_flag', value: 'parkour_completed', operation: 'set' }
       ],
-      conditions: []
+      conditions: [],
+      playTweens: {
+        tweenKey: 'cat_play',
+        x: 400,
+        y: 300,
+      }
     });
 
     // 窗户对话动作 - 纯对话触发
@@ -190,7 +210,7 @@ export class ActionRegistry {
     this.registerAction({
       id: 'scratch_sofa',
       name: '抓沙发',
-      hungerCost: 1,
+      energyCost: 1,
       effects: [], // 效果在对话选项中选择后执行
       conditions: [],
       dialogueId: 'sofa_conversation',
@@ -252,7 +272,7 @@ export class ActionRegistry {
       timeCost: 60,
       energyRequirement: 1,
       effects: [
-        { type: 'hunger', value: GameConstants.ADVANCED_HUNGER_RESTORE, operation: 'add' }
+        { type: 'story_flag', value: 'play_time', operation: 'set' }
       ],
       conditions: []
     });
@@ -276,11 +296,16 @@ export class ActionRegistry {
     this.registerAction({
       id: 'play_with_mouse',
       name: '和玩具老鼠玩耍',
-      hungerCost: 1,
+      energyCost: 1,
       effects: [
         { type: 'story_flag', value: 'play_time', operation: 'set' }
       ],
-      conditions: []
+      conditions: [],
+      playTweens: {
+        tweenKey: 'cat_tap',
+        x: 400,
+        y: 300,
+      }
     });
 
     this.registerAction({
@@ -295,7 +320,6 @@ export class ActionRegistry {
     this.registerAction({
       id: 'destroy_screen',
       name: '破坏显示屏',
-      hungerCost: 1,
       energyCost: 3,
       effects: [
         { type: 'story_flag', value: 'screen_destroyed', operation: 'set' }
@@ -365,7 +389,7 @@ export class ActionRegistry {
     this.registerAction({
       id: 'play_with_clothes',
       name: '玩衣服',
-      hungerCost: 1,
+      energyCost: 1,
       effects: [
         { type: 'story_flag', value: 'clothes_played', operation: 'set' }
       ],
@@ -396,7 +420,7 @@ export class ActionRegistry {
     this.registerAction({
       id: 'scratch_bed',
       name: '抓床',
-      hungerCost: 1,
+      energyCost: 1,
       effects: [
         { type: 'story_flag', value: 'bed_scratched', operation: 'set' }
       ],
@@ -434,7 +458,7 @@ export class ActionRegistry {
     this.registerAction({
       id: 'paw_screen',
       name: '用爪子拍屏幕',
-      hungerCost: 1,
+      energyCost: 1,
       effects: [
         { type: 'story_flag', value: 'screen_pawed', operation: 'set' }
       ],
@@ -473,7 +497,7 @@ export class ActionRegistry {
     this.registerAction({
       id: 'scratch_wall',
       name: '抓墙',
-      hungerCost: 1,
+      energyCost: 1,
       effects: [
         { type: 'story_flag', value: 'wall_scratched', operation: 'set' }
       ],
@@ -501,11 +525,6 @@ export class ActionRegistry {
   public canExecuteAction(actionId: string, gameState: any): boolean {
     const action = this.getAction(actionId);
     if (!action) return false;
-
-    // 检查饥饿值要求
-    if (action.hungerRequirement && gameState.hunger < action.hungerRequirement) {
-      return false;
-    }
 
     // 检查精力值要求
     if (action.energyRequirement && gameState.energy < action.energyRequirement) {

@@ -24,8 +24,8 @@ export class DoorwayScene extends BaseScene {
     if (!roomData) return;
 
     // 创建交互对象
-    roomData.interactiveObjects.forEach((obj: InteractiveObject) => {
-      this.createInteractiveObject(obj);
+    roomData.interactiveObjects.forEach((obj) => {
+      this.addInteractiveObjecrs(obj);
     });
 
     // 创建出口
@@ -38,7 +38,7 @@ export class DoorwayScene extends BaseScene {
       this.uiManager.initialize(this);
       const state = this.gameManager?.getState();
       if (state) {
-        this.uiManager.updateStatusBar(state.currentTime, state.hunger, state.energy);
+        this.uiManager.updateStatusBar(state.currentTime, state.energy);
         this.uiManager.updateInventory(state.inventory);
       }
     }

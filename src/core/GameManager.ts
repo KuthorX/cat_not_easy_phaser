@@ -37,7 +37,6 @@ export class GameManager {
   private initializeGameState(): GameState {
     return {
       currentTime: GameConstants.GAME_START_TIME,
-      hunger: GameConstants.INITIAL_HUNGER,
       energy: GameConstants.INITIAL_ENERGY,
       inventory: [],
       achievements: [],
@@ -49,7 +48,18 @@ export class GameManager {
       gameEnded: false,
       endingType: null,
       currentDialogue: undefined,
-      dialogueHistory: []
+      dialogueHistory: [],
+      battleState: {
+        isActive: false,
+        enemyId: '',
+        enemyName: '',
+        enemyImage: '',
+        playerImage: '',
+        selectedAction: null,
+        result: null,
+        returnScene: '',
+        returnObjectId: ''
+      }
     };
   }
 
@@ -106,31 +116,6 @@ export class GameManager {
     if (hour === GameConstants.SPECIAL_EVENTS.NEIGHBOR_CAT_FIGHT) {
       this.eventEmitter.emit(GameEvents.NEIGHBOR_CAT_FIGHT);
     }
-  }
-
-  // 状态管理
-  public modifyHunger(delta: number): boolean {
-    const newHunger = Math.max(0, Math.min(GameConstants.MAX_HUNGER, this.state.hunger + delta));
-    const changed = newHunger !== this.state.hunger;
-    
-    if (changed) {
-      this.state.hunger = newHunger;
-      this.eventEmitter.emit(GameEvents.HUNGER_CHANGED, { hunger: this.state.hunger });
-    }
-    
-    return changed;
-  }
-
-  public modifyEnergy(delta: number): boolean {
-    const newEnergy = Math.max(0, Math.min(GameConstants.MAX_ENERGY, this.state.energy + delta));
-    const changed = newEnergy !== this.state.energy;
-    
-    if (changed) {
-      this.state.energy = newEnergy;
-      this.eventEmitter.emit(GameEvents.ENERGY_CHANGED, { energy: this.state.energy });
-    }
-    
-    return changed;
   }
 
   // 物品管理
@@ -210,10 +195,6 @@ export class GameManager {
   // 获取状态
   public getState(): GameState {
     return { ...this.state };
-  }
-
-  public getHunger(): number {
-    return this.state.hunger;
   }
 
   public getEnergy(): number {
@@ -299,13 +280,6 @@ export class GameManager {
   public applyDialogueEffects(effects: any[]): void {
     effects.forEach(effect => {
       switch (effect.type) {
-        case 'hunger':
-          if (effect.operation === 'add') {
-            this.modifyHunger(effect.value);
-          } else if (effect.operation === 'remove') {
-            this.modifyHunger(-effect.value);
-          }
-          break;
         case 'energy':
           if (effect.operation === 'add') {
             this.modifyEnergy(effect.value);
@@ -343,5 +317,18 @@ export class GameManager {
   public setDialogueMode(inDialogue: boolean): void {
     this.isInDialogue = inDialogue;
     console.log('对话状态变更:', inDialogue ? '进入对话模式' : '退出对话模式');
+  }
+
+  // 状态管理
+  public modifyEnergy(delta: number): boolean {
+    const newEnergy = Math.max(0, Math.min(GameConstants.MAX_ENERGY, this.state.energy + delta));
+    const changed = newEnergy !== this.state.energy;
+    
+    if (changed) {
+      this.state.energy = newEnergy;
+      this.eventEmitter.emit(GameEvents.ENERGY_CHANGED, { energy: this.state.energy });
+    }
+    
+    return changed;
   }
 } 

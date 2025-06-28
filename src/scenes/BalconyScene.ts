@@ -23,23 +23,18 @@ export class BalconyScene extends BaseScene {
     const roomData = this.sceneManager?.getRoomData(RoomKeys.BALCONY);
     if (!roomData) return;
 
-    // 添加图片对象并创建交互区域
-    roomData.interactiveObjects.forEach((obj) => {
-      switch (obj.type) {
-        case 'InteractiveObject':
-          if (obj.imageKey) {
-            // 创建交互对象
-            this.createInteractiveImageObject(obj, obj.imageKey);
-          } else {
-            // 创建传统的矩形交互对象
-            this.createInteractiveObject(obj);
-          }
-          break;
-        case 'InteractiveObjectWithSprite':
-          this.createInteractiveObjectsWithSprite(obj);
-          break;
-      }
+    // 创建交互对象
+    const interactiveGameObjects = roomData.interactiveObjects.map((obj) => {
+      return this.addInteractiveObjecrs(obj);
     });
+
+    const robotCleaner = interactiveGameObjects.find(pair => pair.first === 'balcony_robot_cleaner')?.second;
+
+    const collidableObjects = interactiveGameObjects.filter(pair => pair.first !== 'balcony_robot_cleaner').map(pair => pair.second);
+    console.log(collidableObjects);
+    if (robotCleaner) {
+      this.physics.add.collider(robotCleaner, collidableObjects);
+    }
 
     // 创建出口
     roomData.exits.forEach((exit: RoomExit) => {
@@ -51,7 +46,7 @@ export class BalconyScene extends BaseScene {
       this.uiManager.initialize(this);
       const state = this.gameManager?.getState();
       if (state) {
-        this.uiManager.updateStatusBar(state.currentTime, state.hunger, state.energy);
+        this.uiManager.updateStatusBar(state.currentTime, state.energy);
         this.uiManager.updateInventory(state.inventory);
       }
     }
@@ -119,4 +114,4 @@ export class BalconyScene extends BaseScene {
       this.executeAction('house_parkour');
     });
   }
-} 
+}

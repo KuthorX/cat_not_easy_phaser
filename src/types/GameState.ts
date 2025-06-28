@@ -1,6 +1,5 @@
 export interface GameState {
   currentTime: number;
-  hunger: number;
   energy: number;
   inventory: string[];
   achievements: string[];
@@ -87,9 +86,7 @@ export interface Action {
   id: string;
   name: string;
   timeCost?: number;
-  hungerCost?: number;
   energyCost?: number;
-  hungerRequirement?: number;
   energyRequirement?: number;
   roomRequirement?: string;
   itemRequirement?: string;
@@ -97,6 +94,14 @@ export interface Action {
   conditions: ActionCondition[];
   dialogueId?: string;
   triggerDialogue?: boolean;
+  playTweens?: {
+    tweenKey: string;
+    x: number;
+    y: number;
+    scale?: number;
+    fps?: number;
+    loop?: boolean;
+  };
   specialCondition?: {
     type: string;
     value: any;

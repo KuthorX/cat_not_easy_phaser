@@ -23,17 +23,9 @@ export class RoomBScene extends BaseScene {
     const roomData = this.sceneManager?.getRoomData(RoomKeys.ROOM_B);
     if (!roomData) return;
 
-    // 添加图片对象并创建交互区域
-    roomData.interactiveObjects.forEach((obj: InteractiveObject) => {
-      if (obj.imageKey) {
-        // 添加图片对象
-        this.add.image(obj.x, obj.y, obj.imageKey);
-        // 创建交互对象
-        this.createInteractiveImageObject(obj, obj.imageKey);
-      } else {
-        // 创建传统的矩形交互对象
-        this.createInteractiveObject(obj);
-      }
+    // 创建交互对象
+    roomData.interactiveObjects.forEach((obj) => {
+      this.addInteractiveObjecrs(obj);
     });
 
     // 创建出口
@@ -46,7 +38,7 @@ export class RoomBScene extends BaseScene {
       this.uiManager.initialize(this);
       const state = this.gameManager?.getState();
       if (state) {
-        this.uiManager.updateStatusBar(state.currentTime, state.hunger, state.energy);
+        this.uiManager.updateStatusBar(state.currentTime, state.energy);
         this.uiManager.updateInventory(state.inventory);
       }
     }

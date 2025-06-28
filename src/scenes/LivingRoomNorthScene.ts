@@ -2,13 +2,11 @@ import { BaseScene } from './BaseScene';
 import { SceneKeys } from '../constants/SceneKeys';
 import { RoomKeys } from '../constants/SceneKeys';
 import { InteractiveObject, InteractiveObjectWithSprite, RoomExit } from '../types/GameState';
-import { RobotCleaner } from '../objects/RobotCleaner';
 import { GameEvents } from '../constants/GameEvents';
 
 export class LivingRoomNorthScene extends BaseScene {
   private interactiveObjects: Map<string, InteractiveObject> = new Map();
-  private interactiveObjectBodies: Phaser.GameObjects.Rectangle[] = [];
-  private robotCleaner!: RobotCleaner;
+  private interactiveObjectBodies: Phaser.GameObjects.GameObject [] = [];
 
   constructor() {
     super(SceneKeys.LIVING_ROOM_NORTH);
@@ -32,7 +30,7 @@ export class LivingRoomNorthScene extends BaseScene {
     // 创建交互对象
     roomData.interactiveObjects.forEach((obj: InteractiveObject | InteractiveObjectWithSprite) => {
       this.interactiveObjects.set(obj.id, obj as InteractiveObject);
-      const objSprite = this.createInteractiveObject(obj);
+      const objSprite = this.addInteractiveObjecrs(obj);
       this.interactiveObjectBodies.push(objSprite);
     });
 
@@ -41,17 +39,52 @@ export class LivingRoomNorthScene extends BaseScene {
       this.createExit(exit);
     });
 
-    // 添加碰撞
-    this.physics.add.collider(this.robotCleaner, this.interactiveObjectBodies);
-
     // 初始化UI
     if (this.uiManager) {
       this.uiManager.initialize(this);
       this.uiManager.setDialogueManager(this.gameManager?.getDialogueManager() || null);
       const state = this.gameManager?.getState();
       if (state) {
-        this.uiManager.updateStatusBar(state.currentTime, state.hunger, state.energy);
+        this.uiManager.updateStatusBar(state.currentTime, state.energy);
         this.uiManager.updateInventory(state.inventory);
+      }
+      
+      // 设置右上角按钮回调
+      this.uiManager.setupTopRightButtons({
+        onTimeWaste: () => {
+          this.uiManager?.showTimeWastePanel();
+        },
+        onOpenLog: () => {
+          this.uiManager?.showLogPage();
+        },
+        onOpenSettings: () => {
+          console.log('打开设置');
+        }
+      });
+      
+      // 设置消磨时间面板回调
+      this.uiManager.setupTimeWastePanel({
+        onCancel: () => {
+          console.log('取消消磨时间');
+        },
+        onWasteOneHour: () => {
+          if (this.gameManager) {
+            this.gameManager.advanceTime(60); // 前进1小时
+            console.log('消磨了一小时');
+          }
+        },
+        onWasteOneDay: () => {
+          if (this.gameManager) {
+            this.gameManager.advanceTime(720); // 前进12小时
+            console.log('消磨了一整天');
+          }
+        }
+      });
+      
+      // 设置日志页数据
+      const game = (window as any).game;
+      if (game && game.achievementRegistry) {
+        this.uiManager.setupLogPage(game.achievementRegistry, this.gameManager?.getState());
       }
     }
 
@@ -68,8 +101,6 @@ export class LivingRoomNorthScene extends BaseScene {
     // 设置键盘快捷键
     this.setupKeyboardShortcuts();
 
-    // 创建扫地机器人
-    this.robotCleaner = new RobotCleaner(this, 0, 400);
     // 检查是否有战斗结果需要处理
     this.checkBattleResult();
   }
@@ -249,7 +280,7 @@ export class LivingRoomNorthScene extends BaseScene {
       if (objectSprite) {
         // 将损坏的沙发替换为损坏的椅子图片
         // 这里我们暂时用颜色变化表示损坏，实际项目中应该替换为损坏的图片
-        objectSprite.setFillStyle(0x8b4513, 0.8);
+        // objectSprite.setFillStyle(0x8b4513, 0.8);
         
         // 如果有损坏的图片，可以这样替换：
         // const damagedSprite = this.add.sprite(object.x, object.y, 'room_b_chair');
