@@ -194,193 +194,165 @@ export class RoomRegistry {
       ]
     });
 
-    // 主人房间B
-    this.registerRoom({
-      id: RoomKeys.ROOM_B,
-      name: '主人房间',
-      
-      background: 'room_b_bg',
-      interactiveObjects: [
-        {
-          type: 'InteractiveObject',
-          id: 'room_b_bed',
-          name: '主人的床',
-          
-          x: 300,
-          y: 400,
-          width: 200,
-          height: 150,
-          imageKey: 'room_b_bed',
-          actions: ['sleep_on_bed', 'scratch_bed']
-        },
-        {
-          type: 'InteractiveObject',
-          id: 'room_b_chair',
-          name: '椅子',
-          
-          x: 800,
-          y: 450,
-          width: 120,
-          height: 100,
-          imageKey: 'room_b_chair',
-          actions: ['sit_on_chair', 'climb_chair']
-        },
-        {
-          type: 'InteractiveObject',
-          id: 'room_b_computer_screen',
-          name: '电脑屏幕',
-          
-          x: 900,
-          y: 350,
-          width: 150,
-          height: 100,
-          imageKey: 'room_b_computer_screen',
-          actions: ['watch_screen', 'paw_screen']
-        },
-        {
-          type: 'InteractiveObject',
-          id: 'room_b_kettle',
-          name: '水壶',
-          
-          x: 700,
-          y: 300,
-          width: 80,
-          height: 60,
-          imageKey: 'room_b_kettle',
-          actions: ['investigate_kettle', 'knock_over_kettle']
-        },
-        {
-          type: 'InteractiveObject',
-          id: 'room_b_side_wall',
-          name: '侧墙',
-          x: 1000,
-          y: 360,
-          width: 100,
-          height: 400,
-          imageKey: 'room_b_side_wall',
-          actions: ['climb_wall', 'scratch_wall']
-        }
-      ],
-      exits: [
-        {
-          id: 'exit_to_hallway',
-          name: '出门',
-          targetRoom: RoomKeys.HALLWAY,
-          x: 1200,
-          y: 300,
-          width: 80,
-          height: 120
-        }
-      ]
-    });
-
-    // 过道
-    this.registerRoom({
-      id: RoomKeys.HALLWAY,
-      name: '过道',
-      
-      background: 'hallway_bg',
-      interactiveObjects: [],
-      exits: [
-        {
-          id: 'exit_to_room_b',
-          name: '主人房间',
-          targetRoom: RoomKeys.ROOM_B,
-          x: 0,
-          y: 300,
-          width: 80,
-          height: 120
-        },
-        {
-          id: 'exit_to_living_room',
-          name: '客厅',
-          targetRoom: RoomKeys.LIVING_ROOM_NORTH,
-          x: 1200,
-          y: 300,
-          width: 80,
-          height: 120
-        }
-      ]
-    });
-
     // 客厅-向东看
     this.registerRoom({
       id: RoomKeys.LIVING_ROOM_EAST,
       name: '客厅-向东看',
-      
       background: 'living_room_east_bg',
       interactiveObjects: [
         {
           type: 'InteractiveObject',
-          id: 'going_balcony',
-          name: '前往阳台',
-          thought: '神秘的禁制，两脚兽不触摸也能打开，想必是和它达成了什么交易。',
-          x: 400,
-          y: 450,
-          width: 80,
-          height: 40,
-          sprite: 'balcony',
-          actions: ['conversating', 'opening']
-        },
-        {
-          type: 'InteractiveObject',
-          id: 'chew_rope',
-          name: '咬绳',
-          thought: '我是不是该咬咬这个东西？',
-          x: 300,
-          y: 400,
-          width: 100,
-          height: 80,
-          sprite: 'chew_rope',
-          actions: ['chew_rope']
-        },
-        {
-          type: 'InteractiveObject',
-          id: 'chase_ball',
-          name: '转球',
-          thought: '这个球看起来很好玩！',
-          x: 500,
-          y: 400,
-          width: 80,
-          height: 80,
-          sprite: 'chase_ball',
-          actions: ['chase_ball']
-        }, 
-        {
-          type: 'InteractiveObject',
-          id: 'table',
-          name: '桌子',
-          thought: '堆满了不知道什么东西。',
-          x: 700,
-          y: 350,
-          width: 200,
-          height: 120,
-          sprite: 'table',
-          actions: ['sweep_table']
-        },
-        {
-          type: 'InteractiveObject',
-          id: 'tv',
-          name: '电视',
-          thought: '没有两脚兽的命令，这个大家伙寂静无声。',
-          x: 900,
-          y: 300,
-          width: 150,
-          height: 100,
-          sprite: 'tv',
-          actions: ['attack_tv']
-        },
-        {
-          type: 'InteractiveObject',
-          id: 'cat_bed',
-          name: '猫窝',
-          thought: '哦，我的宝地。',
-          x: 400,
+          id: 'living_room_east_sofa',
+          name: '沙发',
+          x: 150,
           y: 500,
+          width: 846,
+          height: 1288,
+          imageKey: 'living_room_east_sofa',
+          actions: ['sleep_on_sofa', 'scratch_sofa']
+        },
+        {
+          type: 'InteractiveObject',
+          id: 'living_room_east_table',
+          name: '茶几',
+          x: 400,
+          y: 600,
+          width: 302,
+          height: 291,
+          imageKey: 'living_room_east_table',
+          actions: ['jump_on_table', 'push_item_from_table']
+        },
+        {
+          type: 'InteractiveObject',
+          id: 'living_room_east_dustbin',
+          name: '垃圾桶',
+          x: 500,
+          y: 750,
+          width: 302,
+          height: 291,
+          imageKey: 'living_room_east_dustbin',
+          actions: ['search_dustbin', 'knock_over_dustbin']
+        },
+        {
+          type: 'InteractiveObject',
+          id: 'living_room_east_tvtable',
+          name: '电视柜',
+          x: 950,
+          y: 600,
+          width: 743,
+          height: 940,
+          imageKey: 'living_room_east_tvtable',
+          actions: ['jump_on_tvtable', 'hide_in_tvtable']
+        },
+        {
+          type: 'InteractiveObject',
+          id: 'living_room_east_tv',
+          name: '电视',
+          x: 1100,
+          y: 400,
+          width: 541,
+          height: 1088,
+          imageKey: 'living_room_east_tv',
+          actions: ['watch_tv', 'paw_tv']
+        },
+        {
+          type: 'InteractiveObject',
+          id: 'living_room_east_cat_tree',
+          name: '猫爬架',
+          x: 800,
+          y: 500,
+          width: 302,
+          height: 483,
+          imageKey: 'living_room_east_cat_tree',
+          actions: ['climb_cat_tree', 'play_cat_tree']
+        },
+        {
+          type: 'InteractiveObject',
+          id: 'living_room_east_ball',
+          name: '球',
+          x: 900,
+          y: 750,
           width: 120,
-          height: 100,
-          sprite: 'cat_bed',
-          actions: ['sleep_in_cat_bed']
+          height: 117,
+          imageKey: 'living_room_east_ball',
+          actions: ['play_ball', 'paw_ball']
+        },
+        {
+          type: 'InteractiveObject',
+          id: 'living_room_east_glass',
+          name: '玻璃杯',
+          x: 420,
+          y: 620,
+          width: 190,
+          height: 150,
+          imageKey: 'living_room_east_glass',
+          actions: ['push_glass', 'lick_glass']
+        },
+        {
+          type: 'InteractiveObject',
+          id: 'living_room_east_paper',
+          name: '纸团',
+          x: 470,
+          y: 630,
+          width: 177,
+          height: 228,
+          imageKey: 'living_room_east_paper',
+          actions: ['play_paper', 'push_paper']
+        },
+        {
+          type: 'InteractiveObject',
+          id: 'living_room_east_milk',
+          name: '牛奶',
+          x: 460,
+          y: 610,
+          width: 112,
+          height: 192,
+          imageKey: 'living_room_east_milk',
+          actions: ['drink_milk', 'push_milk']
+        },
+        {
+          type: 'InteractiveObject',
+          id: 'living_room_east_cola',
+          name: '可乐罐',
+          x: 440,
+          y: 600,
+          width: 144,
+          height: 176,
+          imageKey: 'living_room_east_cola',
+          actions: ['push_cola', 'lick_cola']
+        },
+        {
+          type: 'InteractiveObject',
+          id: 'living_room_east_cord',
+          name: '电线',
+          x: 1000,
+          y: 700,
+          width: 144,
+          height: 107,
+          imageKey: 'living_room_east_cord',
+          actions: ['play_cord', 'bite_cord']
+        },
+        {
+          type: 'InteractiveObject',
+          id: 'living_room_east_pot',
+          name: '花盆',
+          x: 600,
+          y: 700,
+          width: 213,
+          height: 202,
+          imageKey: 'living_room_east_pot',
+          actions: ['push_pot', 'sniff_pot']
+        },
+        {
+          type: 'InteractiveObject',
+          id: 'living_room_east_cat_nest',
+          name: '猫窝',
+          x: 300,
+          y: 700,
+          width: 574,
+          height: 356,
+          imageKey: 'living_room_east_cat_nest',
+          actions: ['sleep_in_nest', 'sniff_nest']
         }
       ],
       exits: [
