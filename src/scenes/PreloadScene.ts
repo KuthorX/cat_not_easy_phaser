@@ -60,6 +60,11 @@ export class PreloadScene extends Phaser.Scene {
     this.load.image('room_b_kettle', 'assets/images/room_b_kettle.png');
     this.load.image('room_b_side_wall', 'assets/images/room_b_side_wall.png');
 
+    // 加载菜单按钮图片
+    this.load.image('menu_start_game', 'assets/images/menu/start_game.png');
+    this.load.image('menu_settings', 'assets/images/menu/settings.png');
+    this.load.image('menu_exit_game', 'assets/images/menu/exit_game.png');
+
     // 批量加载PNG序列动画资源
     this.loadTweenSequences();
 
