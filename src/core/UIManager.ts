@@ -12,7 +12,6 @@ import {
   TopRightButtons,
   LogPage,
   TimeWastePanel,
-  SettingsPanel, // 导入 SettingsPanel
   type Action,
   type TopRightButtonCallback,
   type TimeWasteCallback
@@ -34,7 +33,6 @@ export class UIManager {
   private topRightButtons: TopRightButtons;
   private logPage: LogPage;
   private timeWastePanel: TimeWastePanel;
-  private settingsPanel: SettingsPanel; // 添加 settingsPanel
   
   // 对话管理器
   private dialogueManager: DialogueManager | null = null;
@@ -54,7 +52,6 @@ export class UIManager {
     this.topRightButtons = new TopRightButtons();
     this.logPage = new LogPage();
     this.timeWastePanel = new TimeWastePanel();
-    this.settingsPanel = new SettingsPanel(); // 实例化 SettingsPanel
   }
 
   // 设置对话管理器
@@ -79,7 +76,6 @@ export class UIManager {
     this.topRightButtons.initialize(scene);
     this.logPage.initialize(scene);
     this.timeWastePanel.initialize(scene);
-    this.settingsPanel.initialize(scene); // 初始化 SettingsPanel
     
     // 设置动作菜单回调
     this.actionMenu.setActionCallback((actionId: string) => {
@@ -256,10 +252,5 @@ export class UIManager {
   // 显示日志页
   public showLogPage(): void {
     this.logPage.show();
-  }
-
-  // 显示设置面板
-  public showSettingsPanel(): void {
-    this.settingsPanel.show();
   }
 }

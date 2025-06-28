@@ -1,4 +1,5 @@
 import { IUIComponent } from './IUIComponent';
+import { SceneKeys } from '../../constants/SceneKeys';
 
 export interface TopRightButtonCallback {
   onTimeWaste?: () => void;
@@ -79,8 +80,9 @@ export class TopRightButtons implements IUIComponent {
   }
 
   private onSettingsClick(): void {
-    if (this.callback.onOpenSettings) {
-      this.callback.onOpenSettings();
+    // 直接启动设置场景
+    if (this.scene) {
+      this.scene.scene.start(SceneKeys.SETTINGS);
     }
   }
 

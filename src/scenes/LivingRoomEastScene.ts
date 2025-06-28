@@ -33,16 +33,6 @@ export class LivingRoomEastScene extends BaseScene {
       this.createExit(exit);
     });
 
-    // 初始化UI
-    if (this.uiManager) {
-      this.uiManager.initialize(this);
-      const state = this.gameManager?.getState();
-      if (state) {
-        this.uiManager.updateStatusBar(state.currentTime, state.energy);
-        this.uiManager.updateInventory(state.inventory);
-      }
-    }
-
     // 播放背景音乐
     if (this.audioManager) {
       this.audioManager.playRoomMusic(RoomKeys.LIVING_ROOM_EAST);
