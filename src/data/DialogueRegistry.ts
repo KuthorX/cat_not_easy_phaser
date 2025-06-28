@@ -42,6 +42,12 @@ export class DialogueRegistry {
               effects: [
                 { type: 'story_flag', value: 'sofa_damaged', operation: 'set' }
               ]
+            },
+            {
+              id: 'battle_choice',
+              text: '战斗',
+              nextStep: 'sofa_battle_start',
+              effects: []
             }
           ]
         },
@@ -72,6 +78,28 @@ export class DialogueRegistry {
           text: '嘿嘿，抓沙发的感觉太爽了！',
           autoNext: true,
           nextStep: 'end'
+        },
+        {
+          id: 'sofa_battle_start',
+          speaker: 'object',
+          text: '什么？你要和我战斗？好吧，那就来吧！',
+          autoNext: true,
+          nextStep: 'cat_battle_response'
+        },
+        {
+          id: 'cat_battle_response',
+          speaker: 'cat',
+          text: '喵！我要打败你！',
+          autoNext: true,
+          nextStep: 'battle_trigger'
+        },
+        {
+          id: 'battle_trigger',
+          speaker: 'system',
+          text: '战斗开始！',
+          autoNext: true,
+          nextStep: 'end',
+          specialAction: 'start_battle'
         }
       ]
     });

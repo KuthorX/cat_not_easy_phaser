@@ -13,7 +13,7 @@ export class DialogueBubble implements IUIComponent {
     bubbleId: string,
     text: string,
     position: DialogueBubblePosition,
-    speaker: 'object' | 'cat',
+    speaker: 'object' | 'cat' | 'system',
     duration: number = 0
   ): void {
     if (!this.scene) return;
@@ -28,22 +28,45 @@ export class DialogueBubble implements IUIComponent {
     const bubbleWidth = Math.min(textWidth + 40, 300);
     const bubbleHeight = 80;
 
+    // 根据说话者类型设置不同的背景颜色
+    let backgroundColor = 0xFFFFFF;
+    let textColor = '#000000';
+    
+    if (speaker === 'system') {
+      backgroundColor = 0xFFD700; // 金色背景
+      textColor = '#000000';
+    } else if (speaker === 'cat') {
+      backgroundColor = 0x87CEEB; // 天蓝色背景
+      textColor = '#000000';
+    } else {
+      backgroundColor = 0xFFFFFF; // 白色背景
+      textColor = '#000000';
+    }
+
     // 创建气泡背景
-    const background = this.scene.add.rectangle(0, 0, bubbleWidth, bubbleHeight, 0xFFFFFF, 0.9);
+    const background = this.scene.add.rectangle(0, 0, bubbleWidth, bubbleHeight, backgroundColor, 0.9);
     background.setStrokeStyle(2, 0x000000);
 
     // 创建文本
     const textElement = this.scene.add.text(0, 0, text, {
       fontSize: '16px',
-      color: '#000000',
+      color: textColor,
       wordWrap: { width: bubbleWidth - 20 }
     });
     textElement.setOrigin(0.5);
 
-    // 创建小尾巴（指向说话者）
-    const tail = this.createBubbleTail(position.direction, bubbleWidth, bubbleHeight);
+    // 创建小尾巴（指向说话者），系统消息不显示尾巴
+    let tail: Phaser.GameObjects.Graphics | null = null;
+    if (speaker !== 'system') {
+      tail = this.createBubbleTail(position.direction, bubbleWidth, bubbleHeight);
+    }
 
-    bubble.add([background, textElement, tail]);
+    const bubbleElements: any[] = [background, textElement];
+    if (tail) {
+      bubbleElements.push(tail);
+    }
+    
+    bubble.add(bubbleElements);
     bubble.setDepth(1001);
 
     // 设置锚点

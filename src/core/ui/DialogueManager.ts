@@ -78,6 +78,20 @@ export class DialogueUIManager implements IUIComponent {
       // 更新对话状态中的最后一个气泡位置
       currentState.lastBubblePosition = objectPosition;
       
+    } else if (currentStep.speaker === 'system') {
+      // 系统消息，显示在屏幕中央
+      const systemPosition = { x: 640, y: 360 };
+      const systemBubblePosition = this.coreDialogueManager.calculateBubblePosition(
+        systemPosition,
+        currentStep.text,
+        'object'
+      );
+      console.log('系统气泡位置:', systemBubblePosition);
+      this.dialogueBubble.showBubble('system', currentStep.text, systemBubblePosition, 'object', 0);
+      
+      // 更新对话状态中的最后一个气泡位置
+      currentState.lastBubblePosition = systemBubblePosition;
+      
     } else {
       // 猫的对话气泡
       const catPosition = { x: 640, y: 600 }; // 猫的默认位置
