@@ -13,6 +13,7 @@ export { TopRightButtons } from './TopRightButtons';
 export { TimeWastePanel } from './TimeWastePanel';
 export { SettingsPanel } from './SettingsPanel';
 export { LogPage } from './LogPage';
+export { BagPage } from './BagPage';
 export type { IUIComponent } from './IUIComponent';
 export type { Action } from './ActionMenu';
 export type { TransitionConfig } from './TransitionPanel';

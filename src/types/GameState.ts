@@ -1,6 +1,7 @@
 export interface GameState {
   currentTime: number;
   energy: number;
+  hunger: number;
   inventory: string[];
   achievements: string[];
   visitedRooms: Set<string>;

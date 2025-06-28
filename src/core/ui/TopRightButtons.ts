@@ -5,6 +5,7 @@ import { TextRenderer } from '../../utils/TextRenderer';
 export interface TopRightButtonCallback {
   onTimeWaste?: () => void;
   onOpenLog?: () => void;
+  onOpenBag?: () => void;
   onOpenSettings?: () => void;
 }
 
@@ -13,6 +14,7 @@ export class TopRightButtons implements IUIComponent {
   private container: Phaser.GameObjects.Container | null = null;
   private timeWasteButton: Phaser.GameObjects.Text | null = null;
   private logButton: Phaser.GameObjects.Text | null = null;
+  private bagButton: Phaser.GameObjects.Text | null = null;
   private settingsButton: Phaser.GameObjects.Text | null = null;
   private callback: TopRightButtonCallback = {};
 
@@ -25,7 +27,7 @@ export class TopRightButtons implements IUIComponent {
     console.log('create buttons');
     if (!this.scene) return;
 
-    this.container = this.scene.add.container(1280 - 150, 10);
+    this.container = this.scene.add.container(1280 - 200, 10);
 
     // 消磨时间按钮
     this.timeWasteButton = TextRenderer.createChineseText(this.scene, 0, 0, '💤', {
@@ -51,8 +53,20 @@ export class TopRightButtons implements IUIComponent {
     this.logButton.on('pointerover', () => this.logButton?.setStyle({ backgroundColor: '#33333333' }));
     this.logButton.on('pointerout', () => this.logButton?.setStyle({ backgroundColor: '#00000000' }));
 
+    // 背包按钮
+    this.bagButton = TextRenderer.createChineseText(this.scene, 100, 0, '🎒', {
+      fontSize: '24px',
+      backgroundColor: '#00000000',
+      padding: { x: 8, y: 4 },
+      color: '#ffffff'
+    });
+    this.bagButton.setInteractive();
+    this.bagButton.on('pointerdown', () => this.onBagClick());
+    this.bagButton.on('pointerover', () => this.bagButton?.setStyle({ backgroundColor: '#33333333' }));
+    this.bagButton.on('pointerout', () => this.bagButton?.setStyle({ backgroundColor: '#00000000' }));
+
     // 设置按钮
-    this.settingsButton = TextRenderer.createChineseText(this.scene, 100, 0, '⚙️', {
+    this.settingsButton = TextRenderer.createChineseText(this.scene, 150, 0, '⚙️', {
       fontSize: '24px',
       backgroundColor: '#00000000',
       padding: { x: 8, y: 4 },
@@ -63,7 +77,7 @@ export class TopRightButtons implements IUIComponent {
     this.settingsButton.on('pointerover', () => this.settingsButton?.setStyle({ backgroundColor: '#33333333' }));
     this.settingsButton.on('pointerout', () => this.settingsButton?.setStyle({ backgroundColor: '#00000000' }));
 
-    this.container.add([this.timeWasteButton, this.logButton, this.settingsButton]);
+    this.container.add([this.timeWasteButton, this.logButton, this.bagButton, this.settingsButton]);
     this.container.setDepth(1000);
   }
 
@@ -77,6 +91,12 @@ export class TopRightButtons implements IUIComponent {
   private onLogClick(): void {
     if (this.callback.onOpenLog) {
       this.callback.onOpenLog();
+    }
+  }
+
+  private onBagClick(): void {
+    if (this.callback.onOpenBag) {
+      this.callback.onOpenBag();
     }
   }
 
@@ -110,6 +130,7 @@ export class TopRightButtons implements IUIComponent {
       this.container = null;
       this.timeWasteButton = null;
       this.logButton = null;
+      this.bagButton = null;
       this.settingsButton = null;
     }
   }

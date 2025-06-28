@@ -38,7 +38,8 @@ export class GameManager {
     return {
       currentTime: GameConstants.GAME_START_TIME,
       energy: GameConstants.INITIAL_ENERGY,
-      inventory: [],
+      hunger: GameConstants.INITIAL_ENERGY, // 使用相同的初始值
+      inventory: ['cat_food', 'cat_food', 'toy_mouse', 'key', 'fish_treat', 'milk', 'rope_toy', 'ball'], // 添加更多测试物品
       achievements: [],
       visitedRooms: new Set(),
       completedActions: new Set(),

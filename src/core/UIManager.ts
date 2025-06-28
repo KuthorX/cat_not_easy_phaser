@@ -12,6 +12,7 @@ import {
   TopRightButtons,
   LogPage,
   TimeWastePanel,
+  BagPage,
   type Action,
   type TopRightButtonCallback,
   type TimeWasteCallback
@@ -33,6 +34,7 @@ export class UIManager {
   private topRightButtons: TopRightButtons;
   private logPage: LogPage;
   private timeWastePanel: TimeWastePanel;
+  private bagPage: BagPage;
   
   // 对话管理器
   private dialogueManager: DialogueManager | null = null;
@@ -52,6 +54,7 @@ export class UIManager {
     this.topRightButtons = new TopRightButtons();
     this.logPage = new LogPage();
     this.timeWastePanel = new TimeWastePanel();
+    this.bagPage = new BagPage();
   }
 
   // 设置对话管理器
@@ -76,6 +79,7 @@ export class UIManager {
     this.topRightButtons.initialize(scene);
     this.logPage.initialize(scene);
     this.timeWastePanel.initialize(scene);
+    this.bagPage.initialize(scene);
     
     // 设置动作菜单回调
     this.actionMenu.setActionCallback((actionId: string) => {
@@ -252,5 +256,21 @@ export class UIManager {
   // 显示日志页
   public showLogPage(): void {
     this.logPage.show();
+  }
+
+  // 设置背包页数据
+  public setupBagPage(bagRegistry: any, gameState: any): void {
+    this.bagPage.setBagRegistry(bagRegistry);
+    this.bagPage.setGameState(gameState);
+  }
+
+  // 显示背包页
+  public showBagPage(): void {
+    this.bagPage.show();
+  }
+
+  // 隐藏背包页
+  public hideBagPage(): void {
+    this.bagPage.hide();
   }
 }

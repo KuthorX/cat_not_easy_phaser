@@ -7,6 +7,8 @@ import { UIManager } from './core/UIManager';
 import { VolumeManager } from './core/VolumeManager';
 import { BgmManager } from './core/BgmManager';
 import { AchievementRegistry } from './data/AchievementRegistry';
+import { ActionRegistry } from './data/ActionRegistry';
+import { BagRegistry } from './data/BagRegistry';
 import { SceneKeys } from './constants/SceneKeys';
 import { TextRenderer } from './utils/TextRenderer';
 
@@ -36,6 +38,8 @@ class CatGame extends Phaser.Game {
   public volumeManager: VolumeManager;
   public bgmManager: BgmManager;
   public achievementRegistry: AchievementRegistry;
+  public actionRegistry: ActionRegistry;
+  public bagRegistry: BagRegistry;
 
   constructor() {
     super(GameConfig);
@@ -48,6 +52,8 @@ class CatGame extends Phaser.Game {
     this.audioManager = new AudioManager(this);
     this.uiManager = new UIManager(this);
     this.achievementRegistry = new AchievementRegistry();
+    this.actionRegistry = new ActionRegistry();
+    this.bagRegistry = new BagRegistry(this.actionRegistry);
     
     // 注册场景
     this.registerScenes();

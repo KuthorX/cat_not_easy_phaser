@@ -63,9 +63,13 @@ export abstract class BaseScene extends Phaser.Scene {
           console.log('打开日志页');
           this.uiManager?.showLogPage();
         },
+        onOpenBag: () => {
+          console.log('打开背包页');
+          this.uiManager?.showBagPage();
+        },
         onOpenSettings: () => {
           console.log('打开设置');
-          this.uiManager?.showSettingsPanel();
+          // 设置按钮直接启动设置场景，不需要通过UIManager
         }
       });
       
@@ -92,6 +96,11 @@ export abstract class BaseScene extends Phaser.Scene {
       const game = (window as any).game;
       if (game && game.achievementRegistry) {
         this.uiManager.setupLogPage(game.achievementRegistry, this.gameManager?.getState());
+      }
+      
+      // 设置背包页数据
+      if (game && game.bagRegistry) {
+        this.uiManager.setupBagPage(game.bagRegistry, this.gameManager?.getState());
       }
     }
 
