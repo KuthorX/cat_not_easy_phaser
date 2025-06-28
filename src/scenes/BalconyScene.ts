@@ -24,9 +24,17 @@ export class BalconyScene extends BaseScene {
     if (!roomData) return;
 
     // 创建交互对象
-    roomData.interactiveObjects.forEach((obj) => {
-      this.addInteractiveObjecrs(obj);
+    const interactiveGameObjects = roomData.interactiveObjects.map((obj) => {
+      return this.addInteractiveObjecrs(obj);
     });
+
+    const robotCleaner = interactiveGameObjects.find(pair => pair.first === 'balcony_robot_cleaner')?.second;
+
+    const collidableObjects = interactiveGameObjects.filter(pair => pair.first !== 'balcony_robot_cleaner').map(pair => pair.second);
+    console.log(collidableObjects);
+    if (robotCleaner) {
+      this.physics.add.collider(robotCleaner, collidableObjects);
+    }
 
     // 创建出口
     roomData.exits.forEach((exit: RoomExit) => {
@@ -106,4 +114,4 @@ export class BalconyScene extends BaseScene {
       this.executeAction('house_parkour');
     });
   }
-} 
+}
