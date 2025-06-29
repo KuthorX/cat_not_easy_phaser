@@ -1,14 +1,16 @@
 import { GameEvents } from '../constants/GameEvents';
+import { SceneKeys } from '../constants/SceneKeys';
 import { GameManager } from '@/core/GameManager';
 import { SceneManager } from '@/core/SceneManager';
 import { UIManager } from '@/core/UIManager';
 import { AudioManager } from '@/core/AudioManager';
 import { TweenManager } from '@/core/TweenManager';
-import { InteractiveObject, InteractiveObjectWithSprite } from '@/types/GameState';
+import { InteractiveObject, InteractiveObjectWithSprite, RoomExit } from '@/types/GameState';
 import { InteractiveOutlineRenderer } from '../utils/InteractiveOutlineRenderer';
 import { ConditionChecker } from '../utils/ConditionChecker';
 import { TransitionHelper } from '../utils/TransitionHelper';
 import { ConditionsFormatter } from '../utils/ConditionsFormatter';
+import { TextRenderer } from '../utils/TextRenderer';
 
 export abstract class BaseScene extends Phaser.Scene {
   protected gameManager!: GameManager;
@@ -577,7 +579,7 @@ export abstract class BaseScene extends Phaser.Scene {
         buttonColor: 0x16213e,
         buttonTextColor: 0xffffff
       },
-      sceneKey
+      sceneKey || undefined
     );
   }
 
@@ -857,5 +859,31 @@ export abstract class BaseScene extends Phaser.Scene {
     if (targetWidth && targetHeight) {
       bg.setDisplaySize(targetWidth, targetHeight);
     }
+  }
+
+  // 创建出口
+  protected createExit(exit: RoomExit): void {
+    const exitRect = this.add.rectangle(exit.x, exit.y, exit.width, exit.height, 0xff0000, 0.3);
+    exitRect.setInteractive();
+    
+    exitRect.on('pointerdown', () => {
+      this.switchToRoomWithTransition(exit.targetRoom, exit.name);
+    });
+
+    exitRect.on('pointerover', () => {
+      exitRect.setFillStyle(0xff0000, 0.5);
+    });
+
+    exitRect.on('pointerout', () => {
+      exitRect.setFillStyle(0xff0000, 0.3);
+    });
+
+    // 添加出口标签
+    TextRenderer.createCenteredText(this, exit.x, exit.y, exit.name, {
+      fontSize: '14px',
+      color: '#ffffff',
+      backgroundColor: '#000000',
+      padding: { x: 2, y: 1 }
+    });
   }
 }
