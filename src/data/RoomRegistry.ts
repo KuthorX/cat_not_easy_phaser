@@ -393,6 +393,13 @@ export class RoomRegistry {
           scale: 0.5,
           imageKey: 'living_room_east_table',
           actions: ['sweep_table'],
+          outline: {
+            color: '#000000',
+            offset_x: 30,
+            offset_y: -45,
+            offset_width: 100,
+            offset_height: 250,
+          }
         },
         {
           type: 'InteractiveObject',
@@ -490,7 +497,15 @@ export class RoomRegistry {
           height: 483,
           scale: 0.5,
           imageKey: 'living_room_east_cat_tree',
-          actions: ['climb_cat_tree', 'play_cat_tree']
+          actions: ['climb_cat_tree', 'play_cat_tree'],
+          outline: {
+            color: '#FF6B35', // 橙色外框
+            offset_x: 0,
+            offset_y: 0,
+            offset_width: 20, // 宽度增加20像素
+            offset_height: 40, // 高度增加40像素
+            offset_scale: 1.1 // 额外缩放1.1倍
+          }
         },
         {
           type: 'InteractiveObject',

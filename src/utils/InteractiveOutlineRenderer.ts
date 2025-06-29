@@ -24,6 +24,8 @@ export class InteractiveOutlineRenderer {
    * @param height 高度
    * @param color 外框颜色
    * @param thickness 外框厚度
+   * @param scale 缩放比例
+   * @param outlineConfig 自定义外框配置
    * @returns 外框图形对象
    */
   public createInteractiveOutline(
@@ -32,8 +34,10 @@ export class InteractiveOutlineRenderer {
     y: number,
     width: number,
     height: number,
-    color: number = 0x00ff00,
-    thickness: number = 2
+    color: number = 0x000000,
+    thickness: number = 2,
+    scale: number = 1,
+    outlineConfig?: any
   ): Phaser.GameObjects.Graphics {
     // 移除已存在的外框
     this.removeInteractiveOutline(objectId);
@@ -41,14 +45,59 @@ export class InteractiveOutlineRenderer {
     const outline = this.scene.add.graphics();
     outline.setDepth(1000);
     
-    // 设置线条样式
-    outline.lineStyle(thickness, color, 1);
+    // 应用自定义配置
+    let finalColor = color;
+    let finalThickness = thickness;
+    let finalScale = scale;
+    let finalX = x;
+    let finalY = y;
+    let finalWidth = width;
+    let finalHeight = height;
     
-    // 绘制虚线矩形外框
-    this.drawDashedRect(outline, x - width / 2, y - height / 2, width, height);
+    if (outlineConfig) {
+      // 应用颜色配置
+      if (outlineConfig.color) {
+        // 将颜色字符串转换为数字
+        finalColor = this.parseColor(outlineConfig.color);
+      }
+      
+      // 应用偏移配置
+      if (outlineConfig.offset_x !== undefined) {
+        finalX += outlineConfig.offset_x;
+      }
+      if (outlineConfig.offset_y !== undefined) {
+        finalY += outlineConfig.offset_y;
+      }
+      
+      // 应用尺寸偏移配置
+      if (outlineConfig.offset_width !== undefined) {
+        finalWidth += outlineConfig.offset_width;
+      }
+      if (outlineConfig.offset_height !== undefined) {
+        finalHeight += outlineConfig.offset_height;
+      }
+      
+      // 应用缩放偏移配置
+      if (outlineConfig.offset_scale !== undefined) {
+        finalScale *= outlineConfig.offset_scale;
+      }
+    }
+    
+    // 设置线条样式
+    outline.lineStyle(finalThickness, finalColor, 1);
+    
+    // 应用缩放后的尺寸
+    const scaledWidth = finalWidth * finalScale;
+    const scaledHeight = finalHeight * finalScale;
+    
+    // 绘制虚线矩形外框 - 以物体中心为原点绘制，应用缩放
+    this.drawDashedRect(outline, -scaledWidth / 2, -scaledHeight / 2, scaledWidth, scaledHeight);
+    
+    // 设置外框位置为物体中心
+    outline.setPosition(finalX, finalY);
     
     // 创建动画效果
-    this.createOutlineAnimation(outline, width, height);
+    this.createOutlineAnimation(outline, scaledWidth, scaledHeight);
     
     // 存储外框引用
     this.activeOutlines.set(objectId, outline);
@@ -153,12 +202,12 @@ export class InteractiveOutlineRenderer {
     originalWidth: number,
     originalHeight: number
   ): void {
-    // 创建缩放动画
+    // 创建缩放动画 - 由于外框已经以物体中心为原点绘制，缩放会以中心为基准
     this.tweenManager.add({
       targets: outline,
-      scaleX: 1.1,
-      scaleY: 1.1,
-      duration: 1000,
+      scaleX: 1.15,
+      scaleY: 1.15,
+      duration: 1200,
       ease: 'Power2',
       yoyo: true,
       repeat: -1
@@ -167,12 +216,12 @@ export class InteractiveOutlineRenderer {
     // 创建透明度动画
     this.tweenManager.add({
       targets: outline,
-      alpha: 0.3,
-      duration: 800,
+      alpha: 0.4,
+      duration: 1000,
       ease: 'Power2',
       yoyo: true,
       repeat: -1,
-      delay: 200
+      delay: 300
     });
   }
 
@@ -232,6 +281,40 @@ export class InteractiveOutlineRenderer {
     this.clearAllOutlines();
     if (this.outlineGraphics) {
       this.outlineGraphics.destroy();
+    }
+  }
+
+  /**
+   * 将颜色字符串转换为数字
+   * @param colorString 颜色字符串 (如 "#000000", "black", "0x000000")
+   * @returns 颜色数字
+   */
+  private parseColor(colorString: string): number {
+    if (colorString.startsWith('#')) {
+      // 十六进制颜色
+      return parseInt(colorString.substring(1), 16);
+    } else if (colorString.startsWith('0x')) {
+      // 0x格式颜色
+      return parseInt(colorString.substring(2), 16);
+    } else {
+      // 预定义颜色名称
+      const colorMap: Record<string, number> = {
+        'black': 0x000000,
+        'white': 0xFFFFFF,
+        'red': 0xFF0000,
+        'green': 0x00FF00,
+        'blue': 0x0000FF,
+        'yellow': 0xFFFF00,
+        'cyan': 0x00FFFF,
+        'magenta': 0xFF00FF,
+        'gray': 0x808080,
+        'grey': 0x808080,
+        'orange': 0xFFA500,
+        'purple': 0x800080,
+        'brown': 0xA52A2A,
+        'pink': 0xFFC0CB
+      };
+      return colorMap[colorString.toLowerCase()] || 0x000000;
     }
   }
 } 

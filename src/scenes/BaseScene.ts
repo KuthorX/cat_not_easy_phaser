@@ -363,6 +363,23 @@ export abstract class BaseScene extends Phaser.Scene {
     return null; // 默认返回null，子类需要重写
   }
 
+  /**
+   * 计算物体的缩放比例
+   * @param obj 交互对象
+   * @returns 缩放比例
+   */
+  private calculateObjectScale(obj: any): number {
+    if (obj.scale_width && obj.scale_height) {
+      // 如果有scale_width和scale_height，计算平均缩放比例
+      const scaleX = obj.scale_width / obj.width;
+      const scaleY = obj.scale_height / obj.height;
+      return (scaleX + scaleY) / 2;
+    } else if (obj.scale) {
+      return obj.scale;
+    }
+    return 1;
+  }
+
   // 统一处理动作动画和想法气泡的时序关系
   protected handleActionAnimationAndThought(action: any, actionId: string, onAnimationComplete?: () => void): void {
     // 播放PNG序列动画
@@ -612,11 +629,15 @@ export abstract class BaseScene extends Phaser.Scene {
 
   // 创建交互对象
   private createInteractiveObject(obj: any): Phaser.GameObjects.Rectangle {
-    const rect = this.add.rectangle(obj.x, obj.y, obj.width, obj.height, 0x00ff00, 0.3);
+    const scale = this.calculateObjectScale(obj);
+    const scaledWidth = obj.width * scale;
+    const scaledHeight = obj.height * scale;
+    
+    const rect = this.add.rectangle(obj.x, obj.y, scaledWidth, scaledHeight, 0x00ff00, 0.3);
     this.physics.add.existing(rect, true);
     
-    // 如果disableInteractive为true，则需要设置交互
-    if (obj.disableInteractive === true) {
+    // 如果disableInteractive不为true，则需要设置交互
+    if (obj.disableInteractive !== true) {
       rect.setInteractive();
       
       rect.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
@@ -626,10 +647,14 @@ export abstract class BaseScene extends Phaser.Scene {
       rect.on('pointerover', () => {
         console.log('InteractiveObject 鼠标悬停', obj.id);
         rect.setFillStyle(0x00ff00, 0.5);
+        // 创建交互式外框 - 传递缩放参数和outline配置
+        this.interactiveOutlineRenderer.createInteractiveOutline(obj.id, obj.x, obj.y, obj.width, obj.height, 0x000000, 2, scale, obj.outline);
       });
 
       rect.on('pointerout', () => {
         rect.setFillStyle(0x00ff00, 0.3);
+        // 移除交互式外框
+        this.interactiveOutlineRenderer.removeInteractiveOutline(obj.id);
       });
     }
 
@@ -651,19 +676,36 @@ export abstract class BaseScene extends Phaser.Scene {
       image.setScale(obj.scale);
     }
 
+    // 计算缩放后的尺寸
+    const scale = this.calculateObjectScale(obj);
+    const scaledWidth = obj.width * scale;
+    const scaledHeight = obj.height * scale;
+
     // 设置物理体的大小以匹配交互区域
     const body = image.body as Phaser.Physics.Arcade.StaticBody;
-    body.setSize(obj.width, obj.height);
+    body.setSize(scaledWidth, scaledHeight);
     
-    // 如果disableInteractive为true，不创建交互区域
+    // 如果disableInteractive不为true，创建交互区域
     if (obj.disableInteractive !== true) {
       // 创建不可见的交互区域
-      const interactiveArea = this.add.rectangle(obj.x, obj.y, obj.width, obj.height, 0x000000, 0);
+      const interactiveArea = this.add.rectangle(obj.x, obj.y, scaledWidth, scaledHeight, 0x000000, 0);
       interactiveArea.setInteractive();
     
       // 点击事件
       interactiveArea.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
         this.onObjectClicked(obj, pointer);
+      });
+
+      // 悬停事件
+      interactiveArea.on('pointerover', () => {
+        console.log('InteractiveImageObject 鼠标悬停', obj.id);
+        // 创建交互式外框 - 传递缩放参数和outline配置
+        this.interactiveOutlineRenderer.createInteractiveOutline(obj.id, obj.x, obj.y, obj.width, obj.height, 0x000000, 2, scale, obj.outline);
+      });
+
+      interactiveArea.on('pointerout', () => {
+        // 移除交互式外框
+        this.interactiveOutlineRenderer.removeInteractiveOutline(obj.id);
       });
     }
 
@@ -673,10 +715,30 @@ export abstract class BaseScene extends Phaser.Scene {
   private createInteractiveObjectsWithSprite(obj : InteractiveObjectWithSprite): Phaser.GameObjects.Sprite {
     const sprite = obj.spriteConstructor(this, obj.x, obj.y);
     
-    // 如果disableInteractive为true，不设置交互
+    // 如果disableInteractive不为true，设置交互
     if (obj.disableInteractive !== true) {
+      // 计算缩放后的交互区域大小
+      const scale = this.calculateObjectScale(obj);
+      const scaledWidth = obj.width * scale;
+      const scaledHeight = obj.height * scale;
+      
+      // 设置交互区域大小
+      sprite.setInteractive(new Phaser.Geom.Rectangle(-scaledWidth / 2, -scaledHeight / 2, scaledWidth, scaledHeight), Phaser.Geom.Rectangle.Contains);
+      
       sprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
         this.onObjectClicked(obj, pointer);
+      });
+
+      // 悬停事件
+      sprite.on('pointerover', () => {
+        console.log('InteractiveObjectWithSprite 鼠标悬停', obj.id);
+        // 创建交互式外框 - 传递缩放参数和outline配置
+        this.interactiveOutlineRenderer.createInteractiveOutline(obj.id, obj.x, obj.y, obj.width, obj.height, 0x000000, 2, scale, obj.outline);
+      });
+
+      sprite.on('pointerout', () => {
+        // 移除交互式外框
+        this.interactiveOutlineRenderer.removeInteractiveOutline(obj.id);
       });
     }
     
@@ -744,11 +806,6 @@ export abstract class BaseScene extends Phaser.Scene {
     // 清理TweenManager
     if (this.tweenManager) {
       this.tweenManager.destroy();
-    }
-
-    // 清理描边渲染器
-    if (this.outlineRenderer) {
-      this.outlineRenderer.destroy();
     }
 
     // 清理交互式外框渲染器

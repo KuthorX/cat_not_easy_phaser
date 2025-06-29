@@ -154,6 +154,7 @@ export interface InteractiveObjectWithSprite extends BaseObject {
   spriteConstructor: (scene : Phaser.Scene, x: number, y: number)=> Phaser.Physics.Arcade.Sprite ;
   disableInteractive?: boolean; // 是否禁用交互
   conditions?: InteractiveObjectCondition[];
+  outline?: InteractiveObjectOutlineConfig;
 }
 
 export interface InteractiveObject extends BaseObject {
@@ -168,6 +169,16 @@ export interface InteractiveObject extends BaseObject {
   scale_height?: number;
   disableInteractive?: boolean; // 是否禁用交互
   conditions?: InteractiveObjectCondition[];
+  outline?: InteractiveObjectOutlineConfig;
+}
+
+export interface InteractiveObjectOutlineConfig {
+  color?: string; // 默认黑色
+  offset_x?: number; // 偏移x
+  offset_y?: number; // 偏移y
+  offset_width?: number; // 偏移宽度
+  offset_height?: number; // 偏移高度
+  offset_scale?: number; // 偏移缩放
 }
 
 export interface InteractiveObjectCondition {
