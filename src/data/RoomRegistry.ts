@@ -359,7 +359,7 @@ export class RoomRegistry {
           imageKey: 'living_room_east_sofa',
           actions: ['sleeping', 'jumping'],
           outline: {
-            color: '#895D38',
+            color: '#FD6B35',
           }
         },
         {
@@ -374,7 +374,7 @@ export class RoomRegistry {
           imageKey: 'living_room_east_table',
           actions: ['sweep_table'],
           outline: {
-            color: '#E0BE5C',
+            color: '#FC6B35',
             offset_x: 30,
             offset_y: -45,
             offset_width: 100,
@@ -393,7 +393,7 @@ export class RoomRegistry {
           imageKey: 'living_room_east_dustbin',
           actions: ['search_dustbin', 'knock_over_dustbin'],
           outline: {
-            color: '#E0AE5C',
+            color: '#FA6B35',
           }
         },
         {
@@ -408,7 +408,7 @@ export class RoomRegistry {
           imageKey: 'living_room_east_cord',
           actions: ['play_cord', 'bite_cord'],
           outline: {
-            color: '#E0815C',
+            color: '#FF6C35',
           }
         },
         {
@@ -423,7 +423,7 @@ export class RoomRegistry {
           imageKey: 'living_room_east_tvtable',
           actions: ['jump_on_tvtable', 'hide_in_tvtable'],
           outline: {
-            color: '#E0CE5C',
+            color: '#FF6A35',
           }
         },
         {
@@ -438,7 +438,7 @@ export class RoomRegistry {
           imageKey: 'living_room_east_cat_nest',
           actions: ['sleep_in_nest', 'sniff_nest'],
           outline: {
-            color: '#E0A340',
+            color: '#FF6B30',
           }
         },
         {
@@ -458,7 +458,10 @@ export class RoomRegistry {
               value: 'tv_pushed',
               operator: 'not_has'
             }
-          ]
+          ],
+          outline: {
+            color: '#FF5A30',
+          }
         },
         {
           type: 'InteractiveObject',
