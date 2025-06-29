@@ -247,20 +247,8 @@ export class RoomRegistry {
     this.registerRoom({
       id: RoomKeys.HALLWAY,
       name: '过道',
-
-      background: 'hallway_bg',
+      background: 'hallway_bg_open',
       interactiveObjects: [
-        {
-          type: 'InteractiveObject',
-          id: 'closed_door',
-          name: '关闭的房门（主卧）',
-          thought: '两脚兽的巢穴，它每天打猎归来就会回到这里。它不在的时候我很难进去。',
-          x: 300,
-          y: 200,
-          width: 50,
-          height: 80,
-          actions: ['unlock', 'enter']
-        },
         {
           type: 'InteractiveObject',
           id: 'small_shelf',
@@ -274,35 +262,28 @@ export class RoomRegistry {
         },
         {
           type: 'InteractiveObject',
-          id: 'bookshelf',
+          id: 'book_shelf',
           name: '书架',
           thought: '大架子，小册子。两脚兽会往上放很多东西，但很少再拿下来。真奇怪。',
-          x: 400,
-          y: 300,
-          width: 100,
-          height: 200,
+          x: 100,
+          y: 200,
+          width: 864,
+          height: 1231,
+          scale: 0.5,
+          imageKey: 'hallway_book_shelf', 
           actions: ['jump_on_big']
-        },
-        {
-          type: 'InteractiveObject',
-          id: 'food_bowl',
-          name: '粮盆与水碗',
-          thought: '定时涌现食物和净水的神奇地带。感谢大自然的馈赠！',
-          x: 500,
-          y: 400,
-          width: 40,
-          height: 40,
-          actions: ['eat']
         },
         {
           type: 'InteractiveObject',
           id: 'sealed_cat_food',
           name: '封口猫粮',
           thought: '好像有食物的气味。不过懒得管了。',
-          x: 600,
-          y: 400,
-          width: 30,
-          height: 30,
+          x: 100,
+          y: 500,
+          width: 687,
+          height: 776,
+          scale: 0.3,
+          imageKey: 'hallway_food',
           actions: []
         },
         {
@@ -310,31 +291,59 @@ export class RoomRegistry {
           id: 'robot',
           name: '小圆（扫地机器人）',
           thought: '小圆好像不喜欢这个架子，撞了它几下后就继续冬眠了。',
-          x: 700,
-          y: 500,
-          width: 50,
-          height: 50,
+          x: 400,
+          y: 400,
+          width: 562,
+          height: 313,
+          scale: 0.4,
+          imageKey: 'hallway_robot',
           actions: []
-        }
+        },
+        {
+          type: 'InteractiveObject',
+          id: 'food_bowl',
+          name: '粮盆与水碗',
+          thought: '定时涌现食物和净水的神奇地带。感谢大自然的馈赠！',
+          x: 1200,
+          y: 400,
+          width: 602,
+          height: 776,
+          scale: 0.4,
+          imageKey: 'hallway_eat',
+          actions: ['eat']
+        },
+        {
+          type: 'InteractiveObject',
+          id: 'water_bowl',
+          name: '粮盆与水碗',
+          thought: '定时涌现食物和净水的神奇地带。感谢大自然的馈赠！',
+          x: 1200,
+          y: 550,
+          width: 587,
+          height: 469,
+          scale: 0.4,
+          imageKey: 'hallway_water',
+          actions: ['eat']
+        },
       ],
       exits: [
         {
           id: 'exit_to_room_b',
           name: '主人房间',
           targetRoom: RoomKeys.ROOM_B,
-          x: 0,
-          y: 300,
-          width: 80,
-          height: 120
+          x: 650,
+          y: 100,
+          width: 120,
+          height: 40
         },
         {
           id: 'exit_to_living_room',
           name: '客厅',
           targetRoom: RoomKeys.LIVING_ROOM_WEST_LOW,
-          x: 1200,
-          y: 300,
-          width: 80,
-          height: 120
+          x: 600,
+          y: 700,
+          width: 120,
+          height: 40
         }
       ]
     });
