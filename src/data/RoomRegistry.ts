@@ -93,6 +93,15 @@ export class RoomRegistry {
           y: 360,
           width: 150,
           height: 50
+        },
+        {
+          id: 'exit_to_living_room_east',
+          name: '向东看',
+          targetRoom: RoomKeys.LIVING_ROOM_EAST,
+          x: 800,
+          y: 700,
+          width: 120,
+          height: 40
         }
       ]
     });
@@ -340,7 +349,7 @@ export class RoomRegistry {
           id: 'exit_to_living_room',
           name: '客厅',
           targetRoom: RoomKeys.LIVING_ROOM_WEST_LOW,
-          x: 600,
+          x: 500,
           y: 700,
           width: 120,
           height: 40
@@ -652,7 +661,7 @@ export class RoomRegistry {
           id: 'exit_to_west',
           name: '向西',
           targetRoom: RoomKeys.LIVING_ROOM_WEST_LOW,
-          x: 640,
+          x: 800,
           y: 705,
           width: 120,
           height: 30
