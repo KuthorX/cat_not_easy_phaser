@@ -285,13 +285,13 @@ export class LogPage implements IUIComponent {
 
   private createItemContainer(data: any): any {
     const itemContainer = this.scene!.make.container({}, false);
-    const title = this.scene!.make.text({ x: -350, y: 0, text: data.name, style: { fontSize: '18px', color: '#ffff00', fontStyle: 'bold' }}).setOrigin(0, 0);
-    const description = this.scene!.make.text({ x: -350, y: 25, text: data.description, style: { fontSize: '14px', color: '#ffffff', wordWrap: { width: 650 } }}).setOrigin(0, 0);
-    const progressText = this.scene!.make.text({ x: -350, y: 50, text: data.progress, style: { fontSize: '12px', color: '#cccccc' }}).setOrigin(0, 0);
+    const title = this.scene!.make.text({ x: -350, y: 0, text: data.name, style: { fontSize: '18px', color: '#ffff00', fontStyle: 'bold', padding: { x: 0, y: 5 } }}).setOrigin(0, 0);
+    const description = this.scene!.make.text({ x: -350, y: 25, text: data.description, style: { fontSize: '14px', color: '#ffffff', wordWrap: { width: 650 }, padding: { x: 0, y: 5 } }}).setOrigin(0, 0);
+    const progressText = this.scene!.make.text({ x: -350, y: 50, text: data.progress, style: { fontSize: '12px', color: '#cccccc' }, padding: { x: 0, y: 5 }}).setOrigin(0, 0);
 
     let conditionY = 70;
     data.conditions.forEach((condition: any) => {
-      const conditionText = this.scene!.make.text({ x: -330, y: conditionY, text: `• ${condition.description}`, style: { fontSize: '12px', color: condition.completed ? '#00ff00' : '#ff6666' }}).setOrigin(0, 0);
+      const conditionText = this.scene!.make.text({ x: -330, y: conditionY, text: `• ${condition.description}`, style: { fontSize: '12px', color: condition.completed ? '#00ff00' : '#ff6666', padding: { x: 0, y: 5 } }}).setOrigin(0, 0);
       itemContainer.add(conditionText);
       conditionY += 15;
     });
