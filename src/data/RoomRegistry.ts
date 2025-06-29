@@ -390,7 +390,7 @@ export class RoomRegistry {
           // scale_width: 400,
           // scale_height: 600,
           imageKey: 'living_room_east_sofa',
-          actions: ['sleep_on_sofa', 'scratch_sofa']
+          actions: ['sleeping', 'jumping']
         },
         {
           type: 'InteractiveObject',

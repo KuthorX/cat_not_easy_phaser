@@ -129,6 +129,98 @@ export class BagRegistry {
       usableIn: ['living_room_east', 'living_room_west_low', 'room_b']
     });
 
+    // 新增道具
+    this.registerItem({
+      id: 'cat_bites_rope',
+      name: '猫咬绳',
+      description: '长条粗麻绳，摇晃起来有声音，总感觉在挑衅我。',
+      type: 'toy',
+      rarity: 'common',
+      effects: [],
+      conditions: [],
+      maxStack: 1,
+      obtainableFrom: ['bites_rope'],
+      usableIn: ['living_room_west_high']
+    });
+
+    this.registerItem({
+      id: 'cat_bites_air',
+      name: '咬空气',
+      description: '神秘的小黑盒子，两脚兽有时候会拿起来摩擦两下就放下。',
+      type: 'tool',
+      rarity: 'rare',
+      effects: [],
+      conditions: [],
+      maxStack: 1,
+      obtainableFrom: ['bites_air'],
+      usableIn: ['living_room_west_high']
+    });
+
+    this.registerItem({
+      id: 'spinning_ball',
+      name: '转球',
+      description: '从桌下抓出来的小球，可以滚动玩耍。',
+      type: 'toy',
+      rarity: 'common',
+      effects: [],
+      conditions: [],
+      maxStack: 1,
+      obtainableFrom: ['shaking_bite_rope'],
+      usableIn: ['living_room_east']
+    });
+
+    this.registerItem({
+      id: 'medium_box',
+      name: '中型箱子',
+      description: '从杂物堆中找到的箱子，可以用来加固堡垒。',
+      type: 'material',
+      rarity: 'common',
+      effects: [],
+      conditions: [],
+      maxStack: 5,
+      obtainableFrom: ['rummage'],
+      usableIn: ['balcony']
+    });
+
+    this.registerItem({
+      id: 'heavy_water_bottle',
+      name: '沉重水瓶',
+      description: '灰扑扑的大圆瓶子，可以用来加固堡垒。',
+      type: 'material',
+      rarity: 'common',
+      effects: [],
+      conditions: [],
+      maxStack: 3,
+      obtainableFrom: ['rummage_water'],
+      usableIn: ['balcony']
+    });
+
+    this.registerItem({
+      id: 'expired_drink',
+      name: '过期饮料',
+      description: '花花绿绿的水源，两脚兽喜欢饮用。可以用来加固堡垒。',
+      type: 'material',
+      rarity: 'common',
+      effects: [],
+      conditions: [],
+      maxStack: 5,
+      obtainableFrom: ['drink_carry'],
+      usableIn: ['balcony']
+    });
+
+    this.registerItem({
+      id: 'large_box',
+      name: '大箱子',
+      description: '从堡垒地基中找到的大箱子，可以作为地基使用。',
+      type: 'material',
+      rarity: 'uncommon',
+      effects: [],
+      conditions: [],
+      maxStack: 2,
+      obtainableFrom: ['inspect'],
+      usableIn: ['balcony']
+    });
+
     // 工具类物品
     this.registerItem({
       id: 'key',

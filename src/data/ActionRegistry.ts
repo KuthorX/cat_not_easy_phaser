@@ -34,21 +34,34 @@ export class ActionRegistry {
     this.registerAction({
       id: 'conversating',
       name: '对话',
-      effects: [],
+      effects: [
+        { type: 'story_flag', value: 'balcony_conversation', operation: 'set' }
+      ],
       conditions: []
     });
 
     this.registerAction({
       id: 'opening',
       name: '打开',
-      effects: [],
-      conditions: []
+      effects: [
+        { type: 'story_flag', value: 'balcony_opened', operation: 'set' }
+      ],
+      conditions: [
+        { type: 'inventory', operator: 'has', value: 'cat_bites_air' }
+      ],
+      specialCondition: {
+        type: 'inventory_check',
+        value: 'cat_bites_air',
+        failureMessage: '需要咬空气才能打开这个禁制。'
+      }
     });
 
     this.registerAction({
       id: 'catching',
       name: '抓出来',
-      effects: [],
+      effects: [
+        { type: 'story_flag', value: 'toy_hidden_deeper', operation: 'set' }
+      ],
       conditions: []
     });
 
@@ -56,8 +69,17 @@ export class ActionRegistry {
       id: 'shaking_bite_rope',
       name: '甩动咬绳',
       timeCost: 60,
-      effects: [],
-      conditions: []
+      effects: [
+        { type: 'inventory', value: 'spinning_ball', operation: 'add' }
+      ],
+      conditions: [
+        { type: 'inventory', operator: 'has', value: 'cat_bites_rope' }
+      ],
+      specialCondition: {
+        type: 'inventory_check',
+        value: 'cat_bites_rope',
+        failureMessage: '需要猫咬绳才能甩动。'
+      }
     });
 
     this.registerAction({
@@ -65,7 +87,9 @@ export class ActionRegistry {
       name: '睡大觉',
       energyRequirement: 1,
       timeCost: 60,
-      effects: [],
+      effects: [
+        { type: 'energy', value: 1, operation: 'add' }
+      ],
       conditions: []
     });
 
@@ -73,30 +97,54 @@ export class ActionRegistry {
       id: 'sweep_table',
       name: '扫落',
       timeCost: 60,
-      effects: [],
+      effects: [
+        { type: 'story_flag', value: 'table_swept', operation: 'set' }
+      ],
       conditions: []
     });
 
     this.registerAction({
       id: 'attack_tv',
       name: '攻击',
-      effects: [],
-      conditions: []
+      energyCost: 1,
+      timeCost: 60,
+      effects: [
+        { type: 'story_flag', value: 'tv_destroyed', operation: 'set' }
+      ],
+      conditions: [
+        { type: 'story_flag', operator: 'has', value: 'on_cat_bed' }
+      ],
+      specialCondition: {
+        type: 'position_check',
+        value: 'on_cat_bed',
+        failureMessage: '我够不到它！'
+      }
     });
 
     this.registerAction({
       id: 'grinding_claws',
       name: '磨爪',
       timeCost: 60,
-      effects: [],
+      effects: [
+        { type: 'story_flag', value: 'claws_sharpened', operation: 'set' }
+      ],
       conditions: []
     });
 
     this.registerAction({
       id: 'jumping',
       name: '跳跃',
-      effects: [],
-      conditions: []
+      effects: [
+        { type: 'story_flag', value: 'on_cat_bed', operation: 'set' }
+      ],
+      conditions: [
+        { type: 'energy', operator: 'gte', value: 2 }
+      ],
+      specialCondition: {
+        type: 'energy_check',
+        value: 2,
+        failureMessage: '精力不足，跳不上去...'
+      }
     });
 
     //客厅门口
@@ -104,7 +152,9 @@ export class ActionRegistry {
       id: 'rummage',
       name: '翻找',
       timeCost: 60,
-      effects: [],
+      effects: [
+        { type: 'inventory', value: 'medium_box', operation: 'add' }
+      ],
       conditions: []
     });
 
@@ -112,7 +162,9 @@ export class ActionRegistry {
       id: 'pounce',
       name: '扑击',
       timeCost: 60,
-      effects: [],
+      effects: [
+        { type: 'story_flag', value: 'router_damaged', operation: 'set' }
+      ],
       conditions: []
     });
 
@@ -120,7 +172,9 @@ export class ActionRegistry {
       id: 'rummage_water',
       name: '翻找',
       timeCost: 60,
-      effects: [],
+      effects: [
+        { type: 'inventory', value: 'heavy_water_bottle', operation: 'add' }
+      ],
       conditions: []
     });
 
@@ -128,30 +182,52 @@ export class ActionRegistry {
     this.registerAction({
       id: 'unlock',
       name: '解锁',
-      effects: [],
-      conditions: []
+      effects: [
+        { type: 'story_flag', value: 'door_unlocked', operation: 'set' }
+      ],
+      conditions: [
+        { type: 'story_flag', operator: 'has', value: 'on_bookshelf' }
+      ]
     });
 
     this.registerAction({
       id: 'enter',
       name: '进入',
       effects: [],
-      conditions: []
+      conditions: [
+        { type: 'story_flag', operator: 'has', value: 'door_unlocked' }
+      ]
     });
 
     this.registerAction({
       id: 'jump_on',
       name: '跳上',
-      effects: [],
-      conditions: []
+      effects: [
+        { type: 'story_flag', value: 'on_small_shelf', operation: 'set' }
+      ],
+      conditions: [
+        { type: 'story_flag', operator: 'has', value: 'robot_stuck_on_shelf' }
+      ],
+      specialCondition: {
+        type: 'position_check',
+        value: 'robot_stuck_on_shelf',
+        failureMessage: '就差一点点高度了，我需要个垫脚的。'
+      }
     });
 
     this.registerAction({
       id: 'jump_on_big',
       name: '跳上',
       energyRequirement: 2,
-      effects: [],
-      conditions: []
+      effects: [
+        { type: 'story_flag', value: 'on_bookshelf', operation: 'set' }
+      ],
+      conditions: [],
+      specialCondition: {
+        type: 'energy_check',
+        value: 2,
+        failureMessage: '精力不足，跳不上去...'
+      }
     });
 
     this.registerAction({
@@ -159,7 +235,9 @@ export class ActionRegistry {
       name: '进食',
       energyRequirement: 1,
       timeCost: 60,
-      effects: [],
+      effects: [
+        { type: 'energy', value: 1, operation: 'add' }
+      ],
       conditions: []
     });
 
@@ -220,33 +298,15 @@ export class ActionRegistry {
       triggerDialogue: true
     });
 
-    // 沙发对话动作 - 纯对话触发，不包含效果
-    this.registerAction({
-      id: 'sleep_on_sofa',
-      name: '在沙发上睡觉',
-      effects: [], // 效果在对话选项中选择后执行
-      conditions: [],
-      dialogueId: 'sofa_conversation',
-      triggerDialogue: true
-    });
-
-    this.registerAction({
-      id: 'scratch_sofa',
-      name: '抓沙发',
-      energyCost: 1,
-      effects: [], // 效果在对话选项中选择后执行
-      conditions: [],
-      dialogueId: 'sofa_conversation',
-      triggerDialogue: true
-    });
-
     // 笼子相关动作 - 纯对话触发
     this.registerAction({
       id: 'attack_cage',
       name: '攻击笼子',
       energyCost: 1,
       timeCost: 60,
-      effects: [], // 效果在对话选项中选择后执行
+      effects: [
+        { type: 'story_flag', value: 'cage_attacked', operation: 'set' }
+      ],
       conditions: [],
       dialogueId: 'cage_conversation',
       triggerDialogue: true
@@ -255,17 +315,22 @@ export class ActionRegistry {
     this.registerAction({
       id: 'jump_on_cage',
       name: '踩跳',
-      effects: [], // 效果在对话选项中选择后执行
-      conditions: [],
-      dialogueId: 'cage_conversation',
-      triggerDialogue: true
+      effects: [
+        { type: 'story_flag', value: 'cage_jumped', operation: 'set' },
+        { type: 'room_access', value: 'living_room_west_high', operation: 'add' }
+      ],
+      conditions: [
+        { type: 'story_flag', operator: 'has', value: 'cage_attacked' }
+      ]
     });
 
     // 猫厕所动作 - 纯对话触发
     this.registerAction({
       id: 'use_litter_box',
       name: '使用猫厕所',
-      effects: [], // 效果在对话选项中选择后执行
+      effects: [
+        { type: 'energy', value: 1, operation: 'add' }
+      ],
       energyRequirement: 1,
       conditions: [],
       dialogueId: 'litter_box_conversation',
@@ -278,7 +343,9 @@ export class ActionRegistry {
       name: '在猫别墅里玩耍',
       timeCost: 60,
       energyCost: 1,
-      effects: [],
+      effects: [
+        { type: 'story_flag', value: 'play_time', operation: 'set' }
+      ],
       conditions: []
     });
 
@@ -288,7 +355,9 @@ export class ActionRegistry {
       name: '吃鱼干',
       timeCost: 60,
       energyRequirement: 1,
-      effects: [],
+      effects: [
+        { type: 'energy', value: 1, operation: 'add' }
+      ],
       conditions: []
     });
 
@@ -296,16 +365,20 @@ export class ActionRegistry {
     this.registerAction({
       id: 'bites_rope',
       name: '叼走',
-      effects:[],
-      conditions:[]
+      effects: [
+        { type: 'inventory', value: 'cat_bites_rope', operation: 'add' }
+      ],
+      conditions: []
     });
 
     // 叼走空气
     this.registerAction({
       id: 'bites_air',
       name: '叼走',
-      effects:[],
-      conditions:[]
+      effects: [
+        { type: 'inventory', value: 'cat_bites_air', operation: 'add' }
+      ],
+      conditions: []
     });
 
     this.registerAction({
@@ -336,17 +409,28 @@ export class ActionRegistry {
       id: 'destroy_screen',
       name: '破坏显示屏',
       energyCost: 3,
+      timeCost: 120,
       effects: [
         { type: 'story_flag', value: 'screen_destroyed', operation: 'set' }
       ],
-      conditions: []
+      conditions: [
+        { type: 'story_flag', operator: 'has', value: 'claws_sharpened' }
+      ],
+      specialCondition: {
+        type: 'story_flag_check',
+        value: 'claws_sharpened',
+        failureMessage: '爪子不够锋利，需要先磨爪。'
+      }
     });
 
     this.registerAction({
       id: 'climb_wardrobe',
       name: '钻进衣柜',
+      timeCost: 60,
+      energyRequirement: 1,
       effects: [
-        { type: 'story_flag', value: 'wardrobe_explored', operation: 'set' }
+        { type: 'story_flag', value: 'wardrobe_explored', operation: 'set' },
+        { type: 'energy', value: 1, operation: 'add' }
       ],
       conditions: []
     });
@@ -375,15 +459,28 @@ export class ActionRegistry {
     this.registerAction({
       id: 'reinforce',
       name: '加固',
-      effects: [],
-      conditions: [],
+      effects: [
+        { type: 'story_flag', value: 'fortress_reinforced', operation: 'set' }
+      ],
+      conditions: [
+        { type: 'inventory', operator: 'has', value: 'medium_box' },
+        { type: 'inventory', operator: 'has', value: 'heavy_water_bottle' },
+        { type: 'inventory', operator: 'has', value: 'expired_drink' }
+      ],
+      specialCondition: {
+        type: 'inventory_check',
+        value: ['medium_box', 'heavy_water_bottle', 'expired_drink'],
+        failureMessage: '这可是项大工程，还是得两脚兽来做。但他是个蠢货，得我物色好合适的材料才行。'
+      }
     });
 
     this.registerAction({
       id: 'inspect',
       name: '检阅',
       timeCost: 60,
-      effects: [],
+      effects: [
+        { type: 'inventory', value: 'large_box', operation: 'add' }
+      ],
       conditions: []
     });
 
@@ -391,7 +488,9 @@ export class ActionRegistry {
       id: 'interact',
       name: '互动',
       timeCost: 60,
-      effects: [],
+      effects: [
+        { type: 'energy', value: -1, operation: 'add' }
+      ],
       conditions: [],
     });
 
@@ -418,21 +517,27 @@ export class ActionRegistry {
       name: '玩耍',
       energyRequirement: 1,
       timeCost: 60,
-      effects: [],
+      effects: [
+        { type: 'story_flag', value: 'play_time', operation: 'set' }
+      ],
       conditions: []
     });
     
     this.registerAction({
       id: 'carry',
       name: '叼走',
-      effects: [],
+      effects: [
+        { type: 'inventory', value: 'toy_mouse', operation: 'add' }
+      ],
       conditions: []
     });
 
     this.registerAction({
       id: 'drink_carry',
       name: '叼走',
-      effects: [],
+      effects: [
+        { type: 'inventory', value: 'expired_drink', operation: 'add' }
+      ],
       conditions: []
     });
 
@@ -458,7 +563,9 @@ export class ActionRegistry {
       id: 'pee',
       name: '尿床',
       timeCost: 60,
-      effects: [],
+      effects: [
+        { type: 'story_flag', value: 'bed_claimed', operation: 'set' }
+      ],
       conditions: []
     });
 

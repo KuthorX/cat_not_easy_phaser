@@ -359,6 +359,21 @@ export abstract class BaseScene extends Phaser.Scene {
       case 'position_check':
         // 检查是否在指定物体上
         return gameState.storyFlags.get(specialCondition.value) === true;
+      case 'energy_check':
+        // 检查精力值是否足够
+        return gameState.energy >= specialCondition.value;
+      case 'inventory_check':
+        // 检查是否拥有指定物品
+        if (Array.isArray(specialCondition.value)) {
+          return specialCondition.value.every((itemId: string) => 
+            gameState.inventory.includes(itemId)
+          );
+        } else {
+          return gameState.inventory.includes(specialCondition.value);
+        }
+      case 'story_flag_check':
+        // 检查是否拥有指定故事标记
+        return gameState.storyFlags.get(specialCondition.value) === true;
       default:
         return true;
     }
