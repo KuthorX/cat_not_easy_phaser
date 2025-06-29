@@ -3,11 +3,11 @@ import { AchievementRegistry } from '../../data/AchievementRegistry';
 
 export class LogPage implements IUIComponent {
   private scene: Phaser.Scene | null = null;
-  private container: Phaser.GameObjects.Container | null = null;
+  private container: any = null;
   private background: Phaser.GameObjects.Rectangle | null = null;
   private title: Phaser.GameObjects.Text | null = null;
   private closeButton: Phaser.GameObjects.Text | null = null;
-  private scrollContainer: Phaser.GameObjects.Container | null = null;
+  private scrollContainer: any = null;
   private achievementRegistry: AchievementRegistry | null = null;
   private gameState: any = null;
   private currentPage = 0;
@@ -16,6 +16,103 @@ export class LogPage implements IUIComponent {
   private prevButton: Phaser.GameObjects.Text | null = null;
   private nextButton: Phaser.GameObjects.Text | null = null;
   private visibile : boolean = false;
+
+  // 文本映射
+  private actionTextMap: Map<string, string> = new Map([
+    // 玩耍相关动作
+    ['chew_rope', '咬绳子'],
+    ['chase_ball', '追球'],
+    ['play_with_mouse', '和玩具老鼠玩耍'],
+    ['carry_mouse', '叼走玩具老鼠'],
+    ['play_in_house', '在猫别墅里玩耍'],
+    ['sunbathing', '晒太阳'],
+    ['sleep_on_bed', '床上睡觉'],
+    ['eat_fish_treat', '吃鱼干'],
+    
+    // 破坏相关动作
+    ['sweep_table', '推倒桌子'],
+    ['attack_tv', '攻击电视'],
+    ['destroy_screen', '破坏显示屏'],
+    ['attack_cage', '攻击笼子'],
+    
+    // 其他动作
+    ['sleep_on_sofa', '沙发上睡觉'],
+    ['eat_food_water', '吃食物喝水'],
+    ['rummage', '翻找'],
+    ['rummage_water', '翻找水'],
+    ['pounce', '扑击'],
+    ['unlock', '解锁'],
+    ['enter', '进入'],
+    ['jump_on', '跳上'],
+    ['jump_on_big', '跳上高处'],
+    ['eat', '进食'],
+    ['poop', '拉屎'],
+    ['house_parkour', '全屋跑酷'],
+    ['bites_rope', '叼走绳子'],
+    ['bites_air', '叼走空气'],
+    ['carry_mouse', '叼走玩具老鼠'],
+    ['climb_wardrobe', '钻进衣柜'],
+    ['sleep_hammock', '睡猫吊床'],
+    ['escape', '逃跑'],
+    ['reinforce', '加固'],
+    ['inspect', '检阅'],
+    ['interact', '互动'],
+    ['revenge', '报复'],
+    ['ride', '骑上'],
+    ['play', '玩耍'],
+    ['carry', '叼走'],
+    ['drink_carry', '叼走饮料'],
+    ['destroy', '破坏'],
+    ['hide', '钻进去'],
+    ['pee', '尿床']
+  ]);
+
+  private roomTextMap: Map<string, string> = new Map([
+    ['living_room_north', '客厅 - 向北看'],
+    ['living_room_east', '客厅 - 向东看'],
+    ['living_room_west_low', '客厅 - 向西看（低处）'],
+    ['living_room_west_high', '客厅 - 向西看（高处）'],
+    ['living_room_door', '客厅门口'],
+    ['hallway', '过道'],
+    ['room_b', '主人房间'],
+    ['balcony', '阳台'],
+    ['doorway', '门口 - 通向自由']
+  ]);
+
+  private itemTextMap: Map<string, string> = new Map([
+    ['cat_food', '猫粮'],
+    ['fish_treat', '鱼干'],
+    ['milk', '牛奶'],
+    ['toy_mouse', '玩具老鼠'],
+    ['rope_toy', '咬绳'],
+    ['ball', '小球'],
+    ['key', '钥匙'],
+    ['defense_materials', '防御材料'],
+    ['neighbor_cat_fur', '邻居猫的毛'],
+    ['owner_scent', '主人的气味']
+  ]);
+
+  private storyFlagTextMap: Map<string, string> = new Map([
+    ['no_destruction', '没有进行破坏'],
+    ['greet_owner', '门口迎接主人'],
+    ['escaped_through_balcony', '从阳台逃跑'],
+    ['fought_neighbor_cat', '与邻居猫战斗'],
+    ['escaped_through_neighbor', '通过邻居家逃跑'],
+    ['prepared_defense', '准备防御'],
+    ['placed_toy_mouse_trap', '放置玩具老鼠陷阱'],
+    ['placed_other_traps', '放置其他陷阱'],
+    ['play_time', '玩耍时光'],
+    ['screen_destroyed', '显示屏被破坏'],
+    ['wardrobe_explored', '探索衣柜'],
+    ['escaped', '成功逃跑'],
+    ['parkour_completed', '完成跑酷'],
+    ['mouse_carried', '叼走玩具老鼠'],
+    ['has_toy_mouse', '拥有玩具老鼠'],
+    ['has_rope_toy', '拥有咬绳'],
+    ['has_ball', '拥有小球'],
+    ['defeated_neighbor_cat', '击败邻居猫'],
+    ['has_owner_scent', '拥有主人的气味']
+  ]);
 
   constructor() {
     console.log('LogPage constructor');
@@ -186,7 +283,7 @@ export class LogPage implements IUIComponent {
     this.updatePaginationControls();
   }
 
-  private createItemContainer(data: any): Phaser.GameObjects.Container {
+  private createItemContainer(data: any): any {
     const itemContainer = this.scene!.make.container({}, false);
     const title = this.scene!.make.text({ x: -350, y: 0, text: data.name, style: { fontSize: '18px', color: '#ffff00', fontStyle: 'bold' }}).setOrigin(0, 0);
     const description = this.scene!.make.text({ x: -350, y: 25, text: data.description, style: { fontSize: '14px', color: '#ffffff', wordWrap: { width: 650 } }}).setOrigin(0, 0);
@@ -243,15 +340,20 @@ export class LogPage implements IUIComponent {
   private getConditionDescription(condition: any): string {
     switch (condition.type) {
       case 'action_completed':
-        return `完成动作: ${condition.value}`;
+        const actionText = this.actionTextMap.get(condition.value) || `未知动作: ${condition.value}`;
+        return `完成动作: ${actionText}`;
       case 'item_destroyed':
-        return `破坏物品: ${condition.value}`;
+        const destroyedItemText = this.itemTextMap.get(condition.value) || `未知物品: ${condition.value}`;
+        return `破坏物品: ${destroyedItemText}`;
       case 'room_visited':
-        return `访问房间: ${condition.value}`;
+        const roomText = this.roomTextMap.get(condition.value) || `未知房间: ${condition.value}`;
+        return `访问房间: ${roomText}`;
       case 'inventory_has':
-        return `拥有物品: ${condition.value}`;
+        const inventoryItemText = this.itemTextMap.get(condition.value) || `未知物品: ${condition.value}`;
+        return `拥有物品: ${inventoryItemText}`;
       case 'story_flag':
-        return `故事标记: ${condition.value}`;
+        const storyFlagText = this.storyFlagTextMap.get(condition.value) || `未知故事标记: ${condition.value}`;
+        return `故事标记: ${storyFlagText}`;
       default:
         return `未知条件: ${condition.value}`;
     }
