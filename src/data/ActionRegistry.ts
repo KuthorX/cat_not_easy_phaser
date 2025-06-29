@@ -123,27 +123,9 @@ export class ActionRegistry {
         fps: 10,
       },
       effects: [
-        { type: 'story_flag', value: 'tv_table_pushed', operation: 'set' }
+        { type: 'story_flag', value: 'tv_pushed', operation: 'set' }
       ],
       conditions: []
-    });
-
-    this.registerAction({
-      id: 'attack_tv',
-      name: '攻击',
-      energyCost: 1,
-      timeCost: 60,
-      effects: [
-        { type: 'story_flag', value: 'tv_destroyed', operation: 'set' }
-      ],
-      conditions: [
-        { type: 'story_flag', operator: 'has', value: 'on_cat_bed' }
-      ],
-      specialCondition: {
-        type: 'position_check',
-        value: 'on_cat_bed',
-        failureMessage: '我够不到它！'
-      }
     });
 
     this.registerAction({
