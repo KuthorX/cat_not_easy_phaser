@@ -85,18 +85,26 @@ export class ActionRegistry {
     this.registerAction({
       id: 'sleeping',
       name: '睡大觉',
-      energyRequirement: 1,
       timeCost: 60,
       effects: [
         { type: 'energy', value: 1, operation: 'add' }
       ],
-      conditions: []
+      conditions: [
+        { type: 'energy', operator: 'gte', value: 1 }
+      ]
     });
 
     this.registerAction({
       id: 'sweep_table',
-      name: '扫落',
+      name: '扫它！',
       timeCost: 60,
+      playTweens: {
+        tweenKey: 'cat_oars',
+        x: 400,
+        y: 400,
+        scale: 0.5,
+        fps: 30,
+      },
       effects: [
         { type: 'story_flag', value: 'table_swept', operation: 'set' }
       ],
@@ -104,21 +112,20 @@ export class ActionRegistry {
     });
 
     this.registerAction({
-      id: 'attack_tv',
-      name: '攻击',
-      energyCost: 1,
+      id: 'push_tv',
+      name: '推它！',
       timeCost: 60,
+      playTweens: {
+        tweenKey: 'cat_push',
+        x: 600,
+        y: 400,
+        scale: 0.5,
+        fps: 10,
+      },
       effects: [
-        { type: 'story_flag', value: 'tv_destroyed', operation: 'set' }
+        { type: 'story_flag', value: 'tv_pushed', operation: 'set' }
       ],
-      conditions: [
-        { type: 'story_flag', operator: 'has', value: 'on_cat_bed' }
-      ],
-      specialCondition: {
-        type: 'position_check',
-        value: 'on_cat_bed',
-        failureMessage: '我够不到它！'
-      }
+      conditions: []
     });
 
     this.registerAction({
@@ -218,11 +225,12 @@ export class ActionRegistry {
     this.registerAction({
       id: 'jump_on_big',
       name: '跳上',
-      energyRequirement: 2,
       effects: [
         { type: 'story_flag', value: 'on_bookshelf', operation: 'set' }
       ],
-      conditions: [],
+      conditions: [
+        { type: 'energy', operator: 'gte', value: 2 }
+      ],
       specialCondition: {
         type: 'energy_check',
         value: 2,
@@ -233,12 +241,13 @@ export class ActionRegistry {
     this.registerAction({
       id: 'eat',
       name: '进食',
-      energyRequirement: 1,
       timeCost: 60,
       effects: [
         { type: 'energy', value: 1, operation: 'add' }
       ],
-      conditions: []
+      conditions: [
+        { type: 'energy', operator: 'gte', value: 1 }
+      ]
     });
 
     // 主人房间动作
@@ -331,8 +340,9 @@ export class ActionRegistry {
       effects: [
         { type: 'energy', value: 1, operation: 'add' }
       ],
-      energyRequirement: 1,
-      conditions: [],
+      conditions: [
+        { type: 'energy', operator: 'gte', value: 1 }
+      ],
       dialogueId: 'litter_box_conversation',
       triggerDialogue: true
     });
@@ -354,11 +364,12 @@ export class ActionRegistry {
       id: 'eat_fish_treat',
       name: '吃鱼干',
       timeCost: 60,
-      energyRequirement: 1,
       effects: [
         { type: 'energy', value: 1, operation: 'add' }
       ],
-      conditions: []
+      conditions: [
+        { type: 'energy', operator: 'gte', value: 1 }
+      ]
     });
 
     // 叼走绳子
@@ -427,12 +438,13 @@ export class ActionRegistry {
       id: 'climb_wardrobe',
       name: '钻进衣柜',
       timeCost: 60,
-      energyRequirement: 1,
       effects: [
         { type: 'story_flag', value: 'wardrobe_explored', operation: 'set' },
         { type: 'energy', value: 1, operation: 'add' }
       ],
-      conditions: []
+      conditions: [
+        { type: 'energy', operator: 'gte', value: 1 }
+      ]
     });
 
     this.registerAction({
@@ -515,12 +527,13 @@ export class ActionRegistry {
     this.registerAction({
       id: 'play',
       name: '玩耍',
-      energyRequirement: 1,
       timeCost: 60,
       effects: [
         { type: 'story_flag', value: 'play_time', operation: 'set' }
       ],
-      conditions: []
+      conditions: [
+        { type: 'energy', operator: 'gte', value: 1 }
+      ]
     });
     
     this.registerAction({
@@ -544,19 +557,21 @@ export class ActionRegistry {
     this.registerAction({
       id: 'destroy',
       name: '破坏',
-      energyRequirement: 3,
       timeCost: 120,
       effects: [],
-      conditions: []
+      conditions: [
+        { type: 'energy', operator: 'gte', value: 3 }
+      ]
     });
 
     this.registerAction({
       id: 'hide',
       name: '钻进去',
-      energyRequirement: 1,
       timeCost: 60,
       effects: [],
-      conditions: []
+      conditions: [
+        { type: 'energy', operator: 'gte', value: 1 }
+      ]
     });
 
     this.registerAction({
@@ -655,6 +670,16 @@ export class ActionRegistry {
       ],
       conditions: []
     });
+
+    this.registerAction({
+      id: 'add_cat_eat_air_to_inventory',
+      name: '我要把它拿到手！',
+      timeCost: 0,
+      effects: [
+        { type: 'inventory', value: 'cat_eat_air', operation: 'add' }
+      ],
+      conditions: []
+    });
   }
 
   public registerAction(action: Action): void {
@@ -677,11 +702,6 @@ export class ActionRegistry {
   public canExecuteAction(actionId: string, gameState: any): boolean {
     const action = this.getAction(actionId);
     if (!action) return false;
-
-    // 检查精力值要求
-    if (action.energyRequirement && gameState.energy < action.energyRequirement) {
-      return false;
-    }
 
     // 检查物品要求
     if (action.itemRequirement && !gameState.inventory.includes(action.itemRequirement)) {

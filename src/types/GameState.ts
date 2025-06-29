@@ -88,7 +88,6 @@ export interface Action {
   name: string;
   timeCost?: number;
   energyCost?: number;
-  energyRequirement?: number;
   roomRequirement?: string;
   itemRequirement?: string;
   effects: ActionEffect[];
@@ -102,6 +101,7 @@ export interface Action {
     scale?: number;
     fps?: number;
     loop?: boolean;
+    repeat?: number;
   };
   specialCondition?: {
     type: string;
@@ -152,20 +152,39 @@ export interface InteractiveObjectWithSprite extends BaseObject {
   scale_width?: number;
   scale_height?: number;
   spriteConstructor: (scene : Phaser.Scene, x: number, y: number)=> Phaser.Physics.Arcade.Sprite ;
+  disableInteractive?: boolean; // 是否禁用交互
+  conditions?: InteractiveObjectCondition[];
+  outline?: InteractiveObjectOutlineConfig;
 }
 
 export interface InteractiveObject extends BaseObject {
   type: 'InteractiveObject';
   imageKey?: string;
-  state?: any;
   thought?: string;
   width: number;
   height: number;
-  actions: string[];
-  sprite? :string;
+  actions?: string[];
   scale?: number;
   scale_width?: number;
   scale_height?: number;
+  disableInteractive?: boolean; // 是否禁用交互
+  conditions?: InteractiveObjectCondition[];
+  outline?: InteractiveObjectOutlineConfig;
+}
+
+export interface InteractiveObjectOutlineConfig {
+  color?: string; // 默认黑色
+  offset_x?: number; // 偏移x
+  offset_y?: number; // 偏移y
+  offset_width?: number; // 偏移宽度
+  offset_height?: number; // 偏移高度
+  offset_scale?: number; // 偏移缩放
+}
+
+export interface InteractiveObjectCondition {
+  type: 'story_flag' | 'inventory' | 'action_completed';
+  value: any;
+  operator: 'eq' | 'ne' | 'has' | 'not_has';
 }
 
 export interface RoomExit {

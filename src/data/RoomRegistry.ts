@@ -14,9 +14,20 @@ export class RoomRegistry {
     this.registerRoom({
       id: RoomKeys.LIVING_ROOM_WEST_LOW,
       name: '客厅-向西看（低处）',
-      
-      background: 'living_room_west_low_bg',
+      background: 'living_room_west_down_bg',
       interactiveObjects: [
+        {
+          type: 'InteractiveObject',
+          id: 'cat_eat_air',
+          name: '咬空气',
+          thought: '这里是yaokongqi的thought。',
+          x: 500,
+          y: 400,
+          width: 502,
+          height: 448,
+          imageKey: 'living_room_west_down_cage',
+          actions: ['add_cat_eat_air_to_inventory']
+        },
         {
           type: 'InteractiveObject',
           id: 'cat_cage',
@@ -26,7 +37,6 @@ export class RoomRegistry {
           y: 400,
           width: 150,
           height: 100,
-          sprite: 'cat_cage',
           actions: ['attack_cage', 'jump_on_cage']
         },
         {
@@ -38,7 +48,6 @@ export class RoomRegistry {
           y: 500,
           width: 100,
           height: 80,
-          sprite: 'cat_litter_box',
           actions: ['use_litter_box']
         },
         {
@@ -50,25 +59,15 @@ export class RoomRegistry {
           y: 450,
           width: 120,
           height: 100,
-          sprite: 'cat_house',
           actions: ['play_in_house']
         }
       ],
       exits: [
         {
-          id: 'exit_to_north',
-          name: '向北',
-          targetRoom: RoomKeys.LIVING_ROOM_NORTH,
-          x: 640,
-          y: 0,
-          width: 120,
-          height: 80
-        },
-        {
           id: 'exit_to_high',
           name: '跳上高处',
           targetRoom: RoomKeys.LIVING_ROOM_WEST_HIGH,
-          x: 200,
+          x: 300,
           y: 300,
           width: 150,
           height: 50,
@@ -79,6 +78,15 @@ export class RoomRegistry {
               operator: 'eq'
             }
           ]
+        },
+        {
+          id: 'exit_to_bedroom',
+          name: '向过道',
+          targetRoom: RoomKeys.HALLWAY,
+          x: 75,
+          y: 360,
+          width: 150,
+          height: 50
         }
       ]
     });
@@ -87,8 +95,7 @@ export class RoomRegistry {
     this.registerRoom({
       id: RoomKeys.LIVING_ROOM_WEST_HIGH,
       name: '客厅-向西看（高处）',
-      
-      background: 'living_room_west_high_bg',
+      background: 'living_room_west_up_bg',
       interactiveObjects: [
         {
           type: 'InteractiveObject',
@@ -99,7 +106,6 @@ export class RoomRegistry {
           y: 350,
           width: 80,
           height: 40,
-          sprite: 'fish_treat',
           actions: ['eat_fish_treat']
         },
         {
@@ -111,7 +117,6 @@ export class RoomRegistry {
           y: 450,
           width: 80,
           height: 40,
-          sprite: 'cat_bites_rope',
           actions: ['bites_rope']
         },
         {
@@ -123,7 +128,6 @@ export class RoomRegistry {
           y: 550,
           width: 80,
           height: 40,
-          sprite: 'cat_bites_air',
           actions: ['bites_air']
         }
       ],
@@ -156,7 +160,6 @@ export class RoomRegistry {
           y: 250,
           width: 30,
           height: 30,
-          sprite: 'squeaky_toy_mouse',
           actions: ['play', 'carry']
         },
         {
@@ -168,7 +171,6 @@ export class RoomRegistry {
           y: 400,
           width: 20,
           height: 20,
-          sprite: 'drink',
           actions: ['drink_carry']
         },
         {
@@ -180,7 +182,6 @@ export class RoomRegistry {
           y: 300,
           width: 100,
           height: 50,
-          sprite: 'display',
           actions: ['destroy']
         },       
         {
@@ -192,7 +193,6 @@ export class RoomRegistry {
           y: 200,
           width: 80,
           height: 150,
-          sprite: 'wardrobe',
           actions: ['hide']
         },
         {
@@ -204,7 +204,6 @@ export class RoomRegistry {
           y: 400,
           width: 120,
           height: 80,
-          sprite: 'human_bed',
           actions: ['pee']
         }, 
         {
@@ -284,7 +283,6 @@ export class RoomRegistry {
           y: 200,
           width: 50,
           height: 80,
-          sprite: 'closed_door',
           actions: ['unlock', 'enter']
         },
         {
@@ -296,7 +294,6 @@ export class RoomRegistry {
           y: 250,
           width: 60,
           height: 30,
-          sprite: 'small_shelf',
           actions: ['jump_on']
         },
         {
@@ -308,7 +305,6 @@ export class RoomRegistry {
           y: 300,
           width: 100,
           height: 200,
-          sprite: 'bookshelf',
           actions: ['jump_on_big']
         },
         {
@@ -320,7 +316,6 @@ export class RoomRegistry {
           y: 400,
           width: 40,
           height: 40,
-          sprite: 'food_bowl',
           actions: ['eat']
         },
         {
@@ -332,7 +327,6 @@ export class RoomRegistry {
           y: 400,
           width: 30,
           height: 30,
-          sprite: 'sealed_cat_food',
           actions: []
         },
         {
@@ -344,7 +338,6 @@ export class RoomRegistry {
           y: 500,
           width: 50,
           height: 50,
-          sprite: 'robot',
           actions: []
         }
       ],
@@ -361,7 +354,7 @@ export class RoomRegistry {
         {
           id: 'exit_to_living_room',
           name: '客厅',
-          targetRoom: RoomKeys.LIVING_ROOM_NORTH,
+          targetRoom: RoomKeys.LIVING_ROOM_WEST_LOW,
           x: 1200,
           y: 300,
           width: 80,
@@ -387,8 +380,6 @@ export class RoomRegistry {
           width: 846,
           height: 1288,
           scale: 0.5,
-          // scale_width: 400,
-          // scale_height: 600,
           imageKey: 'living_room_east_sofa',
           actions: ['sleeping', 'jumping']
         },
@@ -402,7 +393,14 @@ export class RoomRegistry {
           height: 291,
           scale: 0.5,
           imageKey: 'living_room_east_table',
-          actions: ['jump_on_table', 'push_item_from_table']
+          actions: ['sweep_table'],
+          outline: {
+            color: '#000000',
+            offset_x: 30,
+            offset_y: -45,
+            offset_width: 100,
+            offset_height: 250,
+          }
         },
         {
           type: 'InteractiveObject',
@@ -462,7 +460,33 @@ export class RoomRegistry {
           height: 1088,
           scale: 0.5,
           imageKey: 'living_room_east_tv',
-          actions: ['watch_tv', 'paw_tv']
+          actions: ['push_tv'],
+          conditions: [
+            {
+              type: 'story_flag',
+              value: 'tv_pushed',
+              operator: 'not_has'
+            }
+          ]
+        },
+        {
+          type: 'InteractiveObject',
+          id: 'living_room_east_tv_down',
+          name: '掉落的电视',
+          x: 900,
+          y: 300,
+          width: 300,
+          height: 300,
+          scale: 0.5,
+          imageKey: 'living_room_east_tv_down',
+          disableInteractive: true,
+          conditions: [
+            {
+              type: 'story_flag',
+              value: 'tv_pushed',
+              operator: 'has'
+            }
+          ]
         },
         {
           type: 'InteractiveObject',
@@ -474,7 +498,15 @@ export class RoomRegistry {
           height: 483,
           scale: 0.5,
           imageKey: 'living_room_east_cat_tree',
-          actions: ['climb_cat_tree', 'play_cat_tree']
+          actions: ['climb_cat_tree', 'play_cat_tree'],
+          outline: {
+            color: '#FF6B35', // 橙色外框
+            offset_x: 0,
+            offset_y: 0,
+            offset_width: 20, // 宽度增加20像素
+            offset_height: 40, // 高度增加40像素
+            offset_scale: 1.1 // 额外缩放1.1倍
+          }
         },
         {
           type: 'InteractiveObject',
@@ -498,7 +530,14 @@ export class RoomRegistry {
           height: 150,
           scale: 0.5,
           imageKey: 'living_room_east_glass',
-          actions: ['push_glass', 'lick_glass']
+          disableInteractive: true,
+          conditions: [
+            {
+              type: 'story_flag',
+              value: 'table_swept',
+              operator: 'not_has'
+            }
+          ]
         },
         {
           type: 'InteractiveObject',
@@ -510,7 +549,14 @@ export class RoomRegistry {
           height: 228,
           scale: 0.5,
           imageKey: 'living_room_east_paper',
-          actions: ['play_paper', 'push_paper']
+          disableInteractive: true,
+          conditions: [
+            {
+              type: 'story_flag',
+              value: 'table_swept',
+              operator: 'not_has'
+            }
+          ]
         },
         {
           type: 'InteractiveObject',
@@ -522,7 +568,14 @@ export class RoomRegistry {
           height: 176,
           scale: 0.5,
           imageKey: 'living_room_east_cola',
-          actions: ['push_cola', 'lick_cola']
+          disableInteractive: true,
+          conditions: [
+            {
+              type: 'story_flag',
+              value: 'table_swept',
+              operator: 'not_has'
+            }
+          ]
         },
         {
           type: 'InteractiveObject',
@@ -534,7 +587,14 @@ export class RoomRegistry {
           height: 192,
           scale: 0.5,
           imageKey: 'living_room_east_milk',
-          actions: ['drink_milk', 'push_milk']
+          disableInteractive: true,
+          conditions: [
+            {
+              type: 'story_flag',
+              value: 'table_swept',
+              operator: 'not_has'
+            }
+          ]
         },
         {
           type: 'InteractiveObject',
@@ -546,28 +606,54 @@ export class RoomRegistry {
           height: 202,
           scale: 0.5,
           imageKey: 'living_room_east_pot',
-          actions: ['push_pot', 'sniff_pot']
+          disableInteractive: true,
+          conditions: [
+            {
+              type: 'story_flag',
+              value: 'table_swept',
+              operator: 'not_has'
+            }
+          ]
+        },
+        {
+          type: 'InteractiveObject',
+          id: 'living_room_east_sundries_down',
+          name: '掉落的杂物',
+          x: 200,
+          y: 300,
+          width: 925,
+          height: 629,
+          scale: 0.5,
+          imageKey: 'living_room_east_sundries_down',
+          disableInteractive: true,
+          conditions: [
+            {
+              type: 'story_flag',
+              value: 'table_swept',
+              operator: 'has'
+            }
+          ]
         },
       ],
       exits: [
         {
-          id: 'exit_to_north',
-          name: '向北',
-          targetRoom: RoomKeys.LIVING_ROOM_NORTH,
-          x: 640,
-          y: 0,
-          width: 120,
-          height: 80
-        },
-        {
           id: 'exit_to_balcony',
           name: '阳台',
           targetRoom: RoomKeys.BALCONY,
-          x: 1200,
-          y: 300,
-          width: 80,
-          height: 120
-        }
+          x: 640,
+          y: 15,
+          width: 120,
+          height: 30
+        },
+        {
+          id: 'exit_to_west',
+          name: '向西',
+          targetRoom: RoomKeys.LIVING_ROOM_WEST_LOW,
+          x: 640,
+          y: 705,
+          width: 120,
+          height: 30
+        },
       ]
     });
 
@@ -606,10 +692,11 @@ export class RoomRegistry {
           id: 'robot',
           name: '扫地机器人',
           thought: '这是小圆，家里的恶霸。它一直在冬眠，睡醒就会张牙舞爪横冲直撞，经过的地方都湿乎乎的。是令人恐惧的对手！',
-          x: 400,
-          y: 500,
+          x: 800,
+          y: 600,
           width: 60,
           height: 60,
+          scale: 0.8,
           imageKey: 'balcony_robot_cleaner',
           actions: ['revenge', 'ride']
         }
@@ -627,76 +714,6 @@ export class RoomRegistry {
       ]
     });
 
-    // 客厅门口
-    this.registerRoom({
-      id: RoomKeys.LIVING_ROOM_DOOR,
-      name: '客厅门口',
-      
-      background: 'living_room_door_bg',
-      interactiveObjects: [
-        {
-          type: 'InteractiveObject',
-          id: 'debris_pile',
-          name: '杂物堆(快递)',
-          thought: '两脚兽从门口拿来的小箱子，随手就扔在这里，都堆成小山了。',
-          x: 640,
-          y: 400,
-          width: 200,
-          height: 300,
-          sprite: 'debris_pile',
-          actions: ['rummage']
-        },
-        {
-          type: 'InteractiveObject',
-          id: 'router',
-          name: '路由器（荧光两角虫）',
-          x: 640,
-          y: 400,
-          width: 200,
-          height: 300,
-          sprite: 'router',
-          actions: ['pounce']
-        },
-        {
-          type: 'InteractiveObject',
-          id: 'buckets_water',
-          name: '大桶水',
-          x: 640,
-          y: 400,
-          width: 200,
-          height: 300,
-          sprite: 'buckets_water',
-          actions: ['rummage_water']
-        }
-      ],
-      exits: [
-        {
-          id: 'exit_to_living_room',
-          name: '返回客厅',
-          targetRoom: RoomKeys.LIVING_ROOM_NORTH,
-          x: 640,
-          y: 0,
-          width: 120,
-          height: 80
-        },
-        {
-          id: 'exit_to_outside',
-          name: '门外',
-          targetRoom: RoomKeys.DOORWAY,
-          x: 640,
-          y: 700,
-          width: 200,
-          height: 20,
-          requirements: [
-            {
-              type: 'story_flag',
-              value: 'door_opened',
-              operator: 'eq'
-            }
-          ]
-        }
-      ]
-    });
   }
 
 

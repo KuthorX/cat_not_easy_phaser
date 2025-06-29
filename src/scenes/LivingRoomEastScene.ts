@@ -27,7 +27,7 @@ export class LivingRoomEastScene extends BaseScene {
 
     // 创建交互对象
     roomData.interactiveObjects.forEach((obj) => {
-      this.addInteractiveObjecrs(obj);
+      this.addInteractiveObjects(obj);
     });
 
     // 创建出口
@@ -45,8 +45,6 @@ export class LivingRoomEastScene extends BaseScene {
       this.gameManager.visitRoom(RoomKeys.LIVING_ROOM_EAST);
     }
 
-    // 设置键盘快捷键
-    this.setupKeyboardShortcuts();
   }
 
   private createExit(exit: RoomExit): void {
@@ -75,29 +73,4 @@ export class LivingRoomEastScene extends BaseScene {
     });
   }
 
-  private setupKeyboardShortcuts(): void {
-    // I键打开物品栏
-    this.input.keyboard?.on('keydown-I', () => {
-      if (this.uiManager) {
-        this.uiManager.showInventoryPanel();
-      }
-    });
-
-    // ESC键隐藏UI
-    this.input.keyboard?.on('keydown-ESC', () => {
-      if (this.uiManager) {
-        this.uiManager.hideActionMenu();
-        this.uiManager.hideInventoryPanel();
-      }
-    });
-
-    // 数字键快速执行动作
-    this.input.keyboard?.on('keydown-ONE', () => {
-      this.executeAction('climb_wardrobe');
-    });
-
-    this.input.keyboard?.on('keydown-TWO', () => {
-      this.executeAction('sleep_hammock');
-    });
-  }
 } 

@@ -10,9 +10,7 @@ export class LivingRoomWestHighScene extends BaseScene {
   }
 
   protected initializeScene(): void {
-    // 设置背景
-    this.add.rectangle(640, 360, 1280, 720, 0x8B7355); // 棕色背景
-    
+
     // 添加房间标题
     TextRenderer.createCenteredText(this, 640, 50, '客厅 - 向西看（高处）', {
       fontSize: '32px',
@@ -26,7 +24,7 @@ export class LivingRoomWestHighScene extends BaseScene {
     
     // 创建交互对象
     roomData.interactiveObjects.forEach((obj) => {
-      this.addInteractiveObjecrs(obj);
+      this.addInteractiveObjects(obj);
     });
 
     // 创建出口

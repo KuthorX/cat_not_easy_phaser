@@ -7,6 +7,7 @@ export interface TweenPlayOptions {
   scale?: number;
   fps?: number;
   loop?: boolean;
+  repeat?: number;
   onComplete?: () => void;
 }
 
@@ -16,6 +17,8 @@ export class TweenManager {
   private tweenTimers: Map<string, Phaser.Time.TimerEvent> = new Map();
   private frameTimers: Map<string, Phaser.Time.TimerEvent> = new Map();
   private endCallbacks: Map<string, (() => void) | undefined> = new Map();
+  private repeatCounts: Map<string, { current: number; total: number }> = new Map();
+  private frameStates: Map<string, { currentFrame: number; frameCount: number }> = new Map();
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
@@ -33,6 +36,7 @@ export class TweenManager {
       scale = 0.5, 
       fps = 60, 
       loop = false, 
+      repeat = 1,
       onComplete 
     } = options;
 
@@ -55,9 +59,15 @@ export class TweenManager {
     // 存储回调函数
     this.endCallbacks.set(tweenKey, endCallback);
 
+    // 初始化重复计数
+    this.repeatCounts.set(tweenKey, { current: 0, total: repeat });
+
     // 计算动画持续时间（基于帧数和FPS）
     const frameCount = this.getFrameCount(tweenKey);
     const duration = (frameCount / fps) * 1000; // 转换为毫秒
+
+    // 初始化帧状态
+    this.frameStates.set(tweenKey, { currentFrame: 1, frameCount });
 
     // 如果设置了循环，设置定时器重复播放
     if (loop) {
@@ -78,7 +88,7 @@ export class TweenManager {
     }
 
     // 开始帧动画
-    this.startFrameAnimation(tweenKey, fps, frameCount);
+    this.startFrameAnimation(tweenKey, fps, options);
   }
 
   /**
@@ -101,34 +111,18 @@ export class TweenManager {
   /**
    * 开始帧动画
    */
-  private startFrameAnimation(tweenKey: string, fps: number, frameCount: number): void {
-    console.log('startFrameAnimation', tweenKey, fps, frameCount);
+  private startFrameAnimation(tweenKey: string, fps: number, options: TweenPlayOptions): void {
+    console.log('startFrameAnimation', tweenKey, fps);
     const sprite = this.activeTweens.get(tweenKey);
-    if (!sprite) return;
+    const frameState = this.frameStates.get(tweenKey);
+    if (!sprite || !frameState) return;
 
-    let currentFrame = 1;
     const frameDelay = 1000 / fps; // 每帧的延迟时间
 
     const frameTimer = this.scene.time.addEvent({
       delay: frameDelay,
       callback: () => {
-        if (currentFrame <= frameCount - 2) {
-          const frameNumber = String(currentFrame).padStart(3, '0');
-          const frameKey = `${tweenKey}_${frameNumber}`;
-          if (this.scene.textures.exists(frameKey)) {
-            sprite.setTexture(frameKey);
-          }
-          currentFrame++;
-        } else {
-          // 动画播放完毕，调用回调函数
-          console.log('动画播放完毕，调用回调函数');
-          const callback = this.endCallbacks.get(tweenKey);
-          if (callback) {
-            callback();
-          }
-          // 停止动画
-          this.stopTween(tweenKey);
-        }
+        this.updateFrame(tweenKey, options);
       },
       loop: true
     });
@@ -137,17 +131,67 @@ export class TweenManager {
   }
 
   /**
+   * 更新帧
+   */
+  private updateFrame(tweenKey: string, options: TweenPlayOptions): void {
+    const sprite = this.activeTweens.get(tweenKey);
+    const frameState = this.frameStates.get(tweenKey);
+    const repeatInfo = this.repeatCounts.get(tweenKey);
+    
+    if (!sprite || !frameState || !repeatInfo) {
+      console.warn('updateFrame: 缺少必要的状态信息', { tweenKey, sprite: !!sprite, frameState: !!frameState, repeatInfo: !!repeatInfo });
+      return;
+    }
+
+    console.log('updateFrame', tweenKey, frameState.currentFrame, frameState.frameCount);
+
+    if (frameState.currentFrame <= frameState.frameCount - 2) {
+      // 继续播放当前帧
+      const frameNumber = String(frameState.currentFrame).padStart(3, '0');
+      const frameKey = `${tweenKey}_${frameNumber}`;
+      if (this.scene.textures.exists(frameKey)) {
+        sprite.setTexture(frameKey);
+      }
+      frameState.currentFrame++;
+    } else {
+      // 当前动画播放完毕，检查是否需要重复
+      console.log('动画播放完毕，检查是否需要重复');
+      console.log('repeatInfo', repeatInfo);
+      
+      repeatInfo.current++;
+      
+      if (repeatInfo.current < repeatInfo.total) {
+        // 还需要重复播放
+        console.log(`动画 ${tweenKey} 重复播放 ${repeatInfo.current}/${repeatInfo.total}`);
+        // 重置帧计数并继续播放
+        frameState.currentFrame = 1;
+        sprite.setTexture(tweenKey); // 重置为第一帧
+      } else {
+        // 所有重复播放完成，调用回调函数
+        console.log(`动画 ${tweenKey} 播放完毕，共播放 ${repeatInfo.total} 次`);
+        const callback = this.endCallbacks.get(tweenKey);
+        if (callback) {
+          callback();
+        }
+        // 停止动画
+        this.stopTween(tweenKey);
+      }
+    }
+  }
+
+  /**
    * 重新开始动画
    */
   private restartTween(tweenKey: string, options: TweenPlayOptions): void {
     const sprite = this.activeTweens.get(tweenKey);
-    if (sprite) {
+    const frameState = this.frameStates.get(tweenKey);
+    if (sprite && frameState) {
       sprite.setTexture(tweenKey); // 重置为第一帧
+      frameState.currentFrame = 1; // 重置帧计数
     }
     
     // 重新开始帧动画
-    const frameCount = this.getFrameCount(tweenKey);
-    this.startFrameAnimation(tweenKey, options.fps || 10, frameCount);
+    this.startFrameAnimation(tweenKey, options.fps || 10, options);
   }
 
   /**
@@ -172,8 +216,10 @@ export class TweenManager {
       this.frameTimers.delete(tweenKey);
     }
 
-    // 清理回调函数
+    // 清理回调函数、重复计数和帧状态
     this.endCallbacks.delete(tweenKey);
+    this.repeatCounts.delete(tweenKey);
+    this.frameStates.delete(tweenKey);
   }
 
   /**
@@ -208,5 +254,7 @@ export class TweenManager {
     this.tweenTimers.clear();
     this.frameTimers.clear();
     this.endCallbacks.clear();
+    this.repeatCounts.clear();
+    this.frameStates.clear();
   }
 } 

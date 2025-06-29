@@ -22,15 +22,10 @@ export enum SceneKeys {
 }
 
 export enum RoomKeys {
-  LIVING_ROOM_NORTH = 'living_room_north',
   LIVING_ROOM_EAST = 'living_room_east',
   LIVING_ROOM_WEST_LOW = 'living_room_west_low',
   LIVING_ROOM_WEST_HIGH = 'living_room_west_high',
-  LIVING_ROOM_DOOR = 'living_room_door',
-  HALLWAY = 'hallway',
+  HALLWAY = 'hallway', // 过道/走廊
   BALCONY = 'balcony',
-  ROOM_A = 'room_a',
   ROOM_B = 'room_b',
-  ROOM_C = 'room_c',
-  DOORWAY = 'doorway'
 } 

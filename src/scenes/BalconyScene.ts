@@ -27,7 +27,7 @@ export class BalconyScene extends BaseScene {
 
     // 创建交互对象
     const interactiveGameObjects = roomData.interactiveObjects.map((obj) => {
-      return this.addInteractiveObjecrs(obj);
+      return this.addInteractiveObjects(obj);
     });
 
     // 创建一个虚拟的斜线矩形列表
