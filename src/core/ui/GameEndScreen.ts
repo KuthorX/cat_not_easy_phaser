@@ -1,5 +1,6 @@
 import { IUIComponent } from './IUIComponent';
 import { TextRenderer } from '../../utils/TextRenderer';
+import { SceneKeys } from '@/constants/SceneKeys';
 
 export class GameEndScreen implements IUIComponent {
   private scene: Phaser.Scene | null = null;
@@ -34,13 +35,16 @@ export class GameEndScreen implements IUIComponent {
     const restartButton = this.scene.add.rectangle(0, 100, 200, 50, 0x4A4A4A);
     restartButton.setInteractive();
     restartButton.on('pointerdown', () => {
-      this.game!.scene.start('MenuScene');
+      if (this.scene) {
+        this.scene.scene.start(SceneKeys.MENU);
+      }
     });
 
     const restartText = TextRenderer.createCenteredText(this.scene, 0, 100, '重新开始', {
       fontSize: '20px',
       color: '#ffffff'
     });
+
 
     this.container.add([background, title, endingText, restartButton, restartText]);
     this.container.setDepth(1002);
