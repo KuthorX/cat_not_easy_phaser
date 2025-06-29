@@ -20,7 +20,7 @@ export class RoomRegistry {
           type: 'InteractiveObject',
           id: 'table_over_cat_toilet',
           name: '猫厕所上的桌子',
-          thought:'桌子。两脚兽喜欢在上面放东西。',
+          thought: '桌子。两脚兽喜欢在上面放东西。',
           x: 520,
           y: 600,
           width: 979,
@@ -33,7 +33,7 @@ export class RoomRegistry {
           type: 'InteractiveObject',
           id: 'cat_litter_box',
           name: '猫厕所',
-          thought:'我的排泄处。沙土的质感和野外不太一样，但掩盖气味的能力优秀。毕竟从来没有天敌循着气味来攻击我。',
+          thought: '我的排泄处。沙土的质感和野外不太一样，但掩盖气味的能力优秀。毕竟从来没有天敌循着气味来攻击我。',
           x: 450,
           y: 680,
           width: 507,
@@ -46,7 +46,7 @@ export class RoomRegistry {
           type: 'InteractiveObject',
           id: 'cat_house',
           name: '猫别墅',
-          thought:'自从门坏了之后，就变成我的游乐园了。',
+          thought: '自从门坏了之后，就变成我的游乐园了。',
           x: 1100,
           y: 250,
           width: 653,
@@ -54,7 +54,7 @@ export class RoomRegistry {
           imageKey: 'living_room_west_down_cat_villa',
           actions: ['play_in_house']
         },
-        
+
         {
           type: 'InteractiveObject',
           id: 'cat_cage',
@@ -154,7 +154,6 @@ export class RoomRegistry {
     this.registerRoom({
       id: RoomKeys.ROOM_B,
       name: '主人房间',
-      
       background: 'room_b_bg',
       interactiveObjects: [
         {
@@ -170,95 +169,66 @@ export class RoomRegistry {
         },
         {
           type: 'InteractiveObject',
-          id: 'drink',
-          name: '饮料',
-          thought: '花花绿绿的水源，两脚兽喜欢饮用。唉，两脚兽真是愚蠢的生物。不知道这种水往往有毒吗？',
-          x: 300,
-          y: 400,
-          width: 20,
-          height: 20,
-          actions: ['drink_carry']
-        },
-        {
-          type: 'InteractiveObject',
           id: 'display',
           name: '显示屏',
           thought: '大又扁的光滑抓板。有时候黑漆漆，有时候亮闪闪。两脚兽每天都会盯着它看很久，可能是某种捕猎训练。',
-          x: 450,
-          y: 300,
-          width: 100,
-          height: 50,
-          actions: ['destroy']
-        },       
-        {
-          type: 'InteractiveObject',
-          id: 'wardrobe',
-          name: '衣柜',
-          thought: '很多质感和气味都不正常的草叶。两脚兽每天都会穿在身上。',
-          x: 600,
-          y: 200,
-          width: 80,
-          height: 150,
-          actions: ['hide']
-        },
-        {
-          type: 'InteractiveObject',
-          id: 'human_bed',
-          name: '两脚兽的窝（床）',
-          thought: '两脚兽每次睡觉都睡很久，很容易让猫误会是已经死掉了。',
-          x: 700,
-          y: 400,
-          width: 120,
-          height: 80,
-          actions: ['pee']
-        }, 
-        {
-          type: 'InteractiveObject',
-          id: 'room_b_chair',
-          name: '椅子',
-          
-          x: 800,
+          x: 350,
           y: 450,
-          width: 120,
-          height: 100,
-          imageKey: 'room_b_chair',
-          actions: ['sit_on_chair', 'climb_chair']
-        },
-        {
-          type: 'InteractiveObject',
-          id: 'room_b_computer_screen',
-          name: '电脑屏幕',
-          
-          x: 900,
-          y: 350,
-          width: 150,
-          height: 100,
+          width: 300,
+          height: 300,
+          actions: ['destroy'],
           imageKey: 'room_b_computer_screen',
-          actions: ['watch_screen', 'paw_screen']
         },
         {
           type: 'InteractiveObject',
           id: 'room_b_kettle',
-          name: '水壶',
-          
-          x: 700,
-          y: 300,
-          width: 80,
-          height: 60,
+          name: '饮料',
+          thought: '花花绿绿的水源，两脚兽喜欢饮用。唉，两脚兽真是愚蠢的生物。不知道这种水往往有毒吗？',
+          x: 490,
+          y: 550,
+          width: 127,
+          height: 235,
+          scale: 0.8,
           imageKey: 'room_b_kettle',
-          actions: ['investigate_kettle', 'knock_over_kettle']
+          actions: ['drink_carry']
         },
         {
           type: 'InteractiveObject',
+          id: 'room_b_bed',
+          name: '两脚兽的窝（床）',
+          thought: '两脚兽每次睡觉都睡很久，很容易让猫误会是已经死掉了。',
+          x: 850,
+          y: 400,
+          width: 300,
+          height: 300,
+          scale: 0.8,
+          imageKey: 'room_b_bed',
+          actions: ['pee']
+        },
+        {
+          type: 'InteractiveObject',
+          id: 'room_b_chair',
+          name: '椅子',
+          x: 700,
+          y: 450,
+          width: 300,
+          height: 300,
+          imageKey: 'room_b_chair',
+          disableInteractive: true,
+        },
+
+        {
+          type: 'InteractiveObject',
           id: 'room_b_side_wall',
-          name: '侧墙',
-          x: 1000,
-          y: 360,
-          width: 100,
-          height: 400,
+          name: '衣柜',
+          thought: '很多质感和气味都不正常的草叶。两脚兽每天都会穿在身上。',
+          x: 1100,
+          y: 350,
+          width: 300,
+          height: 300,
           imageKey: 'room_b_side_wall',
-          actions: ['climb_wall', 'scratch_wall']
-        }
+          actions: ['hide']
+        },
       ],
       exits: [
         {
@@ -277,7 +247,7 @@ export class RoomRegistry {
     this.registerRoom({
       id: RoomKeys.HALLWAY,
       name: '过道',
-      
+
       background: 'hallway_bg',
       interactiveObjects: [
         {
@@ -387,7 +357,10 @@ export class RoomRegistry {
           height: 1288,
           scale: 0.5,
           imageKey: 'living_room_east_sofa',
-          actions: ['sleeping', 'jumping']
+          actions: ['sleeping', 'jumping'],
+          outline: {
+            color: '#895D38',
+          }
         },
         {
           type: 'InteractiveObject',
@@ -401,7 +374,7 @@ export class RoomRegistry {
           imageKey: 'living_room_east_table',
           actions: ['sweep_table'],
           outline: {
-            color: '#000000',
+            color: '#E0BE5C',
             offset_x: 30,
             offset_y: -45,
             offset_width: 100,
@@ -418,7 +391,10 @@ export class RoomRegistry {
           height: 291,
           scale: 0.5,
           imageKey: 'living_room_east_dustbin',
-          actions: ['search_dustbin', 'knock_over_dustbin']
+          actions: ['search_dustbin', 'knock_over_dustbin'],
+          outline: {
+            color: '#E0AE5C',
+          }
         },
         {
           type: 'InteractiveObject',
@@ -430,7 +406,10 @@ export class RoomRegistry {
           height: 107,
           scale: 0.5,
           imageKey: 'living_room_east_cord',
-          actions: ['play_cord', 'bite_cord']
+          actions: ['play_cord', 'bite_cord'],
+          outline: {
+            color: '#E0815C',
+          }
         },
         {
           type: 'InteractiveObject',
@@ -442,7 +421,10 @@ export class RoomRegistry {
           height: 940,
           scale: 0.5,
           imageKey: 'living_room_east_tvtable',
-          actions: ['jump_on_tvtable', 'hide_in_tvtable']
+          actions: ['jump_on_tvtable', 'hide_in_tvtable'],
+          outline: {
+            color: '#E0CE5C',
+          }
         },
         {
           type: 'InteractiveObject',
@@ -454,7 +436,10 @@ export class RoomRegistry {
           height: 356,
           scale: 0.5,
           imageKey: 'living_room_east_cat_nest',
-          actions: ['sleep_in_nest', 'sniff_nest']
+          actions: ['sleep_in_nest', 'sniff_nest'],
+          outline: {
+            color: '#E0A340',
+          }
         },
         {
           type: 'InteractiveObject',
@@ -680,7 +665,7 @@ export class RoomRegistry {
           height: 100,
           imageKey: 'balcony_chair',
           actions: ['reinforce', 'inspect']
-        },        
+        },
         {
           type: 'InteractiveObject',
           id: 'black_hand',
