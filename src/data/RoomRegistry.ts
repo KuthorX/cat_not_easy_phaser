@@ -95,25 +95,30 @@ export class RoomRegistry {
           id: 'exit_to_bedroom',
           name: '向过道',
           targetRoom: RoomKeys.HALLWAY,
-          x: 75,
+          x: 35,
           y: 360,
           scale: 0.8,
           rotate: 90,
           textConfig: {
             fontSize: 20,
             color: '#000',
-            offsetY: 0,
-            offsetX: -10,
+            offsetY: -15,
+            offsetX: 20,
           }
         },
         {
           id: 'exit_to_living_room_east',
           name: '向东看',
           targetRoom: RoomKeys.LIVING_ROOM_EAST,
-          x: 800,
+          x: 850,
           y: 700,
-          width: 120,
-          height: 40
+          scale: 0.8,
+          textConfig: {
+            fontSize: 20,
+            color: '#000',
+            offsetY: 0,
+            offsetX: -10,
+          }
         }
       ]
     });
@@ -217,9 +222,14 @@ export class RoomRegistry {
           name: '跳下',
           targetRoom: RoomKeys.LIVING_ROOM_WEST_LOW,
           x: 200,
-          y: 600,
-          width: 150,
-          height: 50
+          y: 700,
+          scale: 0.8,
+          textConfig: {
+            fontSize: 20,
+            color: '#000',
+            offsetY: 0,
+            offsetX: -10,
+          }
         }
       ]
     });
