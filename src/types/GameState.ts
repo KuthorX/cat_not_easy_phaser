@@ -127,6 +127,8 @@ export interface RoomData {
   id: string;
   name: string;
   background: string;
+  background_target_width?: number;
+  background_target_height?: number;
   interactiveObjects: (InteractiveObject | InteractiveObjectWithSprite)[];
   exits: RoomExit[];
   requirements?: RoomRequirement[];
@@ -146,6 +148,9 @@ export interface InteractiveObjectWithSprite extends BaseObject {
   width: number;
   height: number;
   actions: string[];
+  scale?: number;
+  scale_width?: number;
+  scale_height?: number;
   spriteConstructor: (scene : Phaser.Scene, x: number, y: number)=> Phaser.Physics.Arcade.Sprite ;
 }
 
@@ -158,6 +163,9 @@ export interface InteractiveObject extends BaseObject {
   height: number;
   actions: string[];
   sprite? :string;
+  scale?: number;
+  scale_width?: number;
+  scale_height?: number;
 }
 
 export interface RoomExit {

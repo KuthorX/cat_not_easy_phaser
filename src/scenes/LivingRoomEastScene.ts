@@ -10,8 +10,6 @@ export class LivingRoomEastScene extends BaseScene {
   }
 
   protected initializeScene(): void {
-    // 设置背景
-    this.add.rectangle(640, 360, 1280, 720, 0x8B7355); // 棕色背景
     
     // 添加房间标题
     TextRenderer.createCenteredText(this, 640, 50, '客厅 - 向东看', {
@@ -24,7 +22,8 @@ export class LivingRoomEastScene extends BaseScene {
     const roomData = this.sceneManager?.getRoomData(RoomKeys.LIVING_ROOM_EAST);
     if (!roomData) return;
 
-    super.renderBackground(roomData.background);
+    // 渲染背景，传递目标尺寸参数
+    super.renderBackground(roomData.background, roomData.background_target_width, roomData.background_target_height);
 
     // 创建交互对象
     roomData.interactiveObjects.forEach((obj) => {

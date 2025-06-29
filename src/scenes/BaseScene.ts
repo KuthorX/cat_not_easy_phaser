@@ -465,6 +465,15 @@ export abstract class BaseScene extends Phaser.Scene {
     const image = this.add.image(obj.x, obj.y, imageKey);
     this.physics.add.existing(image, true); // true使其成为静态物理体
 
+    // 处理缩放参数
+    if (obj.scale_width && obj.scale_height) {
+      // 优先使用 scale_width 和 scale_height，强制拉伸到指定尺寸
+      image.setDisplaySize(obj.scale_width, obj.scale_height);
+    } else if (obj.scale) {
+      // 使用 scale 参数进行等比缩放
+      image.setScale(obj.scale);
+    }
+
     // 设置物理体的大小以匹配交互区域
     const body = image.body as Phaser.Physics.Arcade.StaticBody;
     body.setSize(obj.width, obj.height);
@@ -660,12 +669,17 @@ export abstract class BaseScene extends Phaser.Scene {
   }
 
   // 渲染房间背景
-  protected renderBackground(backgroundKey: string): void {
+  protected renderBackground(backgroundKey: string, targetWidth?: number, targetHeight?: number): void {
     console.log('渲染房间背景:', backgroundKey);
     // 背景图默认居中铺满
     const bg = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, backgroundKey);
     console.log('bg:', bg);
     bg.setOrigin(0.5, 0.5);
     bg.setDepth(-100); // 保证在最底层
+    
+    // 如果指定了目标尺寸，则强制拉伸缩放
+    if (targetWidth && targetHeight) {
+      bg.setDisplaySize(targetWidth, targetHeight);
+    }
   }
 }

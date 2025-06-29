@@ -375,157 +375,166 @@ export class RoomRegistry {
       id: RoomKeys.LIVING_ROOM_EAST,
       name: '客厅-向东看',
       background: 'living_room_east_bg',
+      background_target_width: 1280,
+      background_target_height: 720,
       interactiveObjects: [
         {
           type: 'InteractiveObject',
-          id: 'going_balcony',
-          name: '前往阳台',
-          thought: '神秘的禁制，两脚兽不触摸也能打开，想必是和它达成了什么交易。',
-          x: 400,
-          y: 450,
-          width: 80,
-          height: 40,
-          sprite: 'going_balcony',
-          actions: ['conversating', 'opening']
-        },
-        {
-          type: 'InteractiveObject',
-          id: 'cat_toys_under_the_table',
-          name: '桌下的猫玩具',
-          thought: '圆溜溜的，会滚动的神奇小球。我练习捕猎的伙伴之一。最近它似乎有小脾气，躲起来不愿意见我。',
-          x: 400,
-          y: 450,
-          width: 80,
-          height: 40,
-          sprite: 'cat_toys_under_the_table',
-          actions: ['catching', 'shaking_bite_rope']
-        },
-        {
-          type: 'InteractiveObject',
-          id: 'sofa',
+          id: 'living_room_east_sofa',
           name: '沙发',
-          thought: '两脚兽的另一个窝，它坐在这里进食的时候，对面的黑漆漆经常变得亮闪闪，还发出怪声。',
-          x: 400,
-          y: 450,
-          width: 80,
-          height: 40,
-          sprite: 'sofa',
-          actions: ['sleeping']
-        },
-        {
-          type: 'InteractiveObject',
-          id: 'table',
-          name: '桌子',
-          thought: '堆满了不知道什么东西。猜测是两脚兽堆垃圾的地方。',
-          x: 700,
-          y: 350,
-          width: 200,
-          height: 120,
-          sprite: 'table',
-          actions: ['sweep_table']
-        },
-        {
-          type: 'InteractiveObject',
-          id: 'tv',
-          name: '电视',
-          thought: '没有两脚兽的命令，这个大家伙寂静无声。',
-          x: 900,
-          y: 300,
-          width: 150,
-          height: 100,
-          sprite: 'tv',
-          actions: ['attack_tv']
-        },
-        {
-          type: 'InteractiveObject',
-          id: 'cat_scratcher',
-          name: '猫抓板',
-          thought: '爪子的最重要的狩猎工具，需要常常养护。所以...看抓喵嗷！',
-          x: 400,
-          y: 500,
-          width: 120,
-          height: 100,
-          sprite: 'cat_scratcher',
-          actions: ['grinding_claws']
-        },
-        {
-          type: 'InteractiveObject',
-          id: 'cat_bed',
-          name: '猫窝',
-          thought: '两脚兽每次看到我趴在这上面，表情都很奇特。',
-          x: 400,
+          x: 150,
           y: 500,
           width: 846,
           height: 1288,
+          scale: 0.5,
+          scale_width: 400,
+          scale_height: 600,
           imageKey: 'living_room_east_sofa',
           actions: ['sleep_on_sofa', 'scratch_sofa']
         },
-        {
-          type: 'InteractiveObject',
-          id: 'living_room_east_table',
-          name: '茶几',
-          x: 400,
-          y: 600,
-          width: 302,
-          height: 291,
-          imageKey: 'living_room_east_table',
-          actions: ['jump_on_table', 'push_item_from_table']
-        },
-        {
-          type: 'InteractiveObject',
-          id: 'living_room_east_dustbin',
-          name: '垃圾桶',
-          x: 500,
-          y: 750,
-          width: 302,
-          height: 291,
-          imageKey: 'living_room_east_dustbin',
-          actions: ['search_dustbin', 'knock_over_dustbin']
-        },
-        {
-          type: 'InteractiveObject',
-          id: 'living_room_east_tvtable',
-          name: '电视柜',
-          x: 950,
-          y: 600,
-          width: 743,
-          height: 940,
-          imageKey: 'living_room_east_tvtable',
-          actions: ['jump_on_tvtable', 'hide_in_tvtable']
-        },
-        {
-          type: 'InteractiveObject',
-          id: 'living_room_east_tv',
-          name: '电视',
-          x: 1100,
-          y: 400,
-          width: 541,
-          height: 1088,
-          imageKey: 'living_room_east_tv',
-          actions: ['watch_tv', 'paw_tv']
-        },
-        {
-          type: 'InteractiveObject',
-          id: 'living_room_east_cat_tree',
-          name: '猫爬架',
-          x: 800,
-          y: 500,
-          width: 302,
-          height: 483,
-          imageKey: 'living_room_east_cat_tree',
-          actions: ['climb_cat_tree', 'play_cat_tree']
-        },
-        {
-          type: 'InteractiveObject',
-          id: 'living_room_east_ball',
-          name: '球',
-          x: 900,
-          y: 750,
-          width: 120,
-          height: 100,
-          sprite: 'cat_bed',
-          actions: ['sleeping','jumping']
-        }
+        // {
+        //   type: 'InteractiveObject',
+        //   id: 'living_room_east_table',
+        //   name: '茶几',
+        //   x: 400,
+        //   y: 600,
+        //   width: 302,
+        //   height: 291,
+        //   imageKey: 'living_room_east_table',
+        //   actions: ['jump_on_table', 'push_item_from_table']
+        // },
+        // {
+        //   type: 'InteractiveObject',
+        //   id: 'living_room_east_dustbin',
+        //   name: '垃圾桶',
+        //   x: 500,
+        //   y: 750,
+        //   width: 302,
+        //   height: 291,
+        //   imageKey: 'living_room_east_dustbin',
+        //   actions: ['search_dustbin', 'knock_over_dustbin']
+        // },
+        // {
+        //   type: 'InteractiveObject',
+        //   id: 'living_room_east_tvtable',
+        //   name: '电视柜',
+        //   x: 950,
+        //   y: 600,
+        //   width: 743,
+        //   height: 940,
+        //   imageKey: 'living_room_east_tvtable',
+        //   actions: ['jump_on_tvtable', 'hide_in_tvtable']
+        // },
+        // {
+        //   type: 'InteractiveObject',
+        //   id: 'living_room_east_tv',
+        //   name: '电视',
+        //   x: 1100,
+        //   y: 400,
+        //   width: 541,
+        //   height: 1088,
+        //   imageKey: 'living_room_east_tv',
+        //   actions: ['watch_tv', 'paw_tv']
+        // },
+        // {
+        //   type: 'InteractiveObject',
+        //   id: 'living_room_east_cat_tree',
+        //   name: '猫爬架',
+        //   x: 800,
+        //   y: 500,
+        //   width: 302,
+        //   height: 483,
+        //   imageKey: 'living_room_east_cat_tree',
+        //   actions: ['climb_cat_tree', 'play_cat_tree']
+        // },
+        // {
+        //   type: 'InteractiveObject',
+        //   id: 'living_room_east_ball',
+        //   name: '球',
+        //   x: 900,
+        //   y: 750,
+        //   width: 120,
+        //   height: 117,
+        //   imageKey: 'living_room_east_ball',
+        //   actions: ['play_ball', 'paw_ball']
+        // },
+        // {
+        //   type: 'InteractiveObject',
+        //   id: 'living_room_east_glass',
+        //   name: '玻璃杯',
+        //   x: 420,
+        //   y: 620,
+        //   width: 190,
+        //   height: 150,
+        //   imageKey: 'living_room_east_glass',
+        //   actions: ['push_glass', 'lick_glass']
+        // },
+        // {
+        //   type: 'InteractiveObject',
+        //   id: 'living_room_east_paper',
+        //   name: '纸团',
+        //   x: 470,
+        //   y: 630,
+        //   width: 177,
+        //   height: 228,
+        //   imageKey: 'living_room_east_paper',
+        //   actions: ['play_paper', 'push_paper']
+        // },
+        // {
+        //   type: 'InteractiveObject',
+        //   id: 'living_room_east_milk',
+        //   name: '牛奶',
+        //   x: 460,
+        //   y: 610,
+        //   width: 112,
+        //   height: 192,
+        //   imageKey: 'living_room_east_milk',
+        //   actions: ['drink_milk', 'push_milk']
+        // },
+        // {
+        //   type: 'InteractiveObject',
+        //   id: 'living_room_east_cola',
+        //   name: '可乐罐',
+        //   x: 440,
+        //   y: 600,
+        //   width: 144,
+        //   height: 176,
+        //   imageKey: 'living_room_east_cola',
+        //   actions: ['push_cola', 'lick_cola']
+        // },
+        // {
+        //   type: 'InteractiveObject',
+        //   id: 'living_room_east_cord',
+        //   name: '电线',
+        //   x: 1000,
+        //   y: 700,
+        //   width: 144,
+        //   height: 107,
+        //   imageKey: 'living_room_east_cord',
+        //   actions: ['play_cord', 'bite_cord']
+        // },
+        // {
+        //   type: 'InteractiveObject',
+        //   id: 'living_room_east_pot',
+        //   name: '花盆',
+        //   x: 600,
+        //   y: 700,
+        //   width: 213,
+        //   height: 202,
+        //   imageKey: 'living_room_east_pot',
+        //   actions: ['push_pot', 'sniff_pot']
+        // },
+        // {
+        //   type: 'InteractiveObject',
+        //   id: 'living_room_east_cat_nest',
+        //   name: '猫窝',
+        //   x: 300,
+        //   y: 700,
+        //   width: 574,
+        //   height: 356,
+        //   imageKey: 'living_room_east_cat_nest',
+        //   actions: ['sleep_in_nest', 'sniff_nest']
+        // }
       ],
       exits: [
         {
@@ -564,7 +573,7 @@ export class RoomRegistry {
           y: 300,
           width: 100,
           height: 100,
-          sprite: 'fortress',
+          imageKey: 'balcony_chair',
           actions: ['reinforce', 'inspect']
         },        
         {
@@ -576,7 +585,7 @@ export class RoomRegistry {
           y: 350,
           width: 50,
           height: 50,
-          sprite: 'black_hand',
+          imageKey: 'balcony_coat_hanger',
           actions: ['interact']
         },
         {
@@ -588,7 +597,7 @@ export class RoomRegistry {
           y: 500,
           width: 60,
           height: 60,
-          sprite: 'robot',
+          imageKey: 'balcony_robot_cleaner',
           actions: ['revenge', 'ride']
         }
       ],

@@ -22,7 +22,8 @@ export class BalconyScene extends BaseScene {
     const roomData = this.sceneManager?.getRoomData(RoomKeys.BALCONY);
     if (!roomData) return;
 
-    super.renderBackground(roomData.background);
+    // 渲染背景，传递目标尺寸参数
+    super.renderBackground(roomData.background, roomData.background_target_width, roomData.background_target_height);
 
     // 创建交互对象
     const interactiveGameObjects = roomData.interactiveObjects.map((obj) => {

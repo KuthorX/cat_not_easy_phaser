@@ -10,8 +10,13 @@ export class RoomBScene extends BaseScene {
   }
 
   protected initializeScene(): void {
-    // 设置背景图片
-    this.add.image(640, 360, 'room_b_bg');
+    // 获取房间数据
+    const roomData = this.sceneManager?.getRoomData(RoomKeys.ROOM_B);
+    if (!roomData) return;
+    console.log('roomData:', roomData); 
+
+    // 渲染背景，传递目标尺寸参数
+    super.renderBackground(roomData.background, roomData.background_target_width, roomData.background_target_height);
     
     // 添加房间标题
     TextRenderer.createCenteredText(this, 640, 50, '主人房间', {
@@ -19,10 +24,6 @@ export class RoomBScene extends BaseScene {
       color: '#000000',
       fontStyle: 'bold'
     });
-
-    // 获取房间数据
-    const roomData = this.sceneManager?.getRoomData(RoomKeys.ROOM_B);
-    if (!roomData) return;
 
     // 创建交互对象
     roomData.interactiveObjects.forEach((obj) => {
