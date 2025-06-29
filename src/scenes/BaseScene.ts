@@ -1,14 +1,16 @@
 import { GameEvents } from '../constants/GameEvents';
+import { SceneKeys } from '../constants/SceneKeys';
 import { GameManager } from '@/core/GameManager';
 import { SceneManager } from '@/core/SceneManager';
 import { UIManager } from '@/core/UIManager';
 import { AudioManager } from '@/core/AudioManager';
 import { TweenManager } from '@/core/TweenManager';
-import { InteractiveObject, InteractiveObjectWithSprite } from '@/types/GameState';
+import { InteractiveObject, InteractiveObjectWithSprite, RoomExit } from '@/types/GameState';
 import { InteractiveOutlineRenderer } from '../utils/InteractiveOutlineRenderer';
 import { ConditionChecker } from '../utils/ConditionChecker';
 import { TransitionHelper } from '../utils/TransitionHelper';
 import { ConditionsFormatter } from '../utils/ConditionsFormatter';
+import { TextRenderer } from '../utils/TextRenderer';
 
 export abstract class BaseScene extends Phaser.Scene {
   protected gameManager!: GameManager;
@@ -19,7 +21,7 @@ export abstract class BaseScene extends Phaser.Scene {
   protected interactiveOutlineRenderer!: InteractiveOutlineRenderer;
   
   // 存储交互对象的状态
-  protected interactiveObjects: Map<string, { object: InteractiveObject | InteractiveObjectWithSprite, gameObject: Phaser.GameObjects.GameObject }> = new Map();
+  protected interactiveObjects: Map<string, { object: InteractiveObject | InteractiveObjectWithSprite, gameObject: Phaser.GameObjects.GameObject, interactiveArea?: Phaser.GameObjects.Rectangle }> = new Map();
 
   constructor(key: string) {
     super(key);
@@ -47,6 +49,12 @@ export abstract class BaseScene extends Phaser.Scene {
 
     // 初始化场景
     this.initializeScene();
+
+    // 增加猫猫头
+    const catHead = this.add.image(0, 0, 'thought_bubble_cat_head');
+    catHead.setScale(0.5);
+    // 放到画面的底部中间
+    catHead.setPosition(640, 680);
 
     // 初始化UI
     if (this.uiManager) {
@@ -209,12 +217,21 @@ export abstract class BaseScene extends Phaser.Scene {
         // 销毁占位符
         gameObject.destroy();
         
+        // 销毁交互区域矩形（如果存在）
+        const entry = this.interactiveObjects.get(objectId);
+        if (entry && entry.interactiveArea) {
+          entry.interactiveArea.destroy();
+        }
+        
         // 重新创建真正的对象
         let newGameObject: Phaser.GameObjects.GameObject;
+        let newInteractiveArea: Phaser.GameObjects.Rectangle | undefined;
         switch (object.type) {
           case 'InteractiveObject':
             if (object.imageKey) {
-              newGameObject = this.createInteractiveImageObject(object, object.imageKey);
+              const result = this.createInteractiveImageObject(object, object.imageKey);
+              newGameObject = result.image;
+              newInteractiveArea = result.interactiveArea;
             } else {
               newGameObject = this.createInteractiveObject(object);
             }
@@ -227,18 +244,29 @@ export abstract class BaseScene extends Phaser.Scene {
         }
         
         // 更新映射
-        this.interactiveObjects.set(objectId, { object, gameObject: newGameObject });
+        this.interactiveObjects.set(objectId, { object, gameObject: newGameObject, interactiveArea: newInteractiveArea });
       } else if (!shouldShow && !(gameObject instanceof Phaser.GameObjects.Rectangle && 
                 (gameObject as any).fillColor === 0x000000 && (gameObject as any).fillAlpha === 0)) {
         // 如果不应该显示且当前不是占位符，销毁对象并创建占位符
         console.log('隐藏对象，创建占位符', objectId);
         
+        // 隐藏交互外框
+        this.interactiveOutlineRenderer.hideInteractiveOutline(objectId);
+        
         // 销毁当前对象
         gameObject.destroy();
         
-        // 创建占位符
+        // 销毁交互区域矩形（如果存在）
+        const entry = this.interactiveObjects.get(objectId);
+        if (entry && entry.interactiveArea) {
+          entry.interactiveArea.destroy();
+        }
+        
+        // 创建占位符 - 不设置交互功能
         const placeholder = this.add.rectangle(object.x, object.y, object.width, object.height, 0x000000, 0);
         placeholder.setVisible(false);
+        // 确保占位符没有交互功能
+        placeholder.disableInteractive();
         
         // 更新映射
         this.interactiveObjects.set(objectId, { object, gameObject: placeholder });
@@ -571,7 +599,7 @@ export abstract class BaseScene extends Phaser.Scene {
         buttonColor: 0x16213e,
         buttonTextColor: 0xffffff
       },
-      sceneKey
+      sceneKey || undefined
     );
   }
 
@@ -602,6 +630,7 @@ export abstract class BaseScene extends Phaser.Scene {
 
   protected addInteractiveObjects(obj : InteractiveObject | InteractiveObjectWithSprite) : { first: string; second: Phaser.GameObjects.GameObject } {
     let gameObject: Phaser.GameObjects.GameObject;
+    let interactiveArea: Phaser.GameObjects.Rectangle | undefined;
     
     // 检查条件，如果条件不满足则不创建对象
     if (!this.shouldShowInteractiveObject(obj, this.gameManager?.getState())) {
@@ -618,7 +647,9 @@ export abstract class BaseScene extends Phaser.Scene {
         console.log('InteractiveObject 创建交互对象', obj.id);
         if (obj.imageKey) {
           // Create interactive object
-          gameObject = this.createInteractiveImageObject(obj, obj.imageKey);
+          const result = this.createInteractiveImageObject(obj, obj.imageKey);
+          gameObject = result.image;
+          interactiveArea = result.interactiveArea;
         } else {
           // Create traditional rectangular interactive object
           gameObject = this.createInteractiveObject(obj);
@@ -631,7 +662,7 @@ export abstract class BaseScene extends Phaser.Scene {
     }
     
     // 存储交互对象信息
-    this.interactiveObjects.set(obj.id, { object: obj, gameObject });
+    this.interactiveObjects.set(obj.id, { object: obj, gameObject, interactiveArea });
     
     return { first: obj.id, second: gameObject };
   }
@@ -671,7 +702,7 @@ export abstract class BaseScene extends Phaser.Scene {
   }
 
   // 创建带描边效果的图片交互对象
-  private createInteractiveImageObject(obj: any, imageKey: string): Phaser.GameObjects.Image {
+  private createInteractiveImageObject(obj: any, imageKey: string): { image: Phaser.GameObjects.Image; interactiveArea?: Phaser.GameObjects.Rectangle } {
     // 创建图片对象
     const image = this.add.image(obj.x, obj.y, imageKey);
     this.physics.add.existing(image, true); // true使其成为静态物理体
@@ -694,10 +725,12 @@ export abstract class BaseScene extends Phaser.Scene {
     const body = image.body as Phaser.Physics.Arcade.StaticBody;
     body.setSize(scaledWidth, scaledHeight);
     
+    let interactiveArea: Phaser.GameObjects.Rectangle | undefined;
+    
     // 如果disableInteractive不为true，创建交互区域
     if (obj.disableInteractive !== true) {
       // 创建不可见的交互区域
-      const interactiveArea = this.add.rectangle(obj.x, obj.y, scaledWidth, scaledHeight, 0x000000, 0);
+      interactiveArea = this.add.rectangle(obj.x, obj.y, scaledWidth, scaledHeight, 0x000000, 0);
       interactiveArea.setInteractive();
     
       // 点击事件
@@ -718,7 +751,7 @@ export abstract class BaseScene extends Phaser.Scene {
       });
     }
 
-    return image;
+    return { image, interactiveArea };
   }
 
   private createInteractiveObjectsWithSprite(obj : InteractiveObjectWithSprite): Phaser.GameObjects.Sprite {
@@ -761,6 +794,13 @@ export abstract class BaseScene extends Phaser.Scene {
     if (this.gameManager.isInDialogueMode()) {
       console.log('正在对话中，禁止点击物体');
       return;
+    }
+    
+    // 新增：如果有thought属性，先显示想法气泡
+    if (obj.thought && this.uiManager) {
+      const x = 1280 - 200; // 右下角位置
+      const y = 720 - 100;
+      this.uiManager.showThought(obj.id, obj.thought, x, y, 3000);
     }
     
     // 检查是否有对话动作
@@ -844,5 +884,31 @@ export abstract class BaseScene extends Phaser.Scene {
     if (targetWidth && targetHeight) {
       bg.setDisplaySize(targetWidth, targetHeight);
     }
+  }
+
+  // 创建出口
+  protected createExit(exit: RoomExit): void {
+    const exitRect = this.add.rectangle(exit.x, exit.y, exit.width, exit.height, 0xff0000, 0.3);
+    exitRect.setInteractive();
+    
+    exitRect.on('pointerdown', () => {
+      this.switchToRoomWithTransition(exit.targetRoom, exit.name);
+    });
+
+    exitRect.on('pointerover', () => {
+      exitRect.setFillStyle(0xff0000, 0.5);
+    });
+
+    exitRect.on('pointerout', () => {
+      exitRect.setFillStyle(0xff0000, 0.3);
+    });
+
+    // 添加出口标签
+    TextRenderer.createCenteredText(this, exit.x, exit.y, exit.name, {
+      fontSize: '14px',
+      color: '#ffffff',
+      backgroundColor: '#000000',
+      padding: { x: 2, y: 1 }
+    });
   }
 }

@@ -47,30 +47,4 @@ export class LivingRoomEastScene extends BaseScene {
 
   }
 
-  private createExit(exit: RoomExit): void {
-    const exitRect = this.add.rectangle(exit.x, exit.y, exit.width, exit.height, 0xff0000, 0.3);
-    exitRect.setInteractive();
-    
-    exitRect.on('pointerdown', () => {
-      console.log('LivingRoomEastScene: 点击出口', exit.name, '目标房间:', exit.targetRoom);
-      this.switchToRoomWithTransition(exit.targetRoom, exit.name);
-    });
-
-    exitRect.on('pointerover', () => {
-      exitRect.setFillStyle(0xff0000, 0.5);
-    });
-
-    exitRect.on('pointerout', () => {
-      exitRect.setFillStyle(0xff0000, 0.3);
-    });
-
-    // 添加出口标签
-    TextRenderer.createCenteredText(this, exit.x, exit.y, exit.name, {
-      fontSize: '14px',
-      color: '#ffffff',
-      backgroundColor: '#000000',
-      padding: { x: 2, y: 1 }
-    });
-  }
-
 } 
