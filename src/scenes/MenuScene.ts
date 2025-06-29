@@ -8,40 +8,29 @@ export class MenuScene extends Phaser.Scene {
 
   create(): void {
     // 设置背景
-    this.add.rectangle(640, 360, 1280, 720, 0x87CEEB);
+    this.add.image(640, 360, 'menu_bg');
     
     // 播放背景音乐 - 使用BgmManager确保不会重复播放
     const game = (window as any).game;
     if (game && game.audioManager) {
       game.audioManager.playMusic('bgm_living_room', this);
     }
-    
-    // 游戏标题 - 使用优化的文字渲染
-    TextRenderer.createTitleText(this, 640, 150, '猫不易');
 
-    TextRenderer.createCenteredText(this, 640, 220, 'Cat Not Easy', {
-      fontSize: '32px',
-      color: '#666666',
-      fontStyle: 'italic'
-    });
+    const group_start_x = 320;
+    const group_gap_x = 320;
+    const group_start_y = 650;
 
     // 创建图片按钮
-    this.createImageButton('menu_start_game', 640, 320, () => {
+    this.createImageButton('menu_start_game', group_start_x, group_start_y, () => {
       this.startNewGame();
     });
 
-    this.createImageButton('menu_settings', 640, 410, () => {
+    this.createImageButton('menu_settings', group_start_x + group_gap_x, group_start_y, () => {
       this.showSettings();
     });
 
-    this.createImageButton('menu_exit_game', 640, 500, () => {
+    this.createImageButton('menu_exit_game', group_start_x + group_gap_x * 2, group_start_y, () => {
       this.quitGame();
-    });
-
-    // 版本信息
-    TextRenderer.createCenteredText(this, 640, 650, '🐈', {
-      fontSize: '16px',
-      color: '#666666'
     });
   }
 
