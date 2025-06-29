@@ -888,27 +888,74 @@ export abstract class BaseScene extends Phaser.Scene {
 
   // 创建出口
   protected createExit(exit: RoomExit): void {
-    const exitRect = this.add.rectangle(exit.x, exit.y, exit.width, exit.height, 0xff0000, 0.3);
-    exitRect.setInteractive();
+    // 使用 nav_btn_bg 图片资源替代矩形
+    const exitImage = this.add.image(exit.x, exit.y, 'nav_btn_bg');
     
-    exitRect.on('pointerdown', () => {
+    // 计算缩放比例
+    let scale = 1;
+    if (exit.scale) {
+      scale = exit.scale;
+      exitImage.setScale(scale);
+    }
+    if (exit.flip_x) {
+      exitImage.setFlipX(true);
+    }
+    if (exit.flip_y) {
+      exitImage.setFlipY(true);
+    }
+    if (exit.rotate) {
+      exitImage.setRotation(Phaser.Math.DegToRad(exit.rotate));
+    }
+    if (exit.width && exit.height) {
+      exitImage.setDisplaySize(exit.width, exit.height);
+      // 如果设置了自定义尺寸，计算对应的缩放比例
+      const originalWidth = exitImage.width;
+      const originalHeight = exitImage.height;
+      scale = Math.min(exit.width / originalWidth, exit.height / originalHeight);
+    }
+    
+    exitImage.setInteractive();
+    
+    exitImage.on('pointerdown', () => {
       this.switchToRoomWithTransition(exit.targetRoom, exit.name);
     });
 
-    exitRect.on('pointerover', () => {
-      exitRect.setFillStyle(0xff0000, 0.5);
+    exitImage.on('pointerover', () => {
+      exitImage.setTint(0xcccccc); // 悬停时变亮
     });
 
-    exitRect.on('pointerout', () => {
-      exitRect.setFillStyle(0xff0000, 0.3);
+    exitImage.on('pointerout', () => {
+      exitImage.clearTint(); // 清除着色效果
     });
 
+    // 计算文字位置和大小
+    const baseX = exit.x;
+    const baseY = exit.y;
+    
+    // 应用文字偏移
+    const textX = baseX + (exit.textConfig?.offsetX || 0);
+    const textY = baseY + (exit.textConfig?.offsetY || 0);
+    
+    // 根据缩放比例调整字体大小
+    const baseFontSize = exit.textConfig?.fontSize || 16;
+    let fontSize = Math.max(12, Math.floor(baseFontSize * scale)); // 最小12px，最大根据缩放调整
+    
+    // 根据出口名称长度调整字体大小
+    const textLength = exit.name.length;
+    if (textLength > 4) {
+      fontSize = Math.max(10, fontSize - 2); // 长文本稍微缩小字体
+    }
+    
     // 添加出口标签
-    TextRenderer.createCenteredText(this, exit.x, exit.y, exit.name, {
-      fontSize: '14px',
-      color: '#ffffff',
-      backgroundColor: '#000000',
-      padding: { x: 2, y: 1 }
+    const textObject = TextRenderer.createCenteredText(this, textX, textY, exit.name, {
+      fontSize: `${fontSize}px`,
+      color: exit.textConfig?.color || '#000',
+      fontStyle: exit.textConfig?.fontStyle,
     });
+    
+    // 如果出口有旋转，文字也需要相应旋转
+    if (exit.rotate) {
+      textObject.setRotation(Phaser.Math.DegToRad(exit.rotate));
+    }
   }
 }

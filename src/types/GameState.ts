@@ -193,9 +193,20 @@ export interface RoomExit {
   targetRoom: string;
   x: number;
   y: number;
-  width: number;
-  height: number;
+  width?: number;
+  height?: number;
+  scale?: number;
+  flip_x?: boolean;
+  flip_y?: boolean;
+  rotate?: number;
   requirements?: RoomRequirement[];
+  textConfig?: {
+    fontSize?: number;
+    color?: string;
+    offsetX?: number;
+    offsetY?: number;
+    fontStyle?: 'normal' | 'bold' | 'italic';
+  };
 }
 
 export interface RoomRequirement {

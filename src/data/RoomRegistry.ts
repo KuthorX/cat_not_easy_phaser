@@ -74,16 +74,22 @@ export class RoomRegistry {
           name: '跳上高处',
           targetRoom: RoomKeys.LIVING_ROOM_WEST_HIGH,
           x: 300,
-          y: 300,
-          width: 150,
-          height: 50,
+          y: 25,
+          scale: 0.8,
+          flip_y: true,
           requirements: [
             {
               type: 'action_completed',
               value: 'attack_cage',
               operator: 'eq'
             }
-          ]
+          ],
+          textConfig: {
+            fontSize: 20,
+            color: '#000',
+            offsetY: 0,
+            offsetX: -10,
+          }
         },
         {
           id: 'exit_to_bedroom',
@@ -91,8 +97,14 @@ export class RoomRegistry {
           targetRoom: RoomKeys.HALLWAY,
           x: 75,
           y: 360,
-          width: 150,
-          height: 50
+          scale: 0.8,
+          rotate: 90,
+          textConfig: {
+            fontSize: 20,
+            color: '#000',
+            offsetY: 0,
+            offsetX: -10,
+          }
         },
         {
           id: 'exit_to_living_room_east',
@@ -709,21 +721,32 @@ export class RoomRegistry {
       exits: [
         {
           id: 'exit_to_balcony',
-          name: '阳台',
+          name: '去阳台',
           targetRoom: RoomKeys.BALCONY,
           x: 640,
           y: 15,
-          width: 120,
-          height: 30
+          scale: 0.8,
+          flip_y: true,
+          textConfig: {
+            fontSize: 20,
+            color: '#000',
+            offsetY: 0,
+            offsetX: -10,
+          }
         },
         {
           id: 'exit_to_west',
-          name: '向西',
+          name: '去客厅西边',
           targetRoom: RoomKeys.LIVING_ROOM_WEST_LOW,
-          x: 800,
+          x: 900,
           y: 705,
-          width: 120,
-          height: 30
+          scale: 0.8,
+          textConfig: {
+            fontSize: 20,
+            color: '#000',
+            offsetY: -5,
+            offsetX: -10,
+          }
         },
       ]
     });
@@ -775,12 +798,18 @@ export class RoomRegistry {
       exits: [
         {
           id: 'exit_to_living_room_east',
-          name: '返回客厅',
+          name: '去客厅东边',
           targetRoom: RoomKeys.LIVING_ROOM_EAST,
-          x: 0,
-          y: 300,
-          width: 80,
-          height: 120
+          x: 25,
+          y: 600,
+          scale: 0.8,
+          rotate: 90,
+          textConfig: {
+            fontSize: 20,
+            color: '#000',
+            offsetY: -30,
+            offsetX: 35,
+          }
         }
       ]
     });
