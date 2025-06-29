@@ -53,19 +53,19 @@ export class RoomRegistry {
       ],
       exits: [
         {
-          id: 'exit_to_north',
-          name: '向北',
-          targetRoom: RoomKeys.LIVING_ROOM_NORTH,
-          x: 640,
-          y: 0,
+          id: 'exit_to_door',
+          name: '向客厅大门',
+          targetRoom: RoomKeys.LIVING_ROOM_DOOR,
+          x: 1200,
+          y: 70 ,
           width: 120,
-          height: 80
+          height: 30
         },
         {
           id: 'exit_to_high',
           name: '跳上高处',
           targetRoom: RoomKeys.LIVING_ROOM_WEST_HIGH,
-          x: 200,
+          x: 300,
           y: 300,
           width: 150,
           height: 50,
@@ -76,6 +76,15 @@ export class RoomRegistry {
               operator: 'eq'
             }
           ]
+        },
+        {
+          id: 'exit_to_bedroom',
+          name: '向过道',
+          targetRoom: RoomKeys.HALLWAY,
+          x: 75,
+          y: 360,
+          width: 150,
+          height: 50
         }
       ]
     });
@@ -344,7 +353,7 @@ export class RoomRegistry {
         {
           id: 'exit_to_living_room',
           name: '客厅',
-          targetRoom: RoomKeys.LIVING_ROOM_NORTH,
+          targetRoom: RoomKeys.LIVING_ROOM_WEST_LOW,
           x: 1200,
           y: 300,
           width: 80,
@@ -612,23 +621,23 @@ export class RoomRegistry {
       ],
       exits: [
         {
-          id: 'exit_to_north',
-          name: '向北',
-          targetRoom: RoomKeys.LIVING_ROOM_NORTH,
-          x: 640,
-          y: 0,
-          width: 120,
-          height: 80
-        },
-        {
           id: 'exit_to_balcony',
           name: '阳台',
           targetRoom: RoomKeys.BALCONY,
-          x: 1200,
-          y: 300,
-          width: 80,
-          height: 120
-        }
+          x: 640,
+          y: 15,
+          width: 120,
+          height: 30
+        },
+        {
+          id: 'exit_to_west',
+          name: '向西',
+          targetRoom: RoomKeys.LIVING_ROOM_WEST_LOW,
+          x: 640,
+          y: 705,
+          width: 120,
+          height: 30
+        },
       ]
     });
 
@@ -736,22 +745,6 @@ export class RoomRegistry {
           y: 0,
           width: 120,
           height: 80
-        },
-        {
-          id: 'exit_to_outside',
-          name: '门外',
-          targetRoom: RoomKeys.DOORWAY,
-          x: 640,
-          y: 700,
-          width: 200,
-          height: 20,
-          requirements: [
-            {
-              type: 'story_flag',
-              value: 'door_opened',
-              operator: 'eq'
-            }
-          ]
         }
       ]
     });
