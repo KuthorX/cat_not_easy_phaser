@@ -180,7 +180,7 @@ export class RoomRegistry {
           type: 'InteractiveObject',
           id: 'display',
           name: '显示屏',
-          thought: '大又扁的光滑抓板。有时候黑漆漆，有时候亮闪闪。\n两脚兽每天都会盯着它看很久，可能是某种捕猎训练。',
+          thought: '大又扁的光滑抓板。\n有时候黑漆漆，有时候亮闪闪。\n两脚兽每天都会盯着它看很久，\n可能是某种捕猎训练。',
           x: 350,
           y: 450,
           width: 300,
@@ -192,7 +192,7 @@ export class RoomRegistry {
           type: 'InteractiveObject',
           id: 'room_b_kettle',
           name: '饮料',
-          thought: '花花绿绿的水源，两脚兽喜欢饮用。唉，两脚兽真是愚蠢的生物。不知道这种水往往有毒吗？',
+          thought: '花花绿绿的水源，\n两脚兽喜欢饮用。\n唉，两脚兽真是愚蠢的生物。\n不知道这种水往往有毒吗？',
           x: 490,
           y: 550,
           width: 127,
@@ -212,7 +212,7 @@ export class RoomRegistry {
           type: 'InteractiveObject',
           id: 'room_b_bed',
           name: '两脚兽的窝（床）',
-          thought: '两脚兽每次睡觉都睡很久，很容易让猫误会是已经死掉了。',
+          thought: '两脚兽每次睡觉都睡很久，\n有时候我会以为它已经死掉了。',
           x: 850,
           y: 400,
           width: 300,
@@ -237,7 +237,7 @@ export class RoomRegistry {
           type: 'InteractiveObject',
           id: 'room_b_side_wall',
           name: '衣柜',
-          thought: '很多质感和气味都不正常的草叶。两脚兽每天都会穿在身上。',
+          thought: '很多质感和气味都不正常的草叶。\n两脚兽每天都会穿在身上。',
           x: 1100,
           y: 350,
           width: 300,
@@ -385,7 +385,8 @@ export class RoomRegistry {
           actions: ['sleeping', 'jumping'],
           outline: {
             color: '#FD6B35',
-          }
+          },
+          thought: "哦，沙发，我最喜欢的地方"
         },
         {
           type: 'InteractiveObject',

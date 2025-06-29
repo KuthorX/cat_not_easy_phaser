@@ -49,7 +49,7 @@ export abstract class BaseScene extends Phaser.Scene {
     this.initializeScene();
 
     // 增加猫猫头
-    const catHead = this.add.image(0, 0, 'though_bubble_cat_head');
+    const catHead = this.add.image(0, 0, 'thought_bubble_cat_head');
     catHead.setScale(0.5);
     // 放到画面的底部中间
     catHead.setPosition(640, 680);

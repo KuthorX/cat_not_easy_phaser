@@ -24,17 +24,18 @@ export class ThoughtBubble implements IUIComponent {
 
     const bubble = this.scene.add.container(x, y);
     
-    // 计算气泡大小
-    // const textWidth = text.length * 8;
+    // 气泡大小
     const bubbleWidth = 400;
     const bubbleHeight = 80;
 
-    // 创建气泡背景（使用虚线边框表示想法）
-    const background = this.scene.add.rectangle(0, 0, bubbleWidth, bubbleHeight, 0xFFFFFF, 0.9);
-    background.setStrokeStyle(2, 0x000000, 0.5);
+    // 创建气泡背景，使用图片 though_bubble_outline 
+    const background = this.scene.add.image(0, 0, 'thought_bubble_outline');
+    background.setScale(0.5);
+    // 设置偏移
+    background.setPosition(-10, -20);
 
     // 创建文本
-    const textElement = TextRenderer.createCenteredText(this.scene, 0, 0, text, {
+    const textElement = TextRenderer.createCenteredText(this.scene, -10, -30, text, {
       fontSize: '16px',
       color: '#000000',
       fontStyle: 'italic',
