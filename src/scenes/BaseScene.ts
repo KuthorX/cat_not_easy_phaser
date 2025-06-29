@@ -545,6 +545,7 @@ export abstract class BaseScene extends Phaser.Scene {
 
   // 带过渡效果的房间切换方法
   protected switchToRoomWithTransition(roomKey: string, exitName: string): void {
+    return this.switchToRoom(roomKey);
     const sceneKey = this.sceneManager?.getSceneKeyForRoom(roomKey);
     if (!sceneKey) {
       console.error(`Unknown room key: ${roomKey}`);
@@ -572,23 +573,26 @@ export abstract class BaseScene extends Phaser.Scene {
   // 根据出口名称生成过渡文本
   protected getTransitionTextForExit(exitName: string): string {
     const transitionTexts: Record<string, string> = {
-      '向东': '你转向东边，准备探索客厅的另一侧...',
-      '向西': '你向西边走去，那里似乎有什么有趣的东西...',
-      '向南': '你回到客厅的中央区域...',
-      '向北': '你向北边走去，寻找新的发现...',
-      '走廊': '你走向走廊，准备探索房子的其他部分...',
-      '阳台': '你走向阳台，想要呼吸一些新鲜空气...',
-      '房间A': '你准备进入房间A，不知道里面有什么...',
-      '房间B': '你走向房间B，心中充满好奇...',
-      '房间C': '你准备探索房间C...',
-      '门口': '你走向门口，准备离开这个房间...',
-      '返回客厅': '你回到客厅的中央区域...',
-      '返回屋内': '你回到屋内，继续探索...',
-      '过道': '你走向过道，准备探索房子的其他部分...',
-      '主人房间': '你走向主人的房间，心中充满好奇...'
+      '向东': '看看东边有什么好玩的！',
+      '向西': '看看西边有什么好玩的!',
+      '向南': '看看南边有什么好玩的！',
+      '向北': '看看北边有什么好玩的！',
+      '走廊': '超级大连廊！',
+      '阳台': '离外面最近的地方！',
+      '房间A': '房间A，我讨厌这个地方，但是这个地方似乎有用...',
+      '房间B': '房间B，我讨厌这个地方，但是这个地方似乎有用...',
+      '房间C': '房间C，我讨厌这个地方，但是这个地方似乎有用...',
+      '门口': '门口，我讨厌这个地方，但是这个地方似乎有用...',
+      '返回客厅': '我讨厌这个地方，但是这个地方似乎有用...',
+      '返回屋内': '我讨厌这个地方，但是这个地方似乎有用...',
+      '过道': '这个地方，很宽阔，但是很无聊...',
+      '主人房间': '我讨厌这个地方，但是这个地方似乎有用...',
+      '高处': '跳到高处看看！',
+      '低处': '回到低处看看！',
+      '返回': '返回！'
     };
     
-    return transitionTexts[exitName] || `你走向${exitName}...`;
+    return transitionTexts[exitName] || `看看${exitName}...`;
   }
 
   protected addInteractiveObjects(obj : InteractiveObject | InteractiveObjectWithSprite) : { first: string; second: Phaser.GameObjects.GameObject } {

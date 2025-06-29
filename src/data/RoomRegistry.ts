@@ -14,9 +14,20 @@ export class RoomRegistry {
     this.registerRoom({
       id: RoomKeys.LIVING_ROOM_WEST_LOW,
       name: '客厅-向西看（低处）',
-      
-      background: 'living_room_west_low_bg',
+      background: 'living_room_west_down_bg',
       interactiveObjects: [
+        {
+          type: 'InteractiveObject',
+          id: 'cat_eat_air',
+          name: '咬空气',
+          thought: '这里是yaokongqi的thought。',
+          x: 500,
+          y: 400,
+          width: 502,
+          height: 448,
+          imageKey: 'living_room_west_down_cage',
+          actions: ['add_cat_eat_air_to_inventory']
+        },
         {
           type: 'InteractiveObject',
           id: 'cat_cage',
@@ -53,15 +64,6 @@ export class RoomRegistry {
       ],
       exits: [
         {
-          id: 'exit_to_door',
-          name: '向客厅大门',
-          targetRoom: RoomKeys.LIVING_ROOM_DOOR,
-          x: 1200,
-          y: 70 ,
-          width: 120,
-          height: 30
-        },
-        {
           id: 'exit_to_high',
           name: '跳上高处',
           targetRoom: RoomKeys.LIVING_ROOM_WEST_HIGH,
@@ -93,8 +95,7 @@ export class RoomRegistry {
     this.registerRoom({
       id: RoomKeys.LIVING_ROOM_WEST_HIGH,
       name: '客厅-向西看（高处）',
-      
-      background: 'living_room_west_high_bg',
+      background: 'living_room_west_up_bg',
       interactiveObjects: [
         {
           type: 'InteractiveObject',
@@ -691,10 +692,11 @@ export class RoomRegistry {
           id: 'robot',
           name: '扫地机器人',
           thought: '这是小圆，家里的恶霸。它一直在冬眠，睡醒就会张牙舞爪横冲直撞，经过的地方都湿乎乎的。是令人恐惧的对手！',
-          x: 400,
-          y: 500,
+          x: 800,
+          y: 600,
           width: 60,
           height: 60,
+          scale: 0.8,
           imageKey: 'balcony_robot_cleaner',
           actions: ['revenge', 'ride']
         }
@@ -712,57 +714,6 @@ export class RoomRegistry {
       ]
     });
 
-    // 客厅门口
-    this.registerRoom({
-      id: RoomKeys.LIVING_ROOM_DOOR,
-      name: '客厅门口',
-      
-      background: 'living_room_door_bg',
-      interactiveObjects: [
-        {
-          type: 'InteractiveObject',
-          id: 'debris_pile',
-          name: '杂物堆(快递)',
-          thought: '两脚兽从门口拿来的小箱子，随手就扔在这里，都堆成小山了。',
-          x: 640,
-          y: 400,
-          width: 200,
-          height: 300,
-          actions: ['rummage']
-        },
-        {
-          type: 'InteractiveObject',
-          id: 'router',
-          name: '路由器（荧光两角虫）',
-          x: 640,
-          y: 400,
-          width: 200,
-          height: 300,
-          actions: ['pounce']
-        },
-        {
-          type: 'InteractiveObject',
-          id: 'buckets_water',
-          name: '大桶水',
-          x: 640,
-          y: 400,
-          width: 200,
-          height: 300,
-          actions: ['rummage_water']
-        }
-      ],
-      exits: [
-        {
-          id: 'exit_to_living_room',
-          name: '返回客厅',
-          targetRoom: RoomKeys.LIVING_ROOM_NORTH,
-          x: 640,
-          y: 0,
-          width: 120,
-          height: 80
-        }
-      ]
-    });
   }
 
 

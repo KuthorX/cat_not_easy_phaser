@@ -670,6 +670,16 @@ export class ActionRegistry {
       ],
       conditions: []
     });
+
+    this.registerAction({
+      id: 'add_cat_eat_air_to_inventory',
+      name: '我要把它拿到手！',
+      timeCost: 0,
+      effects: [
+        { type: 'inventory', value: 'cat_eat_air', operation: 'add' }
+      ],
+      conditions: []
+    });
   }
 
   public registerAction(action: Action): void {
