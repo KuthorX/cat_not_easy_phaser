@@ -24,6 +24,8 @@ export class LivingRoomEastScene extends BaseScene {
     const roomData = this.sceneManager?.getRoomData(RoomKeys.LIVING_ROOM_EAST);
     if (!roomData) return;
 
+    super.renderBackground(roomData.background);
+
     // 创建交互对象
     roomData.interactiveObjects.forEach((obj) => {
       this.addInteractiveObjecrs(obj);

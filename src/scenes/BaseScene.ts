@@ -658,4 +658,14 @@ export abstract class BaseScene extends Phaser.Scene {
   private setupClickOutsideHandler(): void {
 
   }
+
+  // 渲染房间背景
+  protected renderBackground(backgroundKey: string): void {
+    console.log('渲染房间背景:', backgroundKey);
+    // 背景图默认居中铺满
+    const bg = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, backgroundKey);
+    console.log('bg:', bg);
+    bg.setOrigin(0.5, 0.5);
+    bg.setDepth(-100); // 保证在最底层
+  }
 }

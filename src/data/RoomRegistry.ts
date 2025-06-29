@@ -374,7 +374,6 @@ export class RoomRegistry {
     this.registerRoom({
       id: RoomKeys.LIVING_ROOM_EAST,
       name: '客厅-向东看',
-      
       background: 'living_room_east_bg',
       interactiveObjects: [
         {
@@ -456,6 +455,72 @@ export class RoomRegistry {
           thought: '两脚兽每次看到我趴在这上面，表情都很奇特。',
           x: 400,
           y: 500,
+          width: 846,
+          height: 1288,
+          imageKey: 'living_room_east_sofa',
+          actions: ['sleep_on_sofa', 'scratch_sofa']
+        },
+        {
+          type: 'InteractiveObject',
+          id: 'living_room_east_table',
+          name: '茶几',
+          x: 400,
+          y: 600,
+          width: 302,
+          height: 291,
+          imageKey: 'living_room_east_table',
+          actions: ['jump_on_table', 'push_item_from_table']
+        },
+        {
+          type: 'InteractiveObject',
+          id: 'living_room_east_dustbin',
+          name: '垃圾桶',
+          x: 500,
+          y: 750,
+          width: 302,
+          height: 291,
+          imageKey: 'living_room_east_dustbin',
+          actions: ['search_dustbin', 'knock_over_dustbin']
+        },
+        {
+          type: 'InteractiveObject',
+          id: 'living_room_east_tvtable',
+          name: '电视柜',
+          x: 950,
+          y: 600,
+          width: 743,
+          height: 940,
+          imageKey: 'living_room_east_tvtable',
+          actions: ['jump_on_tvtable', 'hide_in_tvtable']
+        },
+        {
+          type: 'InteractiveObject',
+          id: 'living_room_east_tv',
+          name: '电视',
+          x: 1100,
+          y: 400,
+          width: 541,
+          height: 1088,
+          imageKey: 'living_room_east_tv',
+          actions: ['watch_tv', 'paw_tv']
+        },
+        {
+          type: 'InteractiveObject',
+          id: 'living_room_east_cat_tree',
+          name: '猫爬架',
+          x: 800,
+          y: 500,
+          width: 302,
+          height: 483,
+          imageKey: 'living_room_east_cat_tree',
+          actions: ['climb_cat_tree', 'play_cat_tree']
+        },
+        {
+          type: 'InteractiveObject',
+          id: 'living_room_east_ball',
+          name: '球',
+          x: 900,
+          y: 750,
           width: 120,
           height: 100,
           sprite: 'cat_bed',

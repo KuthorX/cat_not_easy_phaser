@@ -10,9 +10,7 @@ export class BalconyScene extends BaseScene {
   }
 
   protected initializeScene(): void {
-    // 设置背景图片
-    this.add.image(640, 360, 'balcony_bg');
-    
+
     // 添加房间标题
     TextRenderer.createCenteredText(this, 640, 50, '阳台', {
       fontSize: '32px',
@@ -23,6 +21,8 @@ export class BalconyScene extends BaseScene {
     // 获取房间数据
     const roomData = this.sceneManager?.getRoomData(RoomKeys.BALCONY);
     if (!roomData) return;
+
+    super.renderBackground(roomData.background);
 
     // 创建交互对象
     const interactiveGameObjects = roomData.interactiveObjects.map((obj) => {
