@@ -98,8 +98,6 @@ export class ActionRegistry {
         y: 400,
         scale: 0.5,
         fps: 5,
-        loop: true,
-        repeat: 5
       },
     });
 
@@ -154,13 +152,52 @@ export class ActionRegistry {
         { type: 'story_flag', value: 'on_cat_bed', operation: 'set' }
       ],
       conditions: [
-        { type: 'energy', operator: 'gte', value: 2 }
+        { type: 'energy', operator: 'gte', value: 1 }
       ],
       specialCondition: {
         type: 'energy_check',
-        value: 2,
+        value: 1,
         failureMessage: '精力不足，跳不上去...'
-      }
+      },
+      playTweens: {
+        tweenKey: 'cat_meow',
+        x: 300,
+        y: 100,
+        scale: 0.8,
+        fps: 10,
+      },
+    });
+
+    this.registerAction({
+      id: 'play_cat_tree',
+      name: '玩它！',
+      effects: [
+      ],
+      conditions: [
+      ],
+      playTweens: {
+        tweenKey: 'cat_grab_down_wall',
+        x: 850,
+        y: 400,
+        scale: 0.5,
+        fps: 10,
+      },
+    });
+
+    this.registerAction({
+      id: 'play_with_ball',
+      name: '玩耍',
+      effects: [
+      ],
+      conditions: [
+      ],
+      playTweens: {
+        tweenKey: 'cat_oars',
+        x: 950,
+        y: 500,
+        scale: 0.5,
+        fps: 15,
+      },
     });
 
     //客厅门口
@@ -248,15 +285,50 @@ export class ActionRegistry {
     });
 
     this.registerAction({
-      id: 'eat',
+      id: 'drink_water',
       name: '进食',
-      timeCost: 60,
+      timeCost: GameConstants.BASIC_ACTION_COST,
+      playTweens: {
+        tweenKey: 'cat_hit_laptop',
+        x: 1200,
+        y: 450,
+        fps: 20,
+        scale: 1.2,
+      },
       effects: [
         { type: 'energy', value: 1, operation: 'add' }
       ],
-      conditions: [
-        { type: 'energy', operator: 'gte', value: 1 }
-      ]
+      conditions: []
+    });
+
+    this.registerAction({
+      id: 'sit_on_evil_robot',
+      name: '压得更扁',
+      timeCost: GameConstants.ADVANCED_ACTION_COST,
+      effects: [
+      ],
+      conditions: [],
+      playTweens: {
+        tweenKey: 'cat_play',
+        x: 500,
+        y: 550,
+        scale: 1,
+      }
+    });
+
+    this.registerAction({
+      id: 'revenge_on_evil_robot',
+      name: '殴打',
+      timeCost: GameConstants.ADVANCED_ACTION_COST,
+      effects: [
+      ],
+      conditions: [],
+      playTweens: {
+        tweenKey: 'cat_slap',
+        x: 500,
+        y: 550,
+        scale: 0.8,
+      }
     });
 
     // 主人房间动作
@@ -422,10 +494,10 @@ export class ActionRegistry {
       name: '睡觉',
       playTweens: {
         tweenKey: 'cat_sleep',
-        x: 562,
-        y: 313,
-        scale: 0.8,
-        fps: 3,
+        x: 400,
+        y: 350,
+        scale: 0.5,
+        fps: 1,
       },
       effects: [],
       conditions: []

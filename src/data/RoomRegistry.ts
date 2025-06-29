@@ -383,28 +383,28 @@ export class RoomRegistry {
         {
           type: 'InteractiveObject',
           id: 'food_bowl',
-          name: '粮盆与水碗',
-          thought: '定时涌现食物和净水的神奇地带。感谢大自然的馈赠！',
+          name: '水碗',
+          thought: '定时涌现净水的神奇地带。\n感谢大自然的馈赠！',
           x: 1200,
           y: 400,
           width: 602,
           height: 776,
           scale: 0.4,
-          imageKey: 'hallway_eat',
-          actions: ['eat']
+          imageKey: 'hallway_water',
+          actions: ['drink_water']
         },
         {
           type: 'InteractiveObject',
           id: 'water_bowl',
-          name: '粮盆与水碗',
-          thought: '定时涌现食物和净水的神奇地带。感谢大自然的馈赠！',
+          name: '粮盆',
+          thought: '定时涌现食物的神奇地带。\n感谢大自然的馈赠！',
           x: 1200,
           y: 550,
           width: 587,
           height: 469,
           scale: 0.4,
-          imageKey: 'hallway_water',
-          actions: ['eat']
+          imageKey: 'hallway_eat',
+          actions: []
         },
       ],
       exits: [
@@ -497,7 +497,8 @@ export class RoomRegistry {
           height: 107,
           scale: 0.5,
           imageKey: 'living_room_east_cord',
-          actions: ['play_cord', 'bite_cord'],
+          disableInteractive: true,
+          actions: [],
           outline: {
             color: '#FF6C35',
           }
@@ -512,7 +513,8 @@ export class RoomRegistry {
           height: 940,
           scale: 0.5,
           imageKey: 'living_room_east_tvtable',
-          actions: ['jump_on_tvtable', 'hide_in_tvtable'],
+          disableInteractive: true,
+          actions: [],
           outline: {
             color: '#FF6A35',
           }
@@ -530,7 +532,8 @@ export class RoomRegistry {
           actions: ['sleep_in_nest', 'sniff_nest'],
           outline: {
             color: '#FF6B30',
-          }
+          },
+          thought: "两脚兽每次见到我在上面，\n都会很意外。",
         },
         {
           type: 'InteractiveObject',
@@ -583,7 +586,7 @@ export class RoomRegistry {
           height: 483,
           scale: 0.5,
           imageKey: 'living_room_east_cat_tree',
-          actions: ['climb_cat_tree', 'play_cat_tree'],
+          actions: ['play_cat_tree'],
           outline: {
             color: '#FF6B35', // 橙色外框
             offset_x: 0,
@@ -603,7 +606,7 @@ export class RoomRegistry {
           height: 117,
           scale: 0.5,
           imageKey: 'living_room_east_ball',
-          actions: ['play_ball', 'paw_ball']
+          actions: ['play_with_ball']
         },
         {
           type: 'InteractiveObject',
@@ -763,7 +766,7 @@ export class RoomRegistry {
           type: 'InteractiveObject',
           id: 'fortress',
           name: '堡垒',
-          thought: '两脚兽搭建的防御设施，封印着隔壁的敌猫。最近有些年久失修，希望别出什么问题。',
+          thought: '两脚兽搭建的防御设施，\n封印着隔壁的敌猫。\n最近有些年久失修，\n希望别出什么问题。',
           x: 200,
           y: 300,
           width: 314,
@@ -773,28 +776,16 @@ export class RoomRegistry {
         },
         {
           type: 'InteractiveObject',
-          id: 'black_hand',
-          name: '黑手',
-          thought: '通过堡垒缝隙出现的劲敌！它动作灵敏，我赢不过。可恶，看来必须要想办法让两脚兽意识到它得加固堡垒防线了。',
-          x: 250,
-          y: 350,
-          width: 172,
-          height: 160,
-          imageKey: 'balcony_coat_hanger',
-          actions: ['interact']
-        },
-        {
-          type: 'InteractiveObject',
           id: 'robot',
           name: '扫地机器人',
-          thought: '这是小圆，家里的恶霸。它一直在冬眠，睡醒就会张牙舞爪横冲直撞，经过的地方都湿乎乎的。是令人恐惧的对手！',
-          x: 800,
+          thought: '这是圆大扁，\n家里的恶霸。\n它一直在冬眠，\n睡醒就会张牙舞爪横冲直撞，\n经过的地方都湿乎乎的。\n是令人恐惧的对手！',
+          x: 500,
           y: 600,
           width: 341,
           height: 232,
           scale: 0.8,
           imageKey: 'balcony_robot_cleaner',
-          actions: ['revenge', 'ride']
+          actions: ['revenge_on_evil_robot', 'sit_on_evil_robot']
         }
       ],
       exits: [
