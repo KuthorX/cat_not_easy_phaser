@@ -31,7 +31,7 @@ export class LivingRoomNorthScene extends BaseScene {
     // 创建交互对象
     roomData.interactiveObjects.forEach((obj: InteractiveObject | InteractiveObjectWithSprite) => {
       this.interactiveObjects.set(obj.id, obj as InteractiveObject);
-      const objSprite = this.addInteractiveObjecrs(obj);
+      const objSprite = this.addInteractiveObjects(obj);
       this.interactiveObjectBodies.push(objSprite.second);
     });
 

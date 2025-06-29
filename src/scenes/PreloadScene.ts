@@ -72,7 +72,7 @@ export class PreloadScene extends Phaser.Scene {
     const imageFiles = {
       balcony: ['bg', 'chair', 'coat_hanger', 'robot_cleaner'],
       room_b: ['bg', 'bed', 'chair', 'computer_screen', 'kettle', 'side_wall'],
-      living_room_east: ['bg', 'ball', 'cat_nest', 'cat_tree', 'cola', 'cord', 'dustbin', 'glass', 'milk', 'paper', 'pot', 'sofa', 'table', 'tv', 'tvtable'],
+      living_room_east: ['bg', 'ball', 'cat_nest', 'cat_tree', 'cola', 'cord', 'dustbin', 'glass', 'milk', 'paper', 'pot', 'sofa', 'table', 'tv', 'tvtable', 'sundries_down', 'tv_down'],
       living_room_west_down: ['bg', 'basket', 'cage', 'cat_toilet', 'cat_villa', 'cord2', 'food', 'ice_maker', 'table'],
       living_room_west_up: ['bg', 'cord', 'handset', 'table', 'umbrella'],
       menu: ['start_game', 'settings', 'exit_game'],

@@ -26,7 +26,6 @@ export class RoomRegistry {
           y: 400,
           width: 150,
           height: 100,
-          sprite: 'cat_cage',
           actions: ['attack_cage', 'jump_on_cage']
         },
         {
@@ -38,7 +37,6 @@ export class RoomRegistry {
           y: 500,
           width: 100,
           height: 80,
-          sprite: 'cat_litter_box',
           actions: ['use_litter_box']
         },
         {
@@ -50,7 +48,6 @@ export class RoomRegistry {
           y: 450,
           width: 120,
           height: 100,
-          sprite: 'cat_house',
           actions: ['play_in_house']
         }
       ],
@@ -99,7 +96,6 @@ export class RoomRegistry {
           y: 350,
           width: 80,
           height: 40,
-          sprite: 'fish_treat',
           actions: ['eat_fish_treat']
         },
         {
@@ -111,7 +107,6 @@ export class RoomRegistry {
           y: 450,
           width: 80,
           height: 40,
-          sprite: 'cat_bites_rope',
           actions: ['bites_rope']
         },
         {
@@ -123,7 +118,6 @@ export class RoomRegistry {
           y: 550,
           width: 80,
           height: 40,
-          sprite: 'cat_bites_air',
           actions: ['bites_air']
         }
       ],
@@ -156,7 +150,6 @@ export class RoomRegistry {
           y: 250,
           width: 30,
           height: 30,
-          sprite: 'squeaky_toy_mouse',
           actions: ['play', 'carry']
         },
         {
@@ -168,7 +161,6 @@ export class RoomRegistry {
           y: 400,
           width: 20,
           height: 20,
-          sprite: 'drink',
           actions: ['drink_carry']
         },
         {
@@ -180,7 +172,6 @@ export class RoomRegistry {
           y: 300,
           width: 100,
           height: 50,
-          sprite: 'display',
           actions: ['destroy']
         },       
         {
@@ -192,7 +183,6 @@ export class RoomRegistry {
           y: 200,
           width: 80,
           height: 150,
-          sprite: 'wardrobe',
           actions: ['hide']
         },
         {
@@ -204,7 +194,6 @@ export class RoomRegistry {
           y: 400,
           width: 120,
           height: 80,
-          sprite: 'human_bed',
           actions: ['pee']
         }, 
         {
@@ -284,7 +273,6 @@ export class RoomRegistry {
           y: 200,
           width: 50,
           height: 80,
-          sprite: 'closed_door',
           actions: ['unlock', 'enter']
         },
         {
@@ -296,7 +284,6 @@ export class RoomRegistry {
           y: 250,
           width: 60,
           height: 30,
-          sprite: 'small_shelf',
           actions: ['jump_on']
         },
         {
@@ -308,7 +295,6 @@ export class RoomRegistry {
           y: 300,
           width: 100,
           height: 200,
-          sprite: 'bookshelf',
           actions: ['jump_on_big']
         },
         {
@@ -320,7 +306,6 @@ export class RoomRegistry {
           y: 400,
           width: 40,
           height: 40,
-          sprite: 'food_bowl',
           actions: ['eat']
         },
         {
@@ -332,7 +317,6 @@ export class RoomRegistry {
           y: 400,
           width: 30,
           height: 30,
-          sprite: 'sealed_cat_food',
           actions: []
         },
         {
@@ -344,7 +328,6 @@ export class RoomRegistry {
           y: 500,
           width: 50,
           height: 50,
-          sprite: 'robot',
           actions: []
         }
       ],
@@ -387,8 +370,6 @@ export class RoomRegistry {
           width: 846,
           height: 1288,
           scale: 0.5,
-          // scale_width: 400,
-          // scale_height: 600,
           imageKey: 'living_room_east_sofa',
           actions: ['sleeping', 'jumping']
         },
@@ -402,7 +383,7 @@ export class RoomRegistry {
           height: 291,
           scale: 0.5,
           imageKey: 'living_room_east_table',
-          actions: ['jump_on_table', 'push_item_from_table']
+          actions: ['sweep_table'],
         },
         {
           type: 'InteractiveObject',
@@ -462,7 +443,33 @@ export class RoomRegistry {
           height: 1088,
           scale: 0.5,
           imageKey: 'living_room_east_tv',
-          actions: ['watch_tv', 'paw_tv']
+          actions: ['push_tv'],
+          conditions: [
+            {
+              type: 'story_flag',
+              value: 'tv_pushed',
+              operator: 'not_has'
+            }
+          ]
+        },
+        {
+          type: 'InteractiveObject',
+          id: 'living_room_east_tv_down',
+          name: '掉落的电视',
+          x: 900,
+          y: 300,
+          width: 300,
+          height: 300,
+          scale: 0.5,
+          imageKey: 'living_room_east_tv_down',
+          disableInteractive: true,
+          conditions: [
+            {
+              type: 'story_flag',
+              value: 'tv_pushed',
+              operator: 'has'
+            }
+          ]
         },
         {
           type: 'InteractiveObject',
@@ -498,7 +505,14 @@ export class RoomRegistry {
           height: 150,
           scale: 0.5,
           imageKey: 'living_room_east_glass',
-          actions: ['push_glass', 'lick_glass']
+          disableInteractive: true,
+          conditions: [
+            {
+              type: 'story_flag',
+              value: 'table_swept',
+              operator: 'not_has'
+            }
+          ]
         },
         {
           type: 'InteractiveObject',
@@ -510,7 +524,14 @@ export class RoomRegistry {
           height: 228,
           scale: 0.5,
           imageKey: 'living_room_east_paper',
-          actions: ['play_paper', 'push_paper']
+          disableInteractive: true,
+          conditions: [
+            {
+              type: 'story_flag',
+              value: 'table_swept',
+              operator: 'not_has'
+            }
+          ]
         },
         {
           type: 'InteractiveObject',
@@ -522,7 +543,14 @@ export class RoomRegistry {
           height: 176,
           scale: 0.5,
           imageKey: 'living_room_east_cola',
-          actions: ['push_cola', 'lick_cola']
+          disableInteractive: true,
+          conditions: [
+            {
+              type: 'story_flag',
+              value: 'table_swept',
+              operator: 'not_has'
+            }
+          ]
         },
         {
           type: 'InteractiveObject',
@@ -534,7 +562,14 @@ export class RoomRegistry {
           height: 192,
           scale: 0.5,
           imageKey: 'living_room_east_milk',
-          actions: ['drink_milk', 'push_milk']
+          disableInteractive: true,
+          conditions: [
+            {
+              type: 'story_flag',
+              value: 'table_swept',
+              operator: 'not_has'
+            }
+          ]
         },
         {
           type: 'InteractiveObject',
@@ -546,7 +581,33 @@ export class RoomRegistry {
           height: 202,
           scale: 0.5,
           imageKey: 'living_room_east_pot',
-          actions: ['push_pot', 'sniff_pot']
+          disableInteractive: true,
+          conditions: [
+            {
+              type: 'story_flag',
+              value: 'table_swept',
+              operator: 'not_has'
+            }
+          ]
+        },
+        {
+          type: 'InteractiveObject',
+          id: 'living_room_east_sundries_down',
+          name: '掉落的杂物',
+          x: 200,
+          y: 300,
+          width: 925,
+          height: 629,
+          scale: 0.5,
+          imageKey: 'living_room_east_sundries_down',
+          disableInteractive: true,
+          conditions: [
+            {
+              type: 'story_flag',
+              value: 'table_swept',
+              operator: 'has'
+            }
+          ]
         },
       ],
       exits: [
@@ -643,7 +704,6 @@ export class RoomRegistry {
           y: 400,
           width: 200,
           height: 300,
-          sprite: 'debris_pile',
           actions: ['rummage']
         },
         {
@@ -654,7 +714,6 @@ export class RoomRegistry {
           y: 400,
           width: 200,
           height: 300,
-          sprite: 'router',
           actions: ['pounce']
         },
         {
@@ -665,7 +724,6 @@ export class RoomRegistry {
           y: 400,
           width: 200,
           height: 300,
-          sprite: 'buckets_water',
           actions: ['rummage_water']
         }
       ],

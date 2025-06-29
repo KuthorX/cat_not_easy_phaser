@@ -5,8 +5,10 @@ import { UIManager } from '@/core/UIManager';
 import { AudioManager } from '@/core/AudioManager';
 import { TweenManager } from '@/core/TweenManager';
 import { InteractiveObject, InteractiveObjectWithSprite } from '@/types/GameState';
-import { OutlineRenderer } from '../utils/OutlineRenderer';
+import { InteractiveOutlineRenderer } from '../utils/InteractiveOutlineRenderer';
+import { ConditionChecker } from '../utils/ConditionChecker';
 import { TransitionHelper } from '../utils/TransitionHelper';
+import { ConditionsFormatter } from '../utils/ConditionsFormatter';
 
 export abstract class BaseScene extends Phaser.Scene {
   protected gameManager!: GameManager;
@@ -14,7 +16,10 @@ export abstract class BaseScene extends Phaser.Scene {
   protected audioManager!: AudioManager;
   protected uiManager!: UIManager;
   protected tweenManager!: TweenManager;
-  protected outlineRenderer!: OutlineRenderer;
+  protected interactiveOutlineRenderer!: InteractiveOutlineRenderer;
+  
+  // 存储交互对象的状态
+  protected interactiveObjects: Map<string, { object: InteractiveObject | InteractiveObjectWithSprite, gameObject: Phaser.GameObjects.GameObject }> = new Map();
 
   constructor(key: string) {
     super(key);
@@ -35,7 +40,7 @@ export abstract class BaseScene extends Phaser.Scene {
     this.sceneManager.setCurrentScene(this);
 
     // 初始化描边渲染器
-    this.outlineRenderer = new OutlineRenderer(this);
+    this.interactiveOutlineRenderer = new InteractiveOutlineRenderer(this);
 
     // 设置事件监听
     this.setupEventListeners();
@@ -119,6 +124,11 @@ export abstract class BaseScene extends Phaser.Scene {
       this.gameManager.on(GameEvents.INVENTORY_CHANGED, this.onInventoryChanged.bind(this));
       this.gameManager.on(GameEvents.ACHIEVEMENT_UNLOCKED, this.onAchievementUnlocked.bind(this));
       this.gameManager.on(GameEvents.GAME_ENDED, this.onGameEnded.bind(this));
+      
+      // 监听状态变化事件，用于更新交互对象显示
+      this.gameManager.on(GameEvents.STORY_FLAG_SET, this.onStateChanged.bind(this));
+      this.gameManager.on(GameEvents.ACTION_COMPLETED, this.onStateChanged.bind(this));
+      this.gameManager.on(GameEvents.INVENTORY_CHANGED, this.onStateChanged.bind(this));
     }
   }
 
@@ -158,6 +168,106 @@ export abstract class BaseScene extends Phaser.Scene {
     }
   }
 
+  /**
+   * 状态变化时的处理
+   * 用于更新交互对象的显示状态
+   */
+  protected onStateChanged(): void {
+    this.updateInteractiveObjectsVisibility();
+  }
+
+  /**
+   * 更新交互对象的可见性
+   */
+  protected updateInteractiveObjectsVisibility(): void {
+    if (!this.gameManager) return;
+
+    const gameState = this.gameManager.getState();
+    
+    console.log('updateInteractiveObjectsVisibility 被调用');
+    console.log('当前 story_flags:', Object.fromEntries(gameState.storyFlags));
+    
+    this.interactiveObjects.forEach((entry, objectId) => {
+      const { object, gameObject } = entry;
+      
+      // 检查条件
+      const shouldShow = this.shouldShowInteractiveObject(object, gameState);
+      
+      console.log(`对象 ${objectId}: shouldShow = ${shouldShow}`);
+      
+      // 如果应该显示但当前是占位符，重新创建真正的对象
+      if (shouldShow && gameObject instanceof Phaser.GameObjects.Rectangle && 
+          (gameObject as any).fillColor === 0x000000 && (gameObject as any).fillAlpha === 0) {
+        
+        console.log('重新创建对象', objectId);
+        
+        // 销毁占位符
+        gameObject.destroy();
+        
+        // 重新创建真正的对象
+        let newGameObject: Phaser.GameObjects.GameObject;
+        switch (object.type) {
+          case 'InteractiveObject':
+            if (object.imageKey) {
+              newGameObject = this.createInteractiveImageObject(object, object.imageKey);
+            } else {
+              newGameObject = this.createInteractiveObject(object);
+            }
+            break;
+          case 'InteractiveObjectWithSprite':
+            newGameObject = this.createInteractiveObjectsWithSprite(object);
+            break;
+          default:
+            return;
+        }
+        
+        // 更新映射
+        this.interactiveObjects.set(objectId, { object, gameObject: newGameObject });
+      } else if (!shouldShow && !(gameObject instanceof Phaser.GameObjects.Rectangle && 
+                (gameObject as any).fillColor === 0x000000 && (gameObject as any).fillAlpha === 0)) {
+        // 如果不应该显示且当前不是占位符，销毁对象并创建占位符
+        console.log('隐藏对象，创建占位符', objectId);
+        
+        // 销毁当前对象
+        gameObject.destroy();
+        
+        // 创建占位符
+        const placeholder = this.add.rectangle(object.x, object.y, object.width, object.height, 0x000000, 0);
+        placeholder.setVisible(false);
+        
+        // 更新映射
+        this.interactiveObjects.set(objectId, { object, gameObject: placeholder });
+      } else {
+        // 更新可见性 - 使用类型断言确保有setVisible方法
+        if ('setVisible' in gameObject) {
+          (gameObject as any).setVisible(shouldShow);
+        }
+        
+        // 如果对象不可见，隐藏其外框
+        if (!shouldShow) {
+          this.interactiveOutlineRenderer.hideInteractiveOutline(objectId);
+        }
+      }
+    });
+  }
+
+  /**
+   * 检查交互对象是否应该显示
+   * @param object 交互对象
+   * @param gameState 游戏状态
+   * @returns 是否应该显示
+   */
+  protected shouldShowInteractiveObject(object: InteractiveObject | InteractiveObjectWithSprite, gameState: any): boolean {
+    // 检查条件
+    if ('conditions' in object && object.conditions && object.conditions.length > 0) {
+      const result = ConditionChecker.checkConditions(object.conditions, gameState);
+      console.log(`对象 ${object.id} 条件检查:`, object.conditions, '结果:', result);
+      return result;
+    }
+    
+    return true; // 没有条件限制，默认显示
+  }
+
   // 执行动作
   protected executeAction(actionId: string, initialPosition?: { x: number, y: number }): boolean {
     if (!this.gameManager) return false;
@@ -166,6 +276,19 @@ export abstract class BaseScene extends Phaser.Scene {
     if (!action) return false;
 
     const gameState = this.gameManager.getState();
+    
+    // 使用ConditionsFormatter检查动作条件
+    const conditionCheck = ConditionsFormatter.checkActionConditions(action, gameState);
+    
+    if (!conditionCheck.canExecute) {
+      // 条件不满足，显示提示信息
+      if (this.uiManager && conditionCheck.message) {
+        const x = 1280 - 200; // 右下角位置
+        const y = 720 - 100;
+        this.uiManager.showThought(`condition_failed_${actionId}`, conditionCheck.message, x, y, 3000);
+      }
+      return false;
+    }
     
     // 检查是否可以执行动作
     if (!this.sceneManager.canAccessRoom(gameState.currentRoom, gameState)) {
@@ -186,16 +309,17 @@ export abstract class BaseScene extends Phaser.Scene {
       return false;
     }
 
-    // 执行动作效果
-    this.applyActionEffects(action, gameState);
-
     // 播放音效
     if (this.audioManager) {
       this.audioManager.playActionSound(actionId);
     }
 
-    // 播放PNG序列动画并处理thought时序
-    this.handleActionAnimationAndThought(action, actionId);
+    // 播放PNG序列动画并处理thought时序，在动画完成后应用效果
+    this.handleActionAnimationAndThought(action, actionId, () => {
+      console.log('动画完成，现在应用动作效果');
+      // 执行动作效果
+      this.applyActionEffects(action, gameState);
+    });
 
     // 处理对话或显示描述
     if (action.triggerDialogue && action.dialogueId && this.uiManager) {
@@ -240,7 +364,7 @@ export abstract class BaseScene extends Phaser.Scene {
   }
 
   // 统一处理动作动画和想法气泡的时序关系
-  protected handleActionAnimationAndThought(action: any, actionId: string): void {
+  protected handleActionAnimationAndThought(action: any, actionId: string, onAnimationComplete?: () => void): void {
     // 播放PNG序列动画
     if (action.playTweens && this.tweenManager) {
       this.tweenManager.playTween({
@@ -249,14 +373,21 @@ export abstract class BaseScene extends Phaser.Scene {
         y: action.playTweens.y,
         scale: action.playTweens.scale,
         fps: action.playTweens.fps,
-        loop: action.playTweens.loop
+        loop: action.playTweens.loop,
+        repeat: action.playTweens.repeat
       }, () => {
+        console.log('动画播放完成');
         console.log('action.thought', action.thought);
         if (action.thought && this.uiManager) {
           const thoughtId = `thought_${actionId}`;
           const x = 1280 - 200; // 右下角位置
           const y = 720 - 100;
           this.uiManager.showThought(thoughtId, action.thought, x, y, 3000);
+        }
+        
+        // 动画完成后调用回调
+        if (onAnimationComplete) {
+          onAnimationComplete();
         }
       });
     } else {
@@ -266,6 +397,11 @@ export abstract class BaseScene extends Phaser.Scene {
         const x = 1280 - 200; // 右下角位置
         const y = 720 - 100;
         this.uiManager.showThought(thoughtId, action.thought, x, y, 3000);
+      }
+      
+      // 没有动画时立即调用回调
+      if (onAnimationComplete) {
+        onAnimationComplete();
       }
     }
   }
@@ -288,11 +424,6 @@ export abstract class BaseScene extends Phaser.Scene {
   }
 
   protected checkActionRequirements(action: any, gameState: any): boolean {
-    // 检查精力值要求
-    if (action.energyRequirement && gameState.energy < action.energyRequirement) {
-      return false;
-    }
-
     // 检查物品要求
     if (action.itemRequirement && !gameState.inventory.includes(action.itemRequirement)) {
       return false;
@@ -443,10 +574,22 @@ export abstract class BaseScene extends Phaser.Scene {
     return transitionTexts[exitName] || `你走向${exitName}...`;
   }
 
-  protected addInteractiveObjecrs(obj : InteractiveObject | InteractiveObjectWithSprite) : { first: string; second: Phaser.GameObjects.GameObject } {
+  protected addInteractiveObjects(obj : InteractiveObject | InteractiveObjectWithSprite) : { first: string; second: Phaser.GameObjects.GameObject } {
     let gameObject: Phaser.GameObjects.GameObject;
+    
+    // 检查条件，如果条件不满足则不创建对象
+    if (!this.shouldShowInteractiveObject(obj, this.gameManager?.getState())) {
+      console.log('条件不满足，不创建对象', obj.id);
+      // 创建一个不可见的占位对象
+      const placeholder = this.add.rectangle(obj.x, obj.y, obj.width, obj.height, 0x000000, 0);
+      placeholder.setVisible(false);
+      this.interactiveObjects.set(obj.id, { object: obj, gameObject: placeholder });
+      return { first: obj.id, second: placeholder };
+    }
+    
     switch (obj.type) {
       case 'InteractiveObject':
+        console.log('InteractiveObject 创建交互对象', obj.id);
         if (obj.imageKey) {
           // Create interactive object
           gameObject = this.createInteractiveImageObject(obj, obj.imageKey);
@@ -456,9 +599,14 @@ export abstract class BaseScene extends Phaser.Scene {
         }
         break;
       case 'InteractiveObjectWithSprite':
+        console.log('InteractiveObjectWithSprite 创建交互对象', obj.id);
         gameObject = this.createInteractiveObjectsWithSprite(obj);
         break;
     }
+    
+    // 存储交互对象信息
+    this.interactiveObjects.set(obj.id, { object: obj, gameObject });
+    
     return { first: obj.id, second: gameObject };
   }
 
@@ -466,19 +614,24 @@ export abstract class BaseScene extends Phaser.Scene {
   private createInteractiveObject(obj: any): Phaser.GameObjects.Rectangle {
     const rect = this.add.rectangle(obj.x, obj.y, obj.width, obj.height, 0x00ff00, 0.3);
     this.physics.add.existing(rect, true);
-    rect.setInteractive();
     
-    rect.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-      this.onObjectClicked(obj, pointer);
-    });
+    // 如果disableInteractive为true，则需要设置交互
+    if (obj.disableInteractive === true) {
+      rect.setInteractive();
+      
+      rect.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+        this.onObjectClicked(obj, pointer);
+      });
 
-    rect.on('pointerover', () => {
-      rect.setFillStyle(0x00ff00, 0.5);
-    });
+      rect.on('pointerover', () => {
+        console.log('InteractiveObject 鼠标悬停', obj.id);
+        rect.setFillStyle(0x00ff00, 0.5);
+      });
 
-    rect.on('pointerout', () => {
-      rect.setFillStyle(0x00ff00, 0.3);
-    });
+      rect.on('pointerout', () => {
+        rect.setFillStyle(0x00ff00, 0.3);
+      });
+    }
 
     return rect;
   }
@@ -502,120 +655,32 @@ export abstract class BaseScene extends Phaser.Scene {
     const body = image.body as Phaser.Physics.Arcade.StaticBody;
     body.setSize(obj.width, obj.height);
     
-    // 创建不可见的交互区域
-    const interactiveArea = this.add.rectangle(obj.x, obj.y, obj.width, obj.height, 0x000000, 0);
-    interactiveArea.setInteractive();
+    // 如果disableInteractive为true，不创建交互区域
+    if (obj.disableInteractive !== true) {
+      // 创建不可见的交互区域
+      const interactiveArea = this.add.rectangle(obj.x, obj.y, obj.width, obj.height, 0x000000, 0);
+      interactiveArea.setInteractive();
     
-    // 使用新的描边渲染器创建交互式描边
-    this.outlineRenderer.createInteractiveOutline(image, interactiveArea, 0x000000, 3);
-    
-    // 点击事件
-    interactiveArea.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-      this.onObjectClicked(obj, pointer);
-    });
+      // 点击事件
+      interactiveArea.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+        this.onObjectClicked(obj, pointer);
+      });
+    }
 
     return image;
   }
 
   private createInteractiveObjectsWithSprite(obj : InteractiveObjectWithSprite): Phaser.GameObjects.Sprite {
     const sprite = obj.spriteConstructor(this, obj.x, obj.y);
-    sprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-      this.onObjectClicked(obj, pointer);
-    });
+    
+    // 如果disableInteractive为true，不设置交互
+    if (obj.disableInteractive !== true) {
+      sprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+        this.onObjectClicked(obj, pointer);
+      });
+    }
+    
     return sprite;
-  }
-
-  // 显示物体描边 - 基于图片的实际形状
-  private showObjectOutline(interactiveArea: Phaser.GameObjects.Rectangle, color: number, thickness: number = 3): void {
-    const outline = (interactiveArea as any).outline;
-    const targetImage = (interactiveArea as any).targetImage;
-    
-    if (!outline || !targetImage) return;
-
-    outline.clear();
-    outline.lineStyle(thickness, color, 1);
-    
-    // 获取图片的实际边界（去除透明区域）
-    const bounds = this.getImageNonTransparentBounds(targetImage);
-    if (bounds) {
-      outline.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
-    }
-  }
-
-  // 获取图片的非透明区域边界
-  private getImageNonTransparentBounds(image: Phaser.GameObjects.Image): { x: number; y: number; width: number; height: number } | null {
-    try {
-      // 获取图片的纹理
-      const texture = image.texture;
-      const source = texture.getSourceImage() as HTMLImageElement;
-      
-      if (!source || !source.complete) {
-        // 如果图片还没加载完成，使用默认边界
-        const bounds = image.getBounds();
-        return bounds;
-      }
-
-      // 创建canvas来分析图片的透明区域
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return null;
-
-      canvas.width = source.width;
-      canvas.height = source.height;
-      ctx.drawImage(source, 0, 0);
-
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const data = imageData.data;
-
-      let minX = canvas.width;
-      let minY = canvas.height;
-      let maxX = 0;
-      let maxY = 0;
-      let hasNonTransparentPixel = false;
-
-      // 扫描图片找到非透明像素的边界
-      for (let y = 0; y < canvas.height; y++) {
-        for (let x = 0; x < canvas.width; x++) {
-          const index = (y * canvas.width + x) * 4;
-          const alpha = data[index + 3]; // 透明度通道
-          
-          if (alpha > 0) { // 非透明像素
-            hasNonTransparentPixel = true;
-            minX = Math.min(minX, x);
-            minY = Math.min(minY, y);
-            maxX = Math.max(maxX, x);
-            maxY = Math.max(maxY, y);
-          }
-        }
-      }
-
-      if (!hasNonTransparentPixel) {
-        return null;
-      }
-
-      // 计算实际边界
-      const imageBounds = image.getBounds();
-      const scaleX = imageBounds.width / canvas.width;
-      const scaleY = imageBounds.height / canvas.height;
-      
-      return {
-        x: imageBounds.x + minX * scaleX,
-        y: imageBounds.y + minY * scaleY,
-        width: (maxX - minX + 1) * scaleX,
-        height: (maxY - minY + 1) * scaleY
-      };
-    } catch (error) {
-      console.warn('无法分析图片透明区域，使用默认边界:', error);
-      return image.getBounds();
-    }
-  }
-
-  // 隐藏物体描边
-  private hideObjectOutline(interactiveArea: Phaser.GameObjects.Rectangle): void {
-    const outline = (interactiveArea as any).outline;
-    if (outline) {
-      outline.clear();
-    }
   }
 
   protected onObjectClicked(obj: any, pointer?: Phaser.Input.Pointer): void {
@@ -626,8 +691,6 @@ export abstract class BaseScene extends Phaser.Scene {
       console.log('正在对话中，禁止点击物体');
       return;
     }
-
-    const gameState = this.gameManager.getState();
     
     // 检查是否有对话动作
     const dialogueActions = obj.actions
@@ -652,16 +715,16 @@ export abstract class BaseScene extends Phaser.Scene {
       
       this.executeAction(dialogueAction.id, initialPosition);
     } else {
-      // 如果没有对话动作，显示传统动作菜单
-      const availableActions = obj.actions
+      // 显示所有动作（不再过滤可执行的动作）
+      const allActions = obj.actions
         .map((actionId: string) => this.sceneManager.getAction(actionId))
-        .filter((action: any) => action && this.sceneManager.canExecuteAction(action.id, gameState));
+        .filter((action: any) => action); // 只过滤掉不存在的动作
 
-      if (availableActions.length > 0 && this.uiManager) {
+      if (allActions.length > 0 && this.uiManager) {
         // 优先使用点击位置，否则使用对象中心位置
         const x = pointer ? pointer.worldX : obj.x;
         const y = pointer ? pointer.worldY : obj.y;
-        this.uiManager.showActionMenu(availableActions, x, y);
+        this.uiManager.showActionMenu(allActions, x, y);
       }
     }
   }
@@ -674,6 +737,8 @@ export abstract class BaseScene extends Phaser.Scene {
       this.gameManager.off(GameEvents.INVENTORY_CHANGED, this.onInventoryChanged.bind(this));
       this.gameManager.off(GameEvents.ACHIEVEMENT_UNLOCKED, this.onAchievementUnlocked.bind(this));
       this.gameManager.off(GameEvents.GAME_ENDED, this.onGameEnded.bind(this));
+      this.gameManager.off(GameEvents.STORY_FLAG_SET, this.onStateChanged.bind(this));
+      this.gameManager.off(GameEvents.ACTION_COMPLETED, this.onStateChanged.bind(this));
     }
 
     // 清理TweenManager
@@ -685,6 +750,14 @@ export abstract class BaseScene extends Phaser.Scene {
     if (this.outlineRenderer) {
       this.outlineRenderer.destroy();
     }
+
+    // 清理交互式外框渲染器
+    if (this.interactiveOutlineRenderer) {
+      this.interactiveOutlineRenderer.destroy();
+    }
+
+    // 清理交互对象映射
+    this.interactiveObjects.clear();
   }
 
   // 设置点击空白区域处理
