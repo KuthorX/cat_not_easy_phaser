@@ -64,6 +64,7 @@ export class PreloadScene extends Phaser.Scene {
       { path: 'assets/images/living_room_east', prefix: 'living_room_east' },
       { path: 'assets/images/living_room_west_down', prefix: 'living_room_west_down' },
       { path: 'assets/images/living_room_west_up', prefix: 'living_room_west_up' },
+      { path: 'assets/images/hallway', prefix: 'hallway' },
       { path: 'assets/images/menu', prefix: 'menu' },
       { path: 'assets/images/endings', prefix: 'endings' },
       { path: 'assets/images/though_bubble', prefix: 'though_bubble' }
@@ -76,6 +77,7 @@ export class PreloadScene extends Phaser.Scene {
       living_room_east: ['bg', 'ball', 'cat_nest', 'cat_tree', 'cola', 'cord', 'dustbin', 'glass', 'milk', 'paper', 'pot', 'sofa', 'table', 'tv', 'tvtable', 'sundries_down', 'tv_down'],
       living_room_west_down: ['bg', 'basket', 'cage', 'cat_toilet', 'cat_villa', 'cord2', 'food', 'ice_maker', 'table'],
       living_room_west_up: ['bg', 'cord', 'handset', 'table', 'umbrella'],
+      hallway: ['bg_close', 'bg_open', 'book_shelf', 'food', 'robot', 'eat', 'water'],
       menu: ['start_game', 'settings', 'exit_game', 'bg'],
       endings: ['allies_of_two_legged_beast', 'husky', 'logistics_officer', 'playtime'],
       though_bubble: ['cat_head']
