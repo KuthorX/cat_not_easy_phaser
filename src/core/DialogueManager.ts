@@ -19,7 +19,7 @@ export class DialogueManager {
   private onDialogueEndCallback: (() => void) | null = null;
 
   constructor() {
-    this.dialogueRegistry = new DialogueRegistry();
+    // this.dialogueRegistry = new DialogueRegistry();
   }
 
   // 设置对话结束回调

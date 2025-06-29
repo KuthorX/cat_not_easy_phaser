@@ -376,8 +376,14 @@ export class ActionRegistry {
     // 鱼干动作
     this.registerAction({
       id: 'eat_fish_treat',
-      name: '吃鱼干',
+      name: '啃咬',
       timeCost: 60,
+      playTweens: {
+        tweenKey: 'cat_lick',
+        x: 180,
+        y: 180,
+        fps: 20,
+      },
       effects: [
         { type: 'energy', value: 1, operation: 'add' }
       ],
@@ -396,13 +402,32 @@ export class ActionRegistry {
       conditions: []
     });
 
-    // 叼走空气
+    // 坐在遥控器上
     this.registerAction({
-      id: 'bites_air',
-      name: '叼走',
-      effects: [
-        { type: 'inventory', value: 'cat_bites_air', operation: 'add' }
-      ],
+      id: 'sit_on_handset',
+      name: '破坏',
+      playTweens: {
+        tweenKey: 'cat_play',
+        x: 1050,
+        y: 150,
+        scale: 0.9,
+      },
+      effects: [],
+      conditions: []
+    });
+
+    // 坐在圆扁扁
+    this.registerAction({
+      id: 'sleep_on_robot_cleaner',
+      name: '睡觉',
+      playTweens: {
+        tweenKey: 'cat_sleep',
+        x: 562,
+        y: 313,
+        scale: 0.8,
+        fps: 3,
+      },
+      effects: [],
       conditions: []
     });
 

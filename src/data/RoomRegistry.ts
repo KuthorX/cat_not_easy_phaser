@@ -20,12 +20,12 @@ export class RoomRegistry {
           type: 'InteractiveObject',
           id: 'table_over_cat_toilet',
           name: '猫厕所上的桌子',
-          thought: '桌子。两脚兽喜欢在上面放东西。',
           x: 520,
           y: 600,
           width: 979,
           height: 790,
           scale: 0.7,
+          disableInteractive: true,
           imageKey: 'living_room_west_down_table',
           actions: [],
         },
@@ -33,7 +33,7 @@ export class RoomRegistry {
           type: 'InteractiveObject',
           id: 'cat_litter_box',
           name: '猫厕所',
-          thought: '我的排泄处。沙土的质感和野外不太一样，但掩盖气味的能力优秀。毕竟从来没有天敌循着气味来攻击我。',
+          thought: '我的排泄处。\n沙土的质感和野外不太一样，\n但掩盖气味的能力优秀。\n毕竟\n从来没有天敌循着气味来攻击我。',
           x: 450,
           y: 680,
           width: 507,
@@ -46,7 +46,7 @@ export class RoomRegistry {
           type: 'InteractiveObject',
           id: 'cat_house',
           name: '猫别墅',
-          thought: '自从门坏了之后，就变成我的游乐园了。',
+          thought: '自从门坏了之后，\n就变成我的游乐园了。',
           x: 1100,
           y: 250,
           width: 653,
@@ -59,7 +59,7 @@ export class RoomRegistry {
           type: 'InteractiveObject',
           id: 'cat_cage',
           name: '笼子',
-          thought: '一个恶毒的陷阱，两脚兽有时会用这个囚禁我，带我去到钢铁巨兽腹中。无论最后是见到白袍祭司，还是暴雨之女，都是不好的回忆。',
+          thought: '一个恶毒的陷阱，\n两脚兽有时会用这个囚禁我，\n带我去到钢铁巨兽腹中。\n无论最后是见到白袍祭司，\n还是暴雨之女，都是不好的回忆。',
           x: 1000,
           y: 650,
           width: 502,
@@ -128,7 +128,7 @@ export class RoomRegistry {
           type: 'InteractiveObject',
           id: 'fish_treat',
           name: '长条硬皮鱼',
-          thought: '皮特别坚韧，但肉是浆糊状，非常美味。两脚兽隔很久才会给我吃一条，但很多第一次见的两脚兽会慷慨地多给我几根。',
+          thought: '皮特别坚韧，\n但肉是浆糊状，非常美味。\n两脚兽隔很久才会给我吃一条，\n但很多第一次见的两脚兽\n会慷慨地多给我几根。',
           scale: 0.5,
           imageKey: 'living_room_west_down_food',
           x: 150,
@@ -140,8 +140,8 @@ export class RoomRegistry {
             color: '#FF6B35', // 橙色外框
             offset_x: -5,
             offset_y: -5,
-            offset_width: 10, // 宽度增加10像素
-            offset_height: 10, // 高度增加10像素
+            offset_width: 50, // 宽度增加10像素
+            offset_height: 50, // 高度增加10像素
             offset_scale: 1.05 // 额外缩放1.05倍
           }
         },
@@ -149,7 +149,7 @@ export class RoomRegistry {
           type: 'InteractiveObject',
           id: 'cat_bites_rope',
           name: '猫咬绳',
-          thought: '长条粗麻绳，摇晃起来有声音，总感觉在挑衅我。',
+          thought: '长条粗麻绳，\n摇晃起来有声音，\n总感觉在挑衅我。',
           imageKey: 'living_room_west_up_cord',
           x: 80,
           y: 550,
@@ -169,13 +169,13 @@ export class RoomRegistry {
           type: 'InteractiveObject',
           id: 'cat_bites_air',
           name: '咬空气',
-          thought: '神秘的小黑盒子，两脚兽有时候会拿起来摩擦两下就放下。',
+          thought: '神秘的小黑盒子，\n两脚兽有时候会拿起来摩擦两下就放下。',
           imageKey: 'living_room_west_up_handset',
           x: 1100,
           y: 200,
-          width: 192,
-          height: 131,
-          actions: ['bites_air'],
+          width: 70,
+          height: 35,
+          actions: ['sit_on_handset'],
           outline: {
             color: '#FF6B35', // 橙色外框
             offset_x: -8,
@@ -195,6 +195,7 @@ export class RoomRegistry {
           width: 231,
           height: 268,
           actions: [],
+          disableInteractive: true,
         },
         {
           type: 'InteractiveObject',
@@ -204,8 +205,9 @@ export class RoomRegistry {
           x: 500,
           y: 150,
           scale: 0.5,
-          width: 566,
-          height: 342,
+          width: 60,
+          height: 200,
+          disableInteractive: true,
           actions: []
         }
       ],
@@ -368,15 +370,15 @@ export class RoomRegistry {
         {
           type: 'InteractiveObject',
           id: 'robot',
-          name: '小圆（扫地机器人）',
-          thought: '小圆好像不喜欢这个架子，撞了它几下后就继续冬眠了。',
+          name: '圆扁扁',
+          thought: '圆扁扁好像不喜欢这个架子，\n撞了它几下后就继续冬眠了。',
           x: 400,
           y: 400,
           width: 562,
           height: 313,
           scale: 0.4,
           imageKey: 'hallway_robot',
-          actions: []
+          actions: ["sleep_on_robot_cleaner"],
         },
         {
           type: 'InteractiveObject',
