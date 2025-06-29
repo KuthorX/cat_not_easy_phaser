@@ -9,8 +9,6 @@ export class BagPage implements IUIComponent {
   private title: Phaser.GameObjects.Text | null = null;
   private itemContainers: Phaser.GameObjects.Container[] = [];
   private closeButton: Phaser.GameObjects.Text | null = null;
-  private useButton: Phaser.GameObjects.Text | null = null;
-  private dropButton: Phaser.GameObjects.Text | null = null;
   
   private bagRegistry: any = null;
   private gameState: any = null;
@@ -43,19 +41,14 @@ export class BagPage implements IUIComponent {
       // 创建物品容器
       this.createItemContainers();
       
-      // 操作按钮
-      this.createActionButtons();
-      
       // 关闭按钮
       this.createCloseButton();
       
-      if (this.container && this.background && this.title && this.closeButton && this.useButton && this.dropButton) {
+      if (this.container && this.background && this.title && this.closeButton) {
         this.container.add([
           this.background,
           this.title,
           ...this.itemContainers,
-          this.useButton,
-          this.dropButton,
           this.closeButton
         ]);
         
@@ -169,42 +162,6 @@ export class BagPage implements IUIComponent {
     }
   }
 
-  private createActionButtons(): void {
-    if (!this.scene) return;
-    
-    // 使用按钮
-    this.useButton = TextRenderer.createCenteredText(this.scene, -100, 250, '使用', {
-      fontSize: '18px',
-      color: '#FFFFFF',
-      backgroundColor: '#0070DD',
-      padding: { x: 15, y: 8 }
-    });
-    this.useButton.setInteractive();
-    this.useButton.on('pointerdown', () => this.useSelectedItem());
-    this.useButton.on('pointerover', () => {
-      if (this.useButton) this.useButton.setColor('#FFFF00');
-    });
-    this.useButton.on('pointerout', () => {
-      if (this.useButton) this.useButton.setColor('#FFFFFF');
-    });
-    
-    // 丢弃按钮
-    this.dropButton = TextRenderer.createCenteredText(this.scene, 100, 250, '丢弃', {
-      fontSize: '18px',
-      color: '#FFFFFF',
-      backgroundColor: '#DD0000',
-      padding: { x: 15, y: 8 }
-    });
-    this.dropButton.setInteractive();
-    this.dropButton.on('pointerdown', () => this.dropSelectedItem());
-    this.dropButton.on('pointerover', () => {
-      if (this.dropButton) this.dropButton.setColor('#FFFF00');
-    });
-    this.dropButton.on('pointerout', () => {
-      if (this.dropButton) this.dropButton.setColor('#FFFFFF');
-    });
-  }
-
   private createCloseButton(): void {
     if (!this.scene) return;
     
@@ -235,7 +192,6 @@ export class BagPage implements IUIComponent {
   private selectItem(index: number): void {
     this.selectedItemIndex = index;
     this.updateItemSelection();
-    this.updateActionButtons();
   }
 
   private updateItemSelection(): void {
@@ -243,58 +199,6 @@ export class BagPage implements IUIComponent {
       const selectionIndicator = (container as any).selectionIndicator as Phaser.GameObjects.Rectangle;
       selectionIndicator.setVisible(index === this.selectedItemIndex);
     });
-  }
-
-  private updateActionButtons(): void {
-    if (this.selectedItemIndex >= 0) {
-      const inventoryStats = this.bagRegistry.getInventoryStats(this.gameState);
-      const selectedItem = inventoryStats[this.selectedItemIndex];
-      
-      if (selectedItem) {
-        const canUse = this.bagRegistry.canUseItem(selectedItem.itemId, this.gameState);
-        this.useButton?.setVisible(true);
-        this.useButton?.setColor(canUse ? '#FFFFFF' : '#666666');
-        this.dropButton?.setVisible(true);
-      } else {
-        this.useButton?.setVisible(false);
-        this.dropButton?.setVisible(false);
-      }
-    } else {
-      this.useButton?.setVisible(false);
-      this.dropButton?.setVisible(false);
-    }
-  }
-
-  private useSelectedItem(): void {
-    if (this.selectedItemIndex < 0) return;
-    
-    const inventoryStats = this.bagRegistry.getInventoryStats(this.gameState);
-    const selectedItem = inventoryStats[this.selectedItemIndex];
-    
-    if (selectedItem && this.bagRegistry.canUseItem(selectedItem.itemId, this.gameState)) {
-      // 这里应该调用游戏管理器来使用物品
-      console.log(`使用物品: ${selectedItem.item.name}`);
-      // TODO: 实现物品使用逻辑
-      
-      // 更新显示
-      this.updateItemDisplay();
-    }
-  }
-
-  private dropSelectedItem(): void {
-    if (this.selectedItemIndex < 0) return;
-    
-    const inventoryStats = this.bagRegistry.getInventoryStats(this.gameState);
-    const selectedItem = inventoryStats[this.selectedItemIndex];
-    
-    if (selectedItem) {
-      // 这里应该调用游戏管理器来丢弃物品
-      console.log(`丢弃物品: ${selectedItem.item.name}`);
-      // TODO: 实现物品丢弃逻辑
-      
-      // 更新显示
-      this.updateItemDisplay();
-    }
   }
 
   private updateItemDisplay(): void {
@@ -318,7 +222,6 @@ export class BagPage implements IUIComponent {
     // 重置选择
     this.selectedItemIndex = -1;
     this.updateItemSelection();
-    this.updateActionButtons();
   }
 
   private updateItemContainer(container: Phaser.GameObjects.Container, itemStat: { itemId: string; count: number; item: Item }): void {
@@ -422,8 +325,6 @@ export class BagPage implements IUIComponent {
       this.title = null;
       this.itemContainers = [];
       this.closeButton = null;
-      this.useButton = null;
-      this.dropButton = null;
     }
   }
 
