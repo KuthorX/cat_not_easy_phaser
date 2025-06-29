@@ -25,12 +25,29 @@ export class EndingScene extends BaseScene {
     let title = '';
     let description = '';
     let color = 0xffffff;
+    let showEndingImage = false;
 
     switch (endingType) {
       case 'time_up':
+        // 随机选择一张结局图片
+        const endingImages = [
+          'endings_allies_of_two_legged_beast',
+          'endings_logistics_officer', 
+          'endings_playtime',
+          'endings_husky'
+        ];
+        const randomImage = endingImages[Math.floor(Math.random() * endingImages.length)];
+        console.log("randomImage", randomImage);
+        // 显示全屏结局图片
+        const endingSprite = this.add.image(640, 360, randomImage);
+        endingSprite.setDisplaySize(1280, 720);
+        endingSprite.setOrigin(0.5);
+        
+        // 设置标题和描述
         title = '时间到了';
         description = '主人回来了，你的一天结束了。';
         color = 0xffd700;
+        showEndingImage = true;
         break;
       case 'escaped':
         title = '获得自由！';
@@ -54,27 +71,45 @@ export class EndingScene extends BaseScene {
     }
 
     // 显示结局标题
-    TextRenderer.createCenteredText(this, 640, 200, title, {
-      fontSize: '48px',
-      color: `#${color.toString(16)}`,
-      fontStyle: 'bold'
-    });
+    if (showEndingImage) {
+      // 如果有结局图片，在图片上方显示文字
+      // 添加半透明背景确保文字可读性
+      const textBg = this.add.rectangle(640, 150, 800, 100, 0x000000, 0.7);
+      textBg.setOrigin(0.5);
+      
+      TextRenderer.createCenteredText(this, 640, 120, title, {
+        fontSize: '48px',
+        color: `#${color.toString(16)}`,
+        fontStyle: 'bold'
+      });
 
-    // 显示结局描述
-    TextRenderer.createCenteredText(this, 640, 280, description, {
-      fontSize: '24px',
-      color: '#ffffff'
-    });
+      TextRenderer.createCenteredText(this, 640, 180, description, {
+        fontSize: '24px',
+        color: '#ffffff'
+      });
+    } else {
+      // 原来的显示方式
+      TextRenderer.createCenteredText(this, 640, 200, title, {
+        fontSize: '48px',
+        color: `#${color.toString(16)}`,
+        fontStyle: 'bold'
+      });
+
+      TextRenderer.createCenteredText(this, 640, 280, description, {
+        fontSize: '24px',
+        color: '#ffffff'
+      });
+    }
 
     // 显示游戏统计
-    this.showGameStats(gameState);
+    this.showGameStats(gameState, showEndingImage);
 
     // 显示重新开始按钮
-    this.createRestartButton();
+    this.createRestartButton(showEndingImage);
   }
 
-  private showGameStats(gameState: any): void {
-    const statsY = 400;
+  private showGameStats(gameState: any, showEndingImage: boolean): void {
+    const statsY = showEndingImage ? 500 : 400;
     const stats = [
       `访问房间数: ${gameState.visitedRooms.size}`,
       `完成动作数: ${gameState.completedActions.size}`,
@@ -91,8 +126,9 @@ export class EndingScene extends BaseScene {
     });
   }
 
-  private createRestartButton(): void {
-    const button = this.add.rectangle(640, 600, 200, 50, 0x666666);
+  private createRestartButton(showEndingImage: boolean): void {
+    const buttonY = showEndingImage ? 650 : 600;
+    const button = this.add.rectangle(640, buttonY, 200, 50, 0x666666);
     button.setInteractive();
     
     button.on('pointerdown', () => {
@@ -113,7 +149,7 @@ export class EndingScene extends BaseScene {
       button.setFillStyle(0x666666);
     });
 
-    TextRenderer.createCenteredText(this, 640, 600, '重新开始', {
+    TextRenderer.createCenteredText(this, 640, buttonY, '重新开始', {
       fontSize: '20px',
       color: '#ffffff'
     });
