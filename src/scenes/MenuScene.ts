@@ -98,8 +98,8 @@ export class MenuScene extends Phaser.Scene {
   }
 
   private showSettings(): void {
-    // 跳转到设置场景
-    this.scene.start(SceneKeys.SETTINGS);
+    // 跳转到设置场景，传递来源场景信息
+    this.scene.start(SceneKeys.SETTINGS, { sourceScene: SceneKeys.MENU });
   }
 
   private quitGame(): void {
