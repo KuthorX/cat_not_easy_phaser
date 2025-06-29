@@ -25,8 +25,11 @@ export class LivingRoomWestLowScene extends BaseScene {
     // 渲染背景，传递目标尺寸参数
     super.renderBackground(roomData.background, roomData.background_target_width, roomData.background_target_height);
 
+
     // 创建交互对象
-    this.addInteractiveObjects(roomData.interactiveObjects);
+    roomData.interactiveObjects.forEach((obj) => {
+      this.addInteractiveObjects(obj);
+    });
 
     // 创建出口
     roomData.exits.forEach((exit: RoomExit) => {

@@ -30,14 +30,16 @@ export class RoomRegistry {
         },
         {
           type: 'InteractiveObject',
-          id: 'cat_cage',
-          name: '笼子',
-          thought: '一个恶毒的陷阱，两脚兽有时会用这个囚禁我，带我去到钢铁巨兽腹中。无论最后是见到白袍祭司，还是暴雨之女，都是不好的回忆。',
-          x: 200,
-          y: 400,
-          width: 150,
-          height: 100,
-          actions: ['attack_cage', 'jump_on_cage']
+          id: 'table_over_cat_toilet',
+          name: '猫厕所上的桌子',
+          thought:'桌子。两脚兽喜欢在上面放东西。',
+          x: 320,
+          y: 300,
+          width: 80,
+          height: 60,
+          scale: 1.0,
+          imageKey: 'living_room_west_down_table',
+          actions: []
         },
         {
           type: 'InteractiveObject',
@@ -48,6 +50,7 @@ export class RoomRegistry {
           y: 500,
           width: 100,
           height: 80,
+          imageKey: 'living_room_west_down_cat_toilet',
           actions: ['use_litter_box']
         },
         {
@@ -55,11 +58,25 @@ export class RoomRegistry {
           id: 'cat_house',
           name: '猫别墅',
           thought:'自从门坏了之后，就变成我的游乐园了。',
-          x: 600,
-          y: 450,
+          x: 1000,
+          y: 250,
           width: 120,
           height: 100,
+          imageKey: 'living_room_west_down_cat_villa',
           actions: ['play_in_house']
+        },
+        
+        {
+          type: 'InteractiveObject',
+          id: 'cat_cage',
+          name: '笼子',
+          thought: '一个恶毒的陷阱，两脚兽有时会用这个囚禁我，带我去到钢铁巨兽腹中。无论最后是见到白袍祭司，还是暴雨之女，都是不好的回忆。',
+          x: 900,
+          y: 650,
+          width: 150,
+          height: 100,
+          imageKey: 'living_room_west_down_cage',
+          actions: ['attack_cage', 'jump_on_cage']
         }
       ],
       exits: [
