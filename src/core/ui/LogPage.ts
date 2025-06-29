@@ -77,7 +77,7 @@ export class LogPage implements IUIComponent {
         color: '#ffffff'
       }
     }, false);
-    this.prevButton.setPosition(-100, 250);
+    this.prevButton.setPosition(-150, 250);
     
     this.nextButton = this.scene.make.text({
       text: '下一页 >',
@@ -86,7 +86,7 @@ export class LogPage implements IUIComponent {
         color: '#ffffff'
       }
     }, false);
-    this.nextButton.setPosition(100, 250);
+    this.nextButton.setPosition(50, 250);
 
     this.pageText = this.scene.make.text({
       text: '',
@@ -95,7 +95,7 @@ export class LogPage implements IUIComponent {
         color: '#ffffff'
       }
     }, false);
-    this.pageText.setPosition(0, 250);
+    this.pageText.setPosition(-70, 250);
 
     this.prevButton.on('pointerdown', () => this.changePage(-1));
     this.nextButton.on('pointerdown', () => this.changePage(1));
