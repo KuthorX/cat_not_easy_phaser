@@ -89,6 +89,7 @@ export class TopRightButtons implements IUIComponent {
   }
 
   private onLogClick(): void {
+    console.log('onLogClick', this.callback);
     if (this.callback.onOpenLog) {
       this.callback.onOpenLog();
     }
