@@ -40,21 +40,6 @@ export class LivingRoomNorthScene extends BaseScene {
       this.createExit(exit);
     });
 
-    // 播放背景音乐
-    if (this.audioManager) {
-      this.audioManager.playRoomMusic(RoomKeys.LIVING_ROOM_NORTH);
-    }
-
-    // 记录房间访问
-    if (this.gameManager) {
-      this.gameManager.visitRoom(RoomKeys.LIVING_ROOM_NORTH);
-    }
-
-    // 设置键盘快捷键
-    this.setupKeyboardShortcuts();
-
-    // 检查是否有战斗结果需要处理
-    this.checkBattleResult();
   }
 
   private createExit(exit: RoomExit): void {
@@ -80,66 +65,6 @@ export class LivingRoomNorthScene extends BaseScene {
       backgroundColor: '#000000',
       padding: { x: 2, y: 1 }
     });
-  }
-
-  private setupKeyboardShortcuts(): void {
-    // I键打开物品栏
-    this.input.keyboard?.on('keydown-I', () => {
-      if (this.uiManager) {
-        this.uiManager.showInventoryPanel();
-      }
-    });
-
-    // ESC键隐藏UI
-    this.input.keyboard?.on('keydown-ESC', () => {
-      if (this.uiManager) {
-        this.uiManager.hideActionMenu();
-        this.uiManager.hideInventoryPanel();
-      }
-    });
-
-    // 数字键快速执行动作
-    this.input.keyboard?.on('keydown-ONE', () => {
-      this.executeAction('sunbathing');
-    });
-
-    this.input.keyboard?.on('keydown-TWO', () => {
-      this.executeAction('sleep_on_sofa');
-    });
-
-    this.input.keyboard?.on('keydown-THREE', () => {
-      this.executeAction('scratch_sofa');
-    });
-
-    // 测试战斗系统
-    this.input.keyboard?.on('keydown-B', () => {
-      console.log('测试战斗系统...');
-      // 直接触发战斗开始事件
-      const battleEvent = new CustomEvent('start_battle', {
-        detail: {
-          enemyId: 'sofa_north',
-          enemyName: '沙发',
-          enemyImage: 'room_b_bed',
-          playerImage: 'balcony_robot_cleaner',
-          returnScene: 'LivingRoomNorthScene',
-          returnObjectId: 'sofa_north'
-        }
-      });
-      window.dispatchEvent(battleEvent);
-    });
-  }
-
-  // 根据动作ID获取对应的物体ID
-  protected getObjectIdForAction(actionId: string): string | null {
-    const actionToObjectMap: Record<string, string> = {
-      'sleep_on_sofa': 'sofa_north',
-      'scratch_sofa': 'sofa_north',
-      'attack_cage': 'cat_cage',
-      'jump_on_cage': 'cat_cage',
-      'use_litter_box': 'cat_litter_box'
-    };
-    
-    return actionToObjectMap[actionId] || null;
   }
 
   // 获取交互对象
@@ -200,29 +125,6 @@ export class LivingRoomNorthScene extends BaseScene {
       // 记录损坏状态到游戏状态
       if (this.gameManager) {
         this.gameManager.getState().destroyedItems.add(objectId);
-      }
-    }
-  }
-
-  private checkBattleResult(): void {
-    // 从场景数据中获取战斗结果
-    const sceneData = (this as any).scene.settings.data;
-    if (sceneData && sceneData.battleResult) {
-      console.log('处理战斗结果:', sceneData);
-      
-      if (sceneData.battleResult === 'success' && sceneData.damagedObject) {
-        // 战斗成功，标记物体为损坏状态
-        this.markObjectAsDamaged(sceneData.damagedObject);
-        
-        // 显示成功提示
-        if (this.uiManager) {
-          this.uiManager.showDialogue('破坏成功！', 3000);
-        }
-      } else if (sceneData.battleResult === 'failure') {
-        // 战斗失败，显示失败提示
-        if (this.uiManager) {
-          this.uiManager.showDialogue('破坏失败！', 3000);
-        }
       }
     }
   }

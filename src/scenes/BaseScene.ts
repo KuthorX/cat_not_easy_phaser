@@ -201,16 +201,11 @@ export abstract class BaseScene extends Phaser.Scene {
     if (action.triggerDialogue && action.dialogueId && this.uiManager) {
       console.log('BaseScene.executeAction: 触发对话', { actionId, dialogueId: action.dialogueId });
       
-      // 获取物体位置：优先使用传入的位置，然后尝试从物体映射获取，最后使用默认位置
+      // 获取物体位置：优先使用传入的位置，然后尝试从当前场景的交互对象中查找，最后使用默认位置
       let objectPosition = initialPosition;
       if (!objectPosition) {
-        const objectId = this.getObjectIdForAction(actionId);
-        if (objectId) {
-          const object = this.getInteractiveObject(objectId);
-          objectPosition = object ? { x: object.x, y: object.y } : { x: 640, y: 360 };
-        } else {
-          objectPosition = { x: 640, y: 360 }; // 默认位置
-        }
+        const object = this.findObjectWithAction(actionId);
+        objectPosition = object ? { x: object.x, y: object.y } : { x: 640, y: 360 };
       }
       
       // 启动对话系统
@@ -220,9 +215,23 @@ export abstract class BaseScene extends Phaser.Scene {
     return true;
   }
 
-  // 子类可以重写此方法来提供动作ID到物体ID的映射
-  protected getObjectIdForAction(actionId: string): string | null {
-    return null; // 默认返回null，表示没有映射
+  // 查找包含指定动作的交互对象
+  protected findObjectWithAction(actionId: string): any {
+    // 获取当前房间数据
+    const currentRoomKey = this.gameManager?.getState()?.currentRoom;
+    if (!currentRoomKey || !this.sceneManager) {
+      return null;
+    }
+    
+    const roomData = this.sceneManager.getRoomData(currentRoomKey);
+    if (!roomData || !roomData.interactiveObjects) {
+      return null;
+    }
+    
+    // 查找包含指定动作的物体
+    return roomData.interactiveObjects.find((obj: any) => 
+      obj.actions && obj.actions.includes(actionId)
+    ) || null;
   }
 
   // 子类可以重写此方法来获取交互对象
