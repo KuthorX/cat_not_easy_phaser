@@ -67,7 +67,8 @@ export class PreloadScene extends Phaser.Scene {
       { path: 'assets/images/hallway', prefix: 'hallway' },
       { path: 'assets/images/menu', prefix: 'menu' },
       { path: 'assets/images/endings', prefix: 'endings' },
-      { path: 'assets/images/thought_bubble', prefix: 'thought_bubble' }
+      { path: 'assets/images/thought_bubble', prefix: 'thought_bubble' },
+      { path: 'assets/images/nav_btn', prefix: 'nav_btn' },
     ];
 
     // 定义每个文件夹中的文件列表（去掉重复的前缀）
@@ -80,7 +81,8 @@ export class PreloadScene extends Phaser.Scene {
       hallway: ['bg_close', 'bg_open', 'book_shelf', 'food', 'robot', 'eat', 'water'],
       menu: ['start_game', 'settings', 'exit_game', 'bg'],
       endings: ['allies_of_two_legged_beast', 'husky', 'logistics_officer', 'playtime'],
-      thought_bubble: ['cat_head', 'outline']
+      thought_bubble: ['cat_head', 'outline'],
+      nav_btn: ['bg']
     };
 
     // 动态加载所有图片
