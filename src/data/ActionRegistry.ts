@@ -343,8 +343,13 @@ export class ActionRegistry {
       conditions: [
         { type: 'energy', operator: 'gte', value: 1 }
       ],
-      dialogueId: 'litter_box_conversation',
-      triggerDialogue: true
+      playTweens: {
+        tweenKey: 'cat_oars',
+        x: 420,
+        y: 680,
+        scale: 0.5,
+        fps: 30,
+      },
     });
 
     // 猫别墅动作
