@@ -133,8 +133,8 @@ export class RoomRegistry {
           imageKey: 'living_room_west_down_food',
           x: 150,
           y: 200,
-          width: 60,
-          height: 30,
+          width: 250,
+          height: 178,
           actions: ['eat_fish_treat'],
           outline: {
             color: '#FF6B35', // 橙色外框
@@ -153,8 +153,8 @@ export class RoomRegistry {
           imageKey: 'living_room_west_up_cord',
           x: 80,
           y: 550,
-          width: 100,
-          height: 50,
+          width: 173,
+          height: 281,
           actions: ['bites_rope'],
           outline: {
             color: '#FF6B35', // 橙色外框
@@ -173,8 +173,8 @@ export class RoomRegistry {
           imageKey: 'living_room_west_up_handset',
           x: 1100,
           y: 200,
-          width: 70,
-          height: 35,
+          width: 192,
+          height: 131,
           actions: ['bites_air'],
           outline: {
             color: '#FF6B35', // 橙色外框
@@ -192,8 +192,8 @@ export class RoomRegistry {
           imageKey: 'living_room_west_up_table',
           x: 100,
           y: 650,
-          width: 120,
-          height: 80,
+          width: 231,
+          height: 268,
           actions: [],
         },
         {
@@ -204,8 +204,8 @@ export class RoomRegistry {
           x: 500,
           y: 150,
           scale: 0.5,
-          width: 60,
-          height: 200,
+          width: 566,
+          height: 342,
           actions: []
         }
       ],
