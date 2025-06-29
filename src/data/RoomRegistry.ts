@@ -619,8 +619,8 @@ export class RoomRegistry {
           type: 'InteractiveObject',
           id: 'living_room_east_sundries_down',
           name: '掉落的杂物',
-          x: 200,
-          y: 300,
+          x: 481,
+          y: 475,
           width: 925,
           height: 629,
           scale: 0.5,
@@ -715,9 +715,6 @@ export class RoomRegistry {
     });
 
   }
-
-
-  
 
   public registerRoom(room: RoomData): void {
     this.rooms.set(room.id, room);

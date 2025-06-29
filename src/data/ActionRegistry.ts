@@ -100,7 +100,7 @@ export class ActionRegistry {
       timeCost: 60,
       playTweens: {
         tweenKey: 'cat_oars',
-        x: 400,
+        x: 450,
         y: 400,
         scale: 0.5,
         fps: 30,
