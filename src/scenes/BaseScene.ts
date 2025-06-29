@@ -48,6 +48,12 @@ export abstract class BaseScene extends Phaser.Scene {
     // 初始化场景
     this.initializeScene();
 
+    // 增加猫猫头
+    const catHead = this.add.image(0, 0, 'though_bubble_cat_head');
+    catHead.setScale(0.5);
+    // 放到画面的底部中间
+    catHead.setPosition(640, 680);
+
     // 初始化UI
     if (this.uiManager) {
       this.uiManager.initialize(this);
@@ -761,6 +767,13 @@ export abstract class BaseScene extends Phaser.Scene {
     if (this.gameManager.isInDialogueMode()) {
       console.log('正在对话中，禁止点击物体');
       return;
+    }
+    
+    // 新增：如果有thought属性，先显示想法气泡
+    if (obj.thought && this.uiManager) {
+      const x = 1280 - 200; // 右下角位置
+      const y = 720 - 100;
+      this.uiManager.showThought(obj.id, obj.thought, x, y, 3000);
     }
     
     // 检查是否有对话动作

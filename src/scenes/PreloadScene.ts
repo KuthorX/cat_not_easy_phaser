@@ -65,7 +65,8 @@ export class PreloadScene extends Phaser.Scene {
       { path: 'assets/images/living_room_west_down', prefix: 'living_room_west_down' },
       { path: 'assets/images/living_room_west_up', prefix: 'living_room_west_up' },
       { path: 'assets/images/menu', prefix: 'menu' },
-      { path: 'assets/images/endings', prefix: 'endings' }
+      { path: 'assets/images/endings', prefix: 'endings' },
+      { path: 'assets/images/though_bubble', prefix: 'though_bubble' }
     ];
 
     // 定义每个文件夹中的文件列表（去掉重复的前缀）
@@ -76,7 +77,8 @@ export class PreloadScene extends Phaser.Scene {
       living_room_west_down: ['bg', 'basket', 'cage', 'cat_toilet', 'cat_villa', 'cord2', 'food', 'ice_maker', 'table'],
       living_room_west_up: ['bg', 'cord', 'handset', 'table', 'umbrella'],
       menu: ['start_game', 'settings', 'exit_game', 'bg'],
-      endings: ['allies_of_two_legged_beast', 'husky', 'logistics_officer', 'playtime']
+      endings: ['allies_of_two_legged_beast', 'husky', 'logistics_officer', 'playtime'],
+      though_bubble: ['cat_head']
     };
 
     // 动态加载所有图片

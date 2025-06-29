@@ -25,8 +25,8 @@ export class ThoughtBubble implements IUIComponent {
     const bubble = this.scene.add.container(x, y);
     
     // 计算气泡大小
-    const textWidth = text.length * 8;
-    const bubbleWidth = Math.min(textWidth + 40, 300);
+    // const textWidth = text.length * 8;
+    const bubbleWidth = 400;
     const bubbleHeight = 80;
 
     // 创建气泡背景（使用虚线边框表示想法）
@@ -41,10 +41,7 @@ export class ThoughtBubble implements IUIComponent {
       wordWrap: { width: bubbleWidth - 20 }
     });
 
-    // 创建小圆点表示想法
-    const dots = this.createThoughtDots(bubbleWidth, bubbleHeight);
-
-    bubble.add([background, textElement, ...dots]);
+    bubble.add([background, textElement]);
     bubble.setDepth(1001);
 
     // 设置位置（在右下角显示）
