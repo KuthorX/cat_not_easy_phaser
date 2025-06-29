@@ -108,33 +108,84 @@ export class RoomRegistry {
           id: 'fish_treat',
           name: '长条硬皮鱼',
           thought: '皮特别坚韧，但肉是浆糊状，非常美味。两脚兽隔很久才会给我吃一条，但很多第一次见的两脚兽会慷慨地多给我几根。',
-          x: 300,
-          y: 350,
-          width: 80,
-          height: 40,
-          actions: ['eat_fish_treat']
+          scale: 0.5,
+          imageKey: 'living_room_west_down_food',
+          x: 150,
+          y: 200,
+          width: 60,
+          height: 30,
+          actions: ['eat_fish_treat'],
+          outline: {
+            color: '#FF6B35', // 橙色外框
+            offset_x: -5,
+            offset_y: -5,
+            offset_width: 10, // 宽度增加10像素
+            offset_height: 10, // 高度增加10像素
+            offset_scale: 1.05 // 额外缩放1.05倍
+          }
         },
         {
           type: 'InteractiveObject',
           id: 'cat_bites_rope',
           name: '猫咬绳',
           thought: '长条粗麻绳，摇晃起来有声音，总感觉在挑衅我。',
-          x: 400,
-          y: 450,
-          width: 80,
-          height: 40,
-          actions: ['bites_rope']
+          imageKey: 'living_room_west_up_cord',
+          x: 80,
+          y: 550,
+          width: 100,
+          height: 50,
+          actions: ['bites_rope'],
+          outline: {
+            color: '#FF6B35', // 橙色外框
+            offset_x: -10,
+            offset_y: -10,
+            offset_width: 20, // 宽度增加20像素
+            offset_height: 20, // 高度增加20像素
+            offset_scale: 1.1 // 额外缩放1.1倍
+          }
         },
         {
           type: 'InteractiveObject',
           id: 'cat_bites_air',
           name: '咬空气',
           thought: '神秘的小黑盒子，两脚兽有时候会拿起来摩擦两下就放下。',
-          x: 450,
-          y: 550,
-          width: 80,
-          height: 40,
-          actions: ['bites_air']
+          imageKey: 'living_room_west_up_handset',
+          x: 1100,
+          y: 200,
+          width: 70,
+          height: 35,
+          actions: ['bites_air'],
+          outline: {
+            color: '#FF6B35', // 橙色外框
+            offset_x: -8,
+            offset_y: -8,
+            offset_width: 16, // 宽度增加16像素
+            offset_height: 16, // 高度增加16像素
+            offset_scale: 1.08 // 额外缩放1.08倍
+          }
+        },
+        {
+          type: 'InteractiveObject',
+          id: 'west_table',
+          name: '桌子',
+          imageKey: 'living_room_west_up_table',
+          x: 100,
+          y: 650,
+          width: 120,
+          height: 80,
+          actions: [],
+        },
+        {
+          type: 'InteractiveObject',
+          id: 'umbrella',
+          name: '雨伞',
+          imageKey: 'living_room_west_up_umbrella',
+          x: 500,
+          y: 150,
+          scale: 0.5,
+          width: 60,
+          height: 200,
+          actions: []
         }
       ],
       exits: [
@@ -663,208 +714,6 @@ export class RoomRegistry {
       ]
     });
 
-    //room_west_up
-    this.registerRoom({
-      id: RoomKeys.LIVING_ROOM_WEST_UP,
-      name: '客厅-向西看-上层',
-      background: 'living_room_west_up_bg',
-      background_target_width: 1280,
-      background_target_height: 720,
-      interactiveObjects: [
-        {
-          type: 'InteractiveObject',
-          id: 'living_room_west_up_cord',
-          name: '猫咬绳',
-          x: 150,
-          y: 500,
-          width: 846,
-          height: 1288,
-          scale: 0.5,
-          imageKey: 'living_room_west_up_cord',
-          actions: [],
-          outline: {
-            color: '#FF6B35', // 橙色外框
-            offset_x: 0,
-            offset_y: 0,
-            offset_width: 20, // 宽度增加20像素
-            offset_height: 40, // 高度增加40像素
-            offset_scale: 1.1 // 额外缩放1.1倍
-          }
-        },
-        {
-          type: 'InteractiveObject',
-          id: 'living_room_west_up_handset',
-          name: '咬空气',
-          x: 150,
-          y: 500,
-          width: 846,
-          height: 1288,
-          scale: 0.5,
-          imageKey: 'living_room_west_up_handset',
-          actions: [],
-          outline: {
-            color: '#FF6B35', // 橙色外框
-            offset_x: 0,
-            offset_y: 0,
-            offset_width: 20, // 宽度增加20像素
-            offset_height: 40, // 高度增加40像素
-            offset_scale: 1.1 // 额外缩放1.1倍
-          }
-        },
-        {
-          type: 'InteractiveObject',
-          id: 'living_room_west_up_table',
-          name: '沙发',
-          x: 150,
-          y: 500,
-          width: 846,
-          height: 1288,
-          scale: 0.5,
-          imageKey: 'living_room_west_up_handset',
-          actions: [],
-          outline: {
-            color: '#FF6B35', // 橙色外框
-            offset_x: 0,
-            offset_y: 0,
-            offset_width: 20, // 宽度增加20像素
-            offset_height: 40, // 高度增加40像素
-            offset_scale: 1.1 // 额外缩放1.1倍
-          }
-        },
-        {
-          type: 'InteractiveObject',
-          id: 'living_room_west_up_umbrella',
-          name: '沙发',
-          x: 150,
-          y: 500,
-          width: 846,
-          height: 1288,
-          scale: 0.5,
-          imageKey: 'living_room_west_up_umbrella',
-          actions: [],
-          outline: {
-            color: '#FF6B35', // 橙色外框
-            offset_x: 0,
-            offset_y: 0,
-            offset_width: 20, // 宽度增加20像素
-            offset_height: 40, // 高度增加40像素
-            offset_scale: 1.1 // 额外缩放1.1倍
-          }
-        }
-      ],
-      exits: [
-        {
-          id: 'exit_to_west',
-          name: '向西',
-          targetRoom: RoomKeys.LIVING_ROOM_WEST_LOW,
-          x: 640,
-          y: 705,
-          width: 120,
-          height: 30
-        },
-      ]
-    });
-      //room_west_up
-    this.registerRoom({
-      id: RoomKeys.LIVING_ROOM_WEST_UP,
-      name: '客厅-向西看-上层',
-      background: 'living_room_west_up_bg',
-      background_target_width: 1280,
-      background_target_height: 720,
-      interactiveObjects: [
-        {
-          type: 'InteractiveObject',
-          id: 'living_room_west_up_cord',
-          name: '猫咬绳',
-          x: 50,
-          y: 300,
-          width: 100,
-          height: 100,
-          scale: 0.5,
-          imageKey: 'living_room_west_up_cord',
-          actions: [],
-          outline: {
-          color: '#FF6B35', // 橙色外框
-          offset_x: 0,
-          offset_y: 0,
-          offset_width: 20, // 宽度增加20像素
-          offset_height: 40, // 高度增加40像素
-          offset_scale: 1.1 // 额外缩放1.1倍
-          }
-        },
-        {
-          type: 'InteractiveObject',
-          id: 'living_room_west_up_handset',
-          name: '咬空气',
-          x: 150,
-          y: 500,
-          width: 846,
-          height: 1288,
-          scale: 0.5,
-          imageKey: 'living_room_west_up_handset',
-          actions: [],
-          outline: {
-            color: '#FF6B35', // 橙色外框
-            offset_x: 0,
-            offset_y: 0,
-            offset_width: 20, // 宽度增加20像素
-            offset_height: 40, // 高度增加40像素
-            offset_scale: 1.1 // 额外缩放1.1倍
-          }
-          },
-          {
-            type: 'InteractiveObject',
-            id: 'living_room_west_up_table',
-            name: '沙发',
-            x: 150,
-            y: 500,
-            width: 846,
-            height: 1288,
-            scale: 0.5,
-            imageKey: 'living_room_west_up_handset',
-            actions: [],
-            outline: {
-            color: '#FF6B35', // 橙色外框
-            offset_x: 0,
-            offset_y: 0,
-            offset_width: 20, // 宽度增加20像素
-            offset_height: 40, // 高度增加40像素
-            offset_scale: 1.1 // 额外缩放1.1倍
-            }
-          },
-          {
-            type: 'InteractiveObject',
-            id: 'living_room_west_up_umbrella',
-            name: '雨伞',
-            x: 150,
-            y: 500,
-            width: 846,
-            height: 1288,
-            scale: 0.5,
-            imageKey: 'living_room_west_up_umbrella',
-            actions: [],
-            outline: {
-            color: '#FF6B35', // 橙色外框
-            offset_x: 0,
-            offset_y: 0,
-            offset_width: 20, // 宽度增加20像素
-            offset_height: 40, // 高度增加40像素
-            offset_scale: 1.1 // 额外缩放1.1倍
-            }
-          }
-        ],
-        exits: [
-          {
-            id: 'exit_to_west',
-            name: '向西',
-            targetRoom: RoomKeys.LIVING_ROOM_WEST_LOW,
-            x: 640,
-            y: 705,
-            width: 120,
-            height: 30
-          },
-        ]
-      });
     // 阳台
     this.registerRoom({
       id: RoomKeys.BALCONY,

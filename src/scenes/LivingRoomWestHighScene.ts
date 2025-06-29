@@ -40,6 +40,9 @@ export class LivingRoomWestHighScene extends BaseScene {
       this.createExit(exit);
     });
 
+    // 渲染背景，传递目标尺寸参数
+    super.renderBackground(roomData.background, roomData.background_target_width, roomData.background_target_height);
+
     // 初始化UI
     if (this.uiManager) {
       this.uiManager.initialize(this);
