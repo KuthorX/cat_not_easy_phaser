@@ -7,6 +7,7 @@ import { TweenManager } from '@/core/TweenManager';
 import { InteractiveObject, InteractiveObjectWithSprite } from '@/types/GameState';
 import { OutlineRenderer } from '../utils/OutlineRenderer';
 import { TransitionHelper } from '../utils/TransitionHelper';
+import { SceneKeys } from '../constants/SceneKeys';
 
 export abstract class BaseScene extends Phaser.Scene {
   protected gameManager!: GameManager;
@@ -150,6 +151,11 @@ export abstract class BaseScene extends Phaser.Scene {
     if (this.audioManager) {
       this.audioManager.playAchievementSound();
     }
+    
+    // 延迟2秒后显示成就结束场景
+    this.time.delayedCall(2000, () => {
+      this.scene.start(SceneKeys.ACHIEVEMENT_ENDING, { achievementId: data.achievement });
+    });
   }
 
   protected onGameEnded(data: { endingType: string }): void {

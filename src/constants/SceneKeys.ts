@@ -16,6 +16,7 @@ export enum SceneKeys {
   ROOM_C = 'RoomCScene',
   DOORWAY = 'DoorwayScene',
   ENDING = 'EndingScene',
+  ACHIEVEMENT_ENDING = 'AchievementEndingScene',
   TRANSITION = 'TransitionScene',
   BATTLE = 'BattleScene'
 }

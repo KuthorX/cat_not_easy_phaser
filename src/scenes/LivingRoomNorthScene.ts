@@ -39,7 +39,6 @@ export class LivingRoomNorthScene extends BaseScene {
     roomData.exits.forEach((exit: RoomExit) => {
       this.createExit(exit);
     });
-
   }
 
   private createExit(exit: RoomExit): void {

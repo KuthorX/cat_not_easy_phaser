@@ -27,6 +27,7 @@ import { RoomBScene } from './scenes/RoomBScene';
 import { HallwayScene } from './scenes/HallwayScene';
 import { DoorwayScene } from './scenes/DoorwayScene';
 import { EndingScene } from './scenes/EndingScene';
+import { AchievementEndingScene } from './scenes/AchievementEndingScene';
 import { TransitionScene } from './scenes/TransitionScene';
 import { BattleScene } from './scenes/mini_game/BattleScene';
 
@@ -78,6 +79,7 @@ class CatGame extends Phaser.Game {
     this.scene.add(SceneKeys.HALLWAY, HallwayScene, false);
     this.scene.add(SceneKeys.DOORWAY, DoorwayScene, false);
     this.scene.add(SceneKeys.ENDING, EndingScene, false);
+    this.scene.add(SceneKeys.ACHIEVEMENT_ENDING, AchievementEndingScene, false);
     this.scene.add(SceneKeys.TRANSITION, TransitionScene, false);
     this.scene.add(SceneKeys.BATTLE, BattleScene, false);
     
