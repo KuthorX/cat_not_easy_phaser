@@ -14,13 +14,19 @@ export class SettingScene extends Phaser.Scene {
   private volumeManager: VolumeManager;
   private unsubscribeMusic: (() => void) | null = null;
   private unsubscribeSound: (() => void) | null = null;
+  private sourceScene: string = SceneKeys.MENU; // 默认来源场景
 
   constructor() {
     super(SceneKeys.SETTINGS);
     this.volumeManager = VolumeManager.getInstance();
   }
 
-  create(): void {
+  create(data?: any): void {
+    // 获取来源场景信息
+    if (data && data.sourceScene) {
+      this.sourceScene = data.sourceScene;
+    }
+
     // 设置背景
     this.add.rectangle(640, 360, 1280, 720, 0x87CEEB);
     
@@ -38,8 +44,8 @@ export class SettingScene extends Phaser.Scene {
     }, false);
 
     // 返回按钮
-    this.createButton('返回菜单', 640, 500, () => {
-      this.returnToMenu();
+    this.createButton('返回', 640, 500, () => {
+      this.returnToSourceScene();
     });
 
     // 订阅音量变化事件
@@ -209,7 +215,7 @@ export class SettingScene extends Phaser.Scene {
     buttonText.on('pointerdown', callback);
   }
 
-  private returnToMenu(): void {
+  private returnToSourceScene(): void {
     // 清理事件订阅
     if (this.unsubscribeMusic) {
       this.unsubscribeMusic();
@@ -218,6 +224,7 @@ export class SettingScene extends Phaser.Scene {
       this.unsubscribeSound();
     }
     
-    this.scene.start(SceneKeys.MENU);
+    // 返回到来源场景
+    this.scene.start(this.sourceScene);
   }
 } 

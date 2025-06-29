@@ -102,9 +102,9 @@ export class TopRightButtons implements IUIComponent {
   }
 
   private onSettingsClick(): void {
-    // 直接启动设置场景
+    // 启动设置场景，传递当前场景作为来源场景
     if (this.scene) {
-      this.scene.scene.start(SceneKeys.SETTINGS);
+      this.scene.scene.start(SceneKeys.SETTINGS, { sourceScene: this.scene.scene.key });
     }
   }
 
