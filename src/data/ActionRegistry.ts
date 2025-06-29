@@ -549,7 +549,8 @@ export class ActionRegistry {
       id: 'drink_carry',
       name: '叼走',
       effects: [
-        { type: 'inventory', value: 'expired_drink', operation: 'add' }
+        { type: 'inventory', value: 'expired_drink', operation: 'add' },
+        { type: 'story_flag', value: 'kettle_carried', operation: 'set' }
       ],
       conditions: []
     });

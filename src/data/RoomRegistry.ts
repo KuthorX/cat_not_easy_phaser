@@ -199,7 +199,14 @@ export class RoomRegistry {
           height: 235,
           scale: 0.8,
           imageKey: 'room_b_kettle',
-          actions: ['drink_carry']
+          actions: ['drink_carry'],
+          conditions: [
+            {
+              type: 'story_flag',
+              value: 'kettle_carried',
+              operator: 'not_has'
+            }
+          ]
         },
         {
           type: 'InteractiveObject',
