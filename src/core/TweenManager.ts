@@ -69,24 +69,6 @@ export class TweenManager {
     // 初始化帧状态
     this.frameStates.set(tweenKey, { currentFrame: 1, frameCount });
 
-    // 如果设置了循环，设置定时器重复播放
-    if (loop) {
-      const timer = this.scene.time.addEvent({
-        delay: duration,
-        callback: () => {
-          this.restartTween(tweenKey, options);
-        },
-        loop: true
-      });
-      this.tweenTimers.set(tweenKey, timer);
-    } else {
-      // 如果不循环，设置定时器停止（但不调用回调，让帧动画结束时调用）
-      const timer = this.scene.time.delayedCall(duration, () => {
-        this.stopTween(tweenKey);
-      });
-      this.tweenTimers.set(tweenKey, timer);
-    }
-
     // 开始帧动画
     this.startFrameAnimation(tweenKey, fps, options);
   }
@@ -145,7 +127,7 @@ export class TweenManager {
 
     console.log('updateFrame', tweenKey, frameState.currentFrame, frameState.frameCount);
 
-    if (frameState.currentFrame <= frameState.frameCount - 2) {
+    if (frameState.currentFrame <= frameState.frameCount) {
       // 继续播放当前帧
       const frameNumber = String(frameState.currentFrame).padStart(3, '0');
       const frameKey = `${tweenKey}_${frameNumber}`;
@@ -177,21 +159,6 @@ export class TweenManager {
         this.stopTween(tweenKey);
       }
     }
-  }
-
-  /**
-   * 重新开始动画
-   */
-  private restartTween(tweenKey: string, options: TweenPlayOptions): void {
-    const sprite = this.activeTweens.get(tweenKey);
-    const frameState = this.frameStates.get(tweenKey);
-    if (sprite && frameState) {
-      sprite.setTexture(tweenKey); // 重置为第一帧
-      frameState.currentFrame = 1; // 重置帧计数
-    }
-    
-    // 重新开始帧动画
-    this.startFrameAnimation(tweenKey, options.fps || 10, options);
   }
 
   /**

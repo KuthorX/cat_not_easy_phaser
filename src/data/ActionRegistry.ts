@@ -91,7 +91,16 @@ export class ActionRegistry {
       ],
       conditions: [
         { type: 'energy', operator: 'gte', value: 1 }
-      ]
+      ],
+      playTweens: {
+        tweenKey: 'cat_sleep',
+        x: 150,
+        y: 400,
+        scale: 0.5,
+        fps: 5,
+        loop: true,
+        repeat: 5
+      },
     });
 
     this.registerAction({
@@ -117,7 +126,7 @@ export class ActionRegistry {
       timeCost: 60,
       playTweens: {
         tweenKey: 'cat_push',
-        x: 600,
+        x: 1150,
         y: 400,
         scale: 0.5,
         fps: 10,
