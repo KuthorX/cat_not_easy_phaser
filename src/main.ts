@@ -17,6 +17,7 @@ import { BootScene } from './scenes/BootScene';
 import { PreloadScene } from './scenes/PreloadScene';
 import { MenuScene } from './scenes/MenuScene';
 import { SettingScene } from './scenes/SettingScene';
+import { ThanksScene } from './scenes/ThanksScene';
 import { LivingRoomWestLowScene } from './scenes/LivingRoomWestLowScene';
 import { LivingRoomWestHighScene } from './scenes/LivingRoomWestHighScene';
 import { LivingRoomEastScene } from './scenes/LivingRoomEastScene';
@@ -66,6 +67,7 @@ class CatGame extends Phaser.Game {
     this.scene.add(SceneKeys.PRELOAD, PreloadScene, false);
     this.scene.add(SceneKeys.MENU, MenuScene, false);
     this.scene.add(SceneKeys.SETTINGS, SettingScene, false);
+    this.scene.add(SceneKeys.THANKS, ThanksScene, false);
     this.scene.add(SceneKeys.LIVING_ROOM_WEST_LOW, LivingRoomWestLowScene, false);
     this.scene.add(SceneKeys.LIVING_ROOM_WEST_HIGH, LivingRoomWestHighScene, false);
     this.scene.add(SceneKeys.LIVING_ROOM_EAST, LivingRoomEastScene, false);

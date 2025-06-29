@@ -32,6 +32,9 @@ export class MenuScene extends Phaser.Scene {
     this.createImageButton('menu_exit_game', group_start_x + group_gap_x * 2, group_start_y, () => {
       this.quitGame();
     });
+
+    // 添加右上角的 ❓ 按钮
+    this.createQuestionButton();
   }
 
   private createImageButton(imageKey: string, x: number, y: number, callback: () => void): void {
@@ -75,6 +78,34 @@ export class MenuScene extends Phaser.Scene {
     });
   }
 
+  private createQuestionButton(): void {
+    // 创建 ❓ 文本按钮
+    const questionText = this.add.text(1100, 80, '❓ ⚠️ 🙏 🤝', {
+      fontSize: '32px',
+      color: '#ffffff',
+      fontStyle: 'bold'
+    });
+    
+    questionText.setInteractive();
+    questionText.setDepth(1000);
+    // 设置中心点
+    questionText.setOrigin(0.5);
+
+    // 悬停效果
+    questionText.on('pointerover', () => {
+      questionText.setScale(1.2);
+    });
+
+    questionText.on('pointerout', () => {
+      questionText.setScale(1.0);
+    });
+
+    // 点击事件
+    questionText.on('pointerdown', () => {
+      this.showThanks();
+    });
+  }
+
   private startNewGame(): void {
     const game = (window as any).game;
     if (game) {
@@ -97,5 +128,10 @@ export class MenuScene extends Phaser.Scene {
       // 关闭浏览器标签页（如果允许）
       window.close();
     }
+  }
+
+  private showThanks(): void {
+    // 跳转到制作人员界面
+    this.scene.start(SceneKeys.THANKS);
   }
 } 
