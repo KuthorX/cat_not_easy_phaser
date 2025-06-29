@@ -41,9 +41,10 @@ export class GameEndScreen implements IUIComponent {
 
     // 重新开始按钮
     const restartButton = this.scene.add.rectangle(0, 200, 200, 50, 0xffffff);
+    restartButton.setInteractive();
     restartButton.on('pointerdown', () => {
       if (this.scene) {
-        this.scene.scene.start(SceneKeys.MENU);
+        window.location.reload();
       }
     });
 
