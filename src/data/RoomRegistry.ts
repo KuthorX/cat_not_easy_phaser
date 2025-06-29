@@ -682,8 +682,8 @@ export class RoomRegistry {
           thought: '两脚兽搭建的防御设施，封印着隔壁的敌猫。最近有些年久失修，希望别出什么问题。',
           x: 200,
           y: 300,
-          width: 100,
-          height: 100,
+          width: 314,
+          height: 487,
           imageKey: 'balcony_chair',
           actions: ['reinforce', 'inspect']
         },
@@ -694,8 +694,8 @@ export class RoomRegistry {
           thought: '通过堡垒缝隙出现的劲敌！它动作灵敏，我赢不过。可恶，看来必须要想办法让两脚兽意识到它得加固堡垒防线了。',
           x: 250,
           y: 350,
-          width: 50,
-          height: 50,
+          width: 172,
+          height: 160,
           imageKey: 'balcony_coat_hanger',
           actions: ['interact']
         },
@@ -706,8 +706,8 @@ export class RoomRegistry {
           thought: '这是小圆，家里的恶霸。它一直在冬眠，睡醒就会张牙舞爪横冲直撞，经过的地方都湿乎乎的。是令人恐惧的对手！',
           x: 800,
           y: 600,
-          width: 60,
-          height: 60,
+          width: 341,
+          height: 232,
           scale: 0.8,
           imageKey: 'balcony_robot_cleaner',
           actions: ['revenge', 'ride']
