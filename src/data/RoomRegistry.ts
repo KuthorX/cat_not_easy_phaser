@@ -37,6 +37,7 @@ export class RoomRegistry {
           y: 400,
           width: 150,
           height: 100,
+          imageKey: 'living_room_west_down_cage',
           actions: ['attack_cage', 'jump_on_cage']
         },
         {
@@ -48,6 +49,7 @@ export class RoomRegistry {
           y: 500,
           width: 100,
           height: 80,
+          imageKey: 'living_room_west_down_cat_toilet',
           actions: ['use_litter_box']
         },
         {
@@ -59,6 +61,7 @@ export class RoomRegistry {
           y: 450,
           width: 120,
           height: 100,
+          imageKey: 'living_room_west_down_cat_villa',
           actions: ['play_in_house']
         }
       ],

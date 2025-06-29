@@ -11,16 +11,24 @@ export class LivingRoomWestHighScene extends BaseScene {
 
   protected initializeScene(): void {
 
+    // 获取房间数据
+    const roomData = this.sceneManager?.getRoomData(RoomKeys.LIVING_ROOM_WEST_HIGH);
+    if (!roomData) return;
+
+    // 设置背景 - 使用房间数据中的背景设置
+    if (roomData.background) {
+      this.renderBackground(roomData.background);
+    } else {
+      // 如果没有背景设置，使用默认的棕色背景
+      this.add.rectangle(640, 360, 1280, 720, 0x8B7355);
+    }
+    
     // 添加房间标题
     TextRenderer.createCenteredText(this, 640, 50, '客厅 - 向西看（高处）', {
       fontSize: '32px',
       color: '#000000',
       fontStyle: 'bold'
     });
-
-    // 获取房间数据
-    const roomData = this.sceneManager?.getRoomData(RoomKeys.LIVING_ROOM_WEST_HIGH);
-    if (!roomData) return;
     
     // 创建交互对象
     roomData.interactiveObjects.forEach((obj) => {
