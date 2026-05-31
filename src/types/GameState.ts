@@ -1,0 +1,249 @@
+export interface GameState {
+  currentTime: number;
+  energy: number;
+  hunger: number;
+  inventory: string[];
+  achievements: string[];
+  visitedRooms: Set<string>;
+  completedActions: Set<string>;
+  destroyedItems: Set<string>;
+  storyFlags: Map<string, any>;
+  currentRoom: string;
+  gameEnded: boolean;
+  endingType: string | null;
+  currentDialogue?: DialogueState;
+  dialogueHistory: DialogueHistoryEntry[];
+  battleState: BattleState;
+}
+
+export interface DialogueState {
+  objectId: string;
+  objectName: string;
+  objectPosition: { x: number; y: number };
+  lastBubblePosition?: DialogueBubblePosition;
+  currentDialogue: Dialogue;
+  currentStep: number;
+  isActive: boolean;
+}
+
+export interface DialogueHistoryEntry {
+  timestamp: number;
+  objectId: string;
+  objectName: string;
+  dialogueText: string;
+  speaker: 'object' | 'cat';
+}
+
+export interface Dialogue {
+  id: string;
+  objectId: string;
+  objectName: string;
+  steps: DialogueStep[];
+  conditions?: DialogueCondition[];
+  effects?: DialogueEffect[];
+}
+
+export interface DialogueStep {
+  id: string;
+  speaker: 'object' | 'cat' | 'system' | 'thought';
+  text: string;
+  choices?: DialogueChoice[];
+  autoNext?: boolean;
+  nextStep?: string;
+  effects?: DialogueEffect[];
+  specialAction?: string;
+}
+
+export interface DialogueChoice {
+  id: string;
+  text: string;
+  nextStep: string;
+  conditions?: DialogueCondition[];
+  effects?: DialogueEffect[];
+}
+
+export interface DialogueCondition {
+  type: 'hunger' | 'energy' | 'inventory' | 'story_flag' | 'room_visited' | 'action_completed' | 'object_state';
+  operator: 'gte' | 'lte' | 'eq' | 'ne' | 'has' | 'not_has';
+  value: any;
+  objectId?: string;
+}
+
+export interface DialogueEffect {
+  type: 'hunger' | 'energy' | 'inventory' | 'story_flag' | 'achievement' | 'room_access' | 'object_state';
+  value: any;
+  operation: 'add' | 'remove' | 'set' | 'modify';
+  objectId?: string;
+}
+
+export interface DialogueBubblePosition {
+  x: number;
+  y: number;
+  anchor: 'left' | 'right' | 'center';
+  direction: 'up' | 'down' | 'left' | 'right';
+}
+
+export interface Action {
+  id: string;
+  name: string;
+  timeCost?: number;
+  energyCost?: number;
+  roomRequirement?: string;
+  itemRequirement?: string;
+  effects: ActionEffect[];
+  conditions: ActionCondition[];
+  dialogueId?: string;
+  triggerDialogue?: boolean;
+  playTweens?: {
+    tweenKey: string;
+    x: number;
+    y: number;
+    scale?: number;
+    fps?: number;
+    loop?: boolean;
+    repeat?: number;
+  };
+  specialCondition?: {
+    type: string;
+    value: any;
+    failureMessage: string;
+  };
+  thought?: string;
+}
+
+export interface ActionEffect {
+  type: 'hunger' | 'energy' | 'inventory' | 'story_flag' | 'achievement' | 'room_access';
+  value: any;
+  operation: 'add' | 'remove' | 'set' | 'modify';
+}
+
+export interface ActionCondition {
+  type: 'hunger' | 'energy' | 'inventory' | 'story_flag' | 'room_visited' | 'action_completed';
+  operator: 'gte' | 'lte' | 'eq' | 'ne' | 'has' | 'not_has';
+  value: any;
+}
+
+export interface RoomData {
+  id: string;
+  name: string;
+  background: string;
+  background_target_width?: number;
+  background_target_height?: number;
+  interactiveObjects: (InteractiveObject | InteractiveObjectWithSprite)[];
+  exits: RoomExit[];
+  requirements?: RoomRequirement[];
+}
+
+export interface BaseObject {
+  type: string
+  id: string;
+  name: string;
+  x: number;
+  y: number;
+}
+
+// InteractiveObject without image or self hold image
+export interface InteractiveObjectWithSprite extends BaseObject {
+  type: 'InteractiveObjectWithSprite';
+  width: number;
+  height: number;
+  actions: string[];
+  scale?: number;
+  scale_width?: number;
+  scale_height?: number;
+  spriteConstructor: (scene : Phaser.Scene, x: number, y: number)=> Phaser.Physics.Arcade.Sprite ;
+  disableInteractive?: boolean; // 是否禁用交互
+  conditions?: InteractiveObjectCondition[];
+  outline?: InteractiveObjectOutlineConfig;
+}
+
+export interface InteractiveObject extends BaseObject {
+  type: 'InteractiveObject';
+  imageKey?: string;
+  thought?: string;
+  width: number;
+  height: number;
+  actions?: string[];
+  scale?: number;
+  scale_width?: number;
+  scale_height?: number;
+  disableInteractive?: boolean; // 是否禁用交互
+  conditions?: InteractiveObjectCondition[];
+  outline?: InteractiveObjectOutlineConfig;
+}
+
+export interface InteractiveObjectOutlineConfig {
+  color?: string; // 默认黑色
+  offset_x?: number; // 偏移x
+  offset_y?: number; // 偏移y
+  offset_width?: number; // 偏移宽度
+  offset_height?: number; // 偏移高度
+  offset_scale?: number; // 偏移缩放
+}
+
+export interface InteractiveObjectCondition {
+  type: 'story_flag' | 'inventory' | 'action_completed';
+  value: any;
+  operator: 'eq' | 'ne' | 'has' | 'not_has';
+}
+
+export interface RoomExit {
+  id: string;
+  name: string;
+  targetRoom: string;
+  x: number;
+  y: number;
+  width?: number;
+  height?: number;
+  scale?: number;
+  flip_x?: boolean;
+  flip_y?: boolean;
+  rotate?: number;
+  requirements?: RoomRequirement[];
+  textConfig?: {
+    fontSize?: number;
+    color?: string;
+    offsetX?: number;
+    offsetY?: number;
+    fontStyle?: 'normal' | 'bold' | 'italic';
+  };
+}
+
+export interface RoomRequirement {
+  type: 'story_flag' | 'inventory' | 'achievement' | 'action_completed';
+  value: any;
+  operator: 'eq' | 'ne' | 'has' | 'not_has';
+}
+
+export interface Achievement {
+  id: string;
+  name: string;
+  description: string;
+  conditions: AchievementCondition[];
+  reward?: any;
+}
+
+export interface AchievementCondition {
+  type: 'action_completed' | 'item_destroyed' | 'room_visited' | 'inventory_has' | 'story_flag';
+  value: any;
+  count?: number;
+}
+
+export interface BattleAction {
+  id: string;
+  name: string;
+  description: string;
+  successRate: number;
+}
+
+export interface BattleState {
+  isActive: boolean;
+  enemyId: string;
+  enemyName: string;
+  enemyImage: string;
+  playerImage: string;
+  selectedAction: string | null;
+  result: 'success' | 'failure' | null;
+  returnScene: string;
+  returnObjectId: string;
+} 

@@ -1,0 +1,91 @@
+import { BaseScene } from './BaseScene';
+import { SceneKeys } from '../constants/SceneKeys';
+import { RoomKeys } from '../constants/SceneKeys';
+import { InteractiveObject, RoomExit, InteractiveObjectWithSprite } from '../types/GameState';
+import { TextRenderer } from '../utils/TextRenderer';
+
+export class LivingRoomWestHighScene extends BaseScene {
+  constructor() {
+    super(SceneKeys.LIVING_ROOM_WEST_HIGH);
+  }
+
+  protected initializeScene(): void {
+
+    // 获取房间数据
+    const roomData = this.sceneManager?.getRoomData(RoomKeys.LIVING_ROOM_WEST_HIGH);
+    if (!roomData) return;
+
+    // 设置背景 - 使用房间数据中的背景设置
+    if (roomData.background) {
+      this.renderBackground(roomData.background);
+    } else {
+      // 如果没有背景设置，使用默认的棕色背景
+      this.add.rectangle(640, 360, 1280, 720, 0x8B7355);
+    }
+    
+    // 添加房间标题
+    TextRenderer.createCenteredText(this, 640, 50, '客厅 - 向西看（高处）', {
+      fontSize: '32px',
+      color: '#000000',
+      fontStyle: 'bold'
+    });
+    
+    // 创建交互对象
+    roomData.interactiveObjects.forEach((obj) => {
+      this.addInteractiveObjects(obj);
+    });
+
+    // 创建出口
+    roomData.exits.forEach((exit: RoomExit) => {
+      this.createExit(exit);
+    });
+
+    // 渲染背景，传递目标尺寸参数
+    super.renderBackground(roomData.background, roomData.background_target_width, roomData.background_target_height);
+
+    // 初始化UI
+    if (this.uiManager) {
+      this.uiManager.initialize(this);
+      const state = this.gameManager?.getState();
+      if (state) {
+        this.uiManager.updateStatusBar(state.currentTime, state.energy);
+        this.uiManager.updateInventory(state.inventory);
+      }
+    }
+
+    // 播放背景音乐
+    if (this.audioManager) {
+      this.audioManager.playRoomMusic(RoomKeys.LIVING_ROOM_WEST_HIGH);
+    }
+
+    // 记录房间访问
+    if (this.gameManager) {
+      this.gameManager.visitRoom(RoomKeys.LIVING_ROOM_WEST_HIGH);
+    }
+
+    // 设置键盘快捷键
+    this.setupKeyboardShortcuts();
+  }
+
+  private setupKeyboardShortcuts(): void {
+    // I键打开物品栏
+    this.input.keyboard?.on('keydown-I', () => {
+      if (this.uiManager) {
+        this.uiManager.showInventoryPanel();
+      }
+    });
+
+    // ESC键隐藏UI
+    this.input.keyboard?.on('keydown-ESC', () => {
+      if (this.uiManager) {
+        this.uiManager.hideActionMenu();
+        this.uiManager.hideInventoryPanel();
+      }
+    });
+
+    // 数字键快速执行动作
+    this.input.keyboard?.on('keydown-ONE', () => {
+      this.executeAction('eat_fish_treat');
+    });
+  }
+} 

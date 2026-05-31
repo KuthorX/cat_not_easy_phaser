@@ -1,6 +1,6 @@
-# 🐱 猫咪的一日 - 休闲剧情游戏
+# 🐱 游戏架构
 
-一个基于Phaser.js的猫咪主题休闲剧情游戏，玩家扮演一只猫咪，在主人不在家的时候探索房屋，完成各种有趣的任务。
+基于Phaser 3的高度工程化猫咪主题策略解密游戏。
 
 ## 🚀 快速开始
 
@@ -90,6 +90,207 @@ npm run build
 - **前端**：Phaser.js 3.60.0 + TypeScript + Vite
 - **后端**：Express.js + TypeScript
 - **构建工具**：npm + tsx + concurrently
+
+## 🎮 游戏玩法
+
+### 基础操作
+- 点击物品进行交互
+- 使用背包中的物品
+- 在不同房间之间移动
+- 完成各种动作来触发成就
+
+### 成就解锁
+- 执行特定动作达到一定次数
+- 探索特定区域
+- 完成特定的物品收集任务
+- 根据行为选择获得不同的游戏结局
+
+## 📝 更新日志
+
+### v1.0.0
+- ✅ 实现完整的成就系统
+- ✅ 添加4条主要成就线路
+- ✅ 实现16个子成就
+- ✅ 集成成就UI和弹窗
+- ✅ 移除bun构建工具链，改用npm和Node.js
+- ✅ 优化开发体验和启动流程
+
+## 🤝 贡献
+
+欢迎提交Issue和Pull Request来改进游戏！
+
+## 🎮 游戏架构
+
+基于Phaser 3的高度工程化猫咪主题策略解密游戏。
+
+## 项目概述
+
+这是一个以猫咪为主角的点击式策略解密游戏，玩家需要在12小时内探索房间、执行各种动作，收集多个结局。游戏采用模块化架构设计，具有高度的可扩展性和维护性。
+
+## 技术栈
+
+- **游戏引擎**: Phaser 3.60.0
+- **开发语言**: TypeScript
+- **构建工具**: Vite
+- **包管理**: npm
+
+## 项目结构
+
+```
+src/
+├── main.ts                 # 游戏主入口
+├── config/
+│   └── GameConfig.ts       # 游戏配置和常量
+├── constants/
+│   ├── SceneKeys.ts        # 场景键值常量
+│   └── GameEvents.ts       # 游戏事件常量
+├── core/                   # 核心管理器
+│   ├── GameManager.ts      # 游戏状态管理
+│   ├── SceneManager.ts     # 场景管理
+│   ├── AudioManager.ts     # 音频管理
+│   ├── UIManager.ts        # UI管理
+│   └── SaveManager.ts      # 存档管理
+├── data/                   # 数据层
+│   ├── RoomRegistry.ts     # 房间数据注册
+│   ├── ActionRegistry.ts   # 动作数据注册
+│   └── AchievementRegistry.ts # 成就数据注册
+├── scenes/                 # 场景层
+│   ├── BaseScene.ts        # 基础场景类
+│   ├── BootScene.ts        # 启动场景
+│   ├── PreloadScene.ts     # 预加载场景
+│   ├── MenuScene.ts        # 菜单场景
+│   └── LivingRoomNorthScene.ts # 客厅北向场景
+├── types/                  # 类型定义
+│   └── GameState.ts        # 游戏状态类型
+└── utils/                  # 工具类
+    └── EventEmitter.ts     # 事件发射器
+```
+
+## 核心架构
+
+### 1. 管理器模式 (Manager Pattern)
+
+游戏采用管理器模式，将不同功能模块分离：
+
+- **GameManager**: 管理游戏状态、时间、饥饿值、精力值等核心数据
+- **SceneManager**: 管理场景切换和房间访问逻辑
+- **AudioManager**: 管理音效和背景音乐
+- **UIManager**: 管理用户界面元素
+- **SaveManager**: 管理游戏存档和读档
+
+### 2. 事件驱动架构
+
+使用自定义事件发射器实现松耦合的组件通信：
+
+```typescript
+// 监听游戏事件
+gameManager.on(GameEvents.TIME_CHANGED, (data) => {
+  // 处理时间变化
+});
+
+// 触发事件
+gameManager.emit(GameEvents.ACHIEVEMENT_UNLOCKED, { achievement: 'play_time' });
+```
+
+### 3. 数据驱动设计
+
+游戏内容通过配置文件定义，便于扩展和修改：
+
+- **房间数据**: 在`RoomRegistry`中定义房间布局和交互对象
+- **动作数据**: 在`ActionRegistry`中定义所有可执行动作
+- **成就数据**: 在`AchievementRegistry`中定义成就条件
+
+### 4. 场景系统
+
+采用Phaser场景系统，每个房间对应一个场景：
+
+```typescript
+// 基础场景类提供通用功能
+export abstract class BaseScene extends Phaser.Scene {
+  protected abstract initializeScene(): void;
+  protected executeAction(actionId: string): boolean;
+  protected switchToRoom(roomKey: string): void;
+}
+```
+
+## 游戏机制
+
+### 时间系统
+- 游戏从早上8点开始，到晚上8点结束
+- 每次交互消耗30分钟或60分钟
+- 时间推进触发特殊事件
+
+### 状态系统
+- **饥饿值**: 影响某些动作的执行条件
+- **精力值**: 限制高级动作的执行
+- **物品栏**: 收集和使用各种道具
+
+### 成就系统
+- 多种成就类型：玩耍时光、猫中哈士奇、探索者等
+- 基于条件的解锁机制
+- 进度跟踪和显示
+
+## 开发指南
+
+### 添加新房间
+
+1. 在`RoomRegistry`中定义房间数据
+2. 创建对应的场景类继承`BaseScene`
+3. 在`main.ts`中注册场景
+
+### 添加新动作
+
+1. 在`ActionRegistry`中定义动作数据
+2. 设置时间消耗、状态要求、效果等
+3. 在房间数据中关联动作
+
+### 添加新成就
+
+1. 在`AchievementRegistry`中定义成就
+2. 设置解锁条件
+3. 在相关动作中触发成就检查
+
+## 运行项目
+
+```bash
+# 安装依赖
+npm install
+
+# 开发模式
+npm run dev
+
+# 构建项目
+npm run build
+
+# 预览构建结果
+npm run preview
+```
+
+## 游戏特色
+
+1. **高度工程化**: 模块化设计，易于维护和扩展
+2. **数据驱动**: 游戏内容通过配置文件管理
+3. **事件驱动**: 松耦合的组件通信
+4. **类型安全**: 完整的TypeScript类型定义
+5. **存档系统**: 完整的游戏存档和读档功能
+6. **成就系统**: 丰富的成就和进度跟踪
+
+## 扩展计划
+
+- [ ] 添加更多房间和交互对象
+- [ ] 实现更复杂的剧情分支
+- [ ] 添加音效和背景音乐
+- [ ] 优化UI界面
+- [ ] 添加更多成就类型
+- [ ] 实现多人游戏功能
+
+## 贡献指南
+
+1. Fork项目
+2. 创建功能分支
+3. 提交更改
+4. 推送到分支
+5. 创建Pull Request
 
 ## 🎮 游戏玩法
 
