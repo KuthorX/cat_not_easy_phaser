@@ -9,6 +9,7 @@
     "dev:full": "concurrently \"npm run dev\" \"npm run dev:server\"",
     "dev:quick": "bun run quick_dev.js",
     "build": "vite build",
+    "package:itch": "npm run build && rm -f cat-not-easy-itch.zip && cd dist && zip -X -r ../cat-not-easy-itch.zip .",
     "build:server": "tsc server/index.ts --outDir dist-server",
     "preview": "vite preview",
     "start": "tsx server/index.ts",
