@@ -1,5 +1,5 @@
 import { Dialogue } from '../types/GameState';
-import { GameConstants } from '../config/GameConfig';
+import { GameConstants } from '../config/GameConstants';
 
 export class DialogueRegistry {
   private dialogues: Map<string, Dialogue> = new Map();

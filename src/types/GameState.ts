@@ -224,7 +224,7 @@ export interface Achievement {
 }
 
 export interface AchievementCondition {
-  type: 'action_completed' | 'item_destroyed' | 'room_visited' | 'inventory_has' | 'story_flag';
+  type: 'action_completed' | 'item_destroyed' | 'room_visited' | 'inventory_has' | 'story_flag' | 'no_destruction';
   value: any;
   count?: number;
 }

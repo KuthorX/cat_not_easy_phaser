@@ -172,7 +172,7 @@ export class BagRegistry {
     this.registerItem({
       id: 'medium_box',
       name: '中型箱子',
-      description: '从杂物堆中找到的箱子，可以用来加固堡垒。',
+      description: '从垃圾桶里翻出来的纸箱，可以用来加固堡垒。',
       type: 'material',
       rarity: 'common',
       effects: [],

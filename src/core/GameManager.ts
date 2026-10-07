@@ -1,9 +1,11 @@
 import { GameState } from '../types/GameState';
-import { GameConstants } from '../config/GameConfig';
+import { GameConstants } from '../config/GameConstants';
 import { EventEmitter } from '../utils/EventEmitter';
 import { GameEvents } from '../constants/GameEvents';
 import { EventManager } from './EventManager';
 import { DialogueManager } from './DialogueManager';
+import { AchievementRegistry } from '../data/AchievementRegistry';
+import { ENDING_ACHIEVEMENT_IDS, OWNER_RETURNED_FLAG, pickDayEndEnding } from '../logic/achievements';
 
 export class GameManager {
   private game: Phaser.Game;
@@ -12,6 +14,7 @@ export class GameManager {
   private eventManager: EventManager;
   private dialogueManager: DialogueManager;
   private isInDialogue: boolean = false; // 全局对话状态
+  private achievementRegistry: AchievementRegistry = new AchievementRegistry();
 
   constructor(game: Phaser.Game) {
     this.game = game;
@@ -39,7 +42,7 @@ export class GameManager {
       currentTime: GameConstants.GAME_START_TIME,
       energy: GameConstants.INITIAL_ENERGY,
       hunger: GameConstants.INITIAL_ENERGY, // 使用相同的初始值
-      inventory: ['cat_food', 'cat_food', 'toy_mouse', 'key', 'fish_treat', 'milk', 'rope_toy', 'ball'], // 添加更多测试物品
+      inventory: [],
       achievements: [],
       visitedRooms: new Set(),
       completedActions: new Set(),
@@ -91,31 +94,51 @@ export class GameManager {
 
   // 推进游戏时间
   public advanceTime(minutes: number): void {
-    if (this.state.gameEnded) return;
+    if (this.state.gameEnded || minutes <= 0) return;
 
-    const newTime = this.state.currentTime + (minutes / 60); // 转换为小时
-
-    if (newTime >= GameConstants.GAME_END_TIME) {
-      this.endGame('time_up');
-      return;
-    }
+    const previousTime = this.state.currentTime;
+    const newTime = Math.min(previousTime + minutes / 60, GameConstants.GAME_END_TIME);
 
     this.state.currentTime = newTime;
     this.eventEmitter.emit(GameEvents.TIME_CHANGED, { time: this.state.currentTime });
-    
-    // 检查特殊事件
-    this.checkSpecialEvents();
+
+    if (newTime >= GameConstants.GAME_END_TIME) {
+      this.endDay();
+      return;
+    }
+
+    // 检查特殊事件（只在跨过整点时触发一次）
+    this.checkSpecialEvents(previousTime, newTime);
   }
 
-  private checkSpecialEvents(): void {
-    const hour = Math.floor(this.state.currentTime);
-    
-    if (hour === GameConstants.SPECIAL_EVENTS.OWNER_RETURN) {
+  // 时间耗尽：两脚兽回家，根据今天的表现决定结局
+  private endDay(): void {
+    this.state.storyFlags.set(OWNER_RETURNED_FLAG, true);
+    const ending = pickDayEndEnding(this.achievementRegistry.getAllAchievements(), this.state);
+    this.unlockAchievement(ending);
+    this.endGame(ending, 'time_up');
+  }
+
+  private checkSpecialEvents(previousTime: number, newTime: number): void {
+    const crossed = (hour: number) => previousTime < hour && newTime >= hour;
+
+    if (crossed(GameConstants.SPECIAL_EVENTS.OWNER_RETURN)) {
       this.eventEmitter.emit(GameEvents.OWNER_RETURN);
     }
-    
-    if (hour === GameConstants.SPECIAL_EVENTS.NEIGHBOR_CAT_FIGHT) {
+
+    if (crossed(GameConstants.SPECIAL_EVENTS.NEIGHBOR_CAT_FIGHT)) {
       this.eventEmitter.emit(GameEvents.NEIGHBOR_CAT_FIGHT);
+    }
+  }
+
+  // 检查成就；结局类成就达成时当天结束
+  private checkAchievements(): void {
+    if (this.state.gameEnded) return;
+    const unlockable = this.achievementRegistry.getUnlockableAchievements(this.state);
+    unlockable.forEach(achievement => this.unlockAchievement(achievement.id));
+    const ending = unlockable.find(a => (ENDING_ACHIEVEMENT_IDS as readonly string[]).includes(a.id));
+    if (ending) {
+      this.endGame(ending.id, 'achievement');
     }
   }
 
@@ -124,6 +147,7 @@ export class GameManager {
     if (!this.state.inventory.includes(item)) {
       this.state.inventory.push(item);
       this.eventEmitter.emit(GameEvents.INVENTORY_CHANGED, { inventory: this.state.inventory });
+      this.checkAchievements();
     }
   }
 
@@ -153,6 +177,7 @@ export class GameManager {
     
     // 检查房间访问事件
     this.eventManager.checkEvents(this.state, 'room_visit', room);
+    this.checkAchievements();
   }
 
   // 动作完成
@@ -162,6 +187,7 @@ export class GameManager {
     
     // 检查动作完成事件
     this.eventManager.checkEvents(this.state, 'action', action);
+    this.checkAchievements();
   }
 
   // 物品破坏
@@ -174,6 +200,7 @@ export class GameManager {
   public setStoryFlag(flag: string, value: any): void {
     this.state.storyFlags.set(flag, value);
     this.eventEmitter.emit(GameEvents.STORY_FLAG_SET, { flag, value });
+    this.checkAchievements();
   }
 
   public getStoryFlag(flag: string): any {
@@ -181,10 +208,11 @@ export class GameManager {
   }
 
   // 游戏结束
-  public endGame(endingType: string): void {
+  public endGame(endingType: string, reason: 'achievement' | 'time_up' = 'achievement'): void {
+    if (this.state.gameEnded) return;
     this.state.gameEnded = true;
     this.state.endingType = endingType;
-    this.eventEmitter.emit(GameEvents.GAME_ENDED, { endingType });
+    this.eventEmitter.emit(GameEvents.GAME_ENDED, { endingType, reason });
   }
 
   // 清理资源
@@ -235,6 +263,7 @@ export class GameManager {
   // 重置游戏
   public resetGame(): void {
     this.state = this.initializeGameState();
+    this.isInDialogue = false;
     this.eventManager.resetTriggeredEvents();
     this.eventEmitter.emit(GameEvents.GAME_RESET);
   }

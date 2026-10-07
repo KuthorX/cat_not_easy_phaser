@@ -17,7 +17,8 @@
     "server": "tsx server/index.ts",
     "client": "python -m http.server 8000",
     "quick-start": "bun run run_it/quick_start.js",
-    "generate-assets": "node generate_placeholders.js"
+    "generate-assets": "node generate_placeholders.js",
+    "test": "node --import tsx --test tests/*.test.ts"
   },
   "dependencies": {
     "phaser": "^3.60.0",

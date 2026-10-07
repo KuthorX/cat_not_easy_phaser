@@ -1,5 +1,5 @@
 import { IUIComponent } from './IUIComponent';
-import { GameConstants } from '../../config/GameConfig';
+import { GameConstants } from '../../config/GameConstants';
 import { TextRenderer } from '../../utils/TextRenderer';
 
 export class StatusBar implements IUIComponent {

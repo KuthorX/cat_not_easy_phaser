@@ -1,5 +1,5 @@
 import { Action } from '../types/GameState';
-import { GameConstants } from '../config/GameConfig';
+import { GameConstants } from '../config/GameConstants';
 
 export class ActionRegistry {
   private actions: Map<string, Action> = new Map();
@@ -89,9 +89,7 @@ export class ActionRegistry {
       effects: [
         { type: 'energy', value: 1, operation: 'add' }
       ],
-      conditions: [
-        { type: 'energy', operator: 'gte', value: 1 }
-      ],
+      conditions: [],
       playTweens: {
         tweenKey: 'cat_sleep',
         x: 150,
@@ -203,7 +201,7 @@ export class ActionRegistry {
     //客厅门口
     this.registerAction({
       id: 'rummage',
-      name: '翻找',
+      name: '翻垃圾桶',
       timeCost: 60,
       effects: [
         { type: 'inventory', value: 'medium_box', operation: 'add' }
@@ -223,7 +221,7 @@ export class ActionRegistry {
 
     this.registerAction({
       id: 'rummage_water',
-      name: '翻找',
+      name: '翻找水桶',
       timeCost: 60,
       effects: [
         { type: 'inventory', value: 'heavy_water_bottle', operation: 'add' }
@@ -286,7 +284,7 @@ export class ActionRegistry {
 
     this.registerAction({
       id: 'drink_water',
-      name: '进食',
+      name: '喝水',
       timeCost: GameConstants.BASIC_ACTION_COST,
       playTweens: {
         tweenKey: 'cat_hit_laptop',
@@ -397,9 +395,7 @@ export class ActionRegistry {
       effects: [
         { type: 'story_flag', value: 'cage_attacked', operation: 'set' }
       ],
-      conditions: [],
-      dialogueId: 'cage_conversation',
-      triggerDialogue: true
+      conditions: []
     });
 
     this.registerAction({
@@ -418,12 +414,11 @@ export class ActionRegistry {
     this.registerAction({
       id: 'use_litter_box',
       name: '使用猫厕所',
+      timeCost: GameConstants.BASIC_ACTION_COST,
       effects: [
         { type: 'energy', value: 1, operation: 'add' }
       ],
-      conditions: [
-        { type: 'energy', operator: 'gte', value: 1 }
-      ],
+      conditions: [],
       playTweens: {
         tweenKey: 'cat_oars',
         x: 420,
@@ -459,9 +454,7 @@ export class ActionRegistry {
       effects: [
         { type: 'energy', value: 1, operation: 'add' }
       ],
-      conditions: [
-        { type: 'energy', operator: 'gte', value: 1 }
-      ]
+      conditions: []
     });
 
     // 叼走绳子
@@ -499,7 +492,10 @@ export class ActionRegistry {
         scale: 0.5,
         fps: 1,
       },
-      effects: [],
+      timeCost: GameConstants.BASIC_ACTION_COST,
+      effects: [
+        { type: 'energy', value: 1, operation: 'add' }
+      ],
       conditions: []
     });
 
@@ -582,6 +578,7 @@ export class ActionRegistry {
     this.registerAction({
       id: 'reinforce',
       name: '加固',
+      timeCost: GameConstants.BASIC_ACTION_COST,
       effects: [
         { type: 'story_flag', value: 'fortress_reinforced', operation: 'set' }
       ],

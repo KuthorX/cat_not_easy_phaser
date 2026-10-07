@@ -1,6 +1,5 @@
 import { RoomData } from '../types/GameState';
 import { RoomKeys } from '../constants/SceneKeys';
-import { RobotCleaner } from '@/objects/RobotCleaner';
 
 export class RoomRegistry {
   private rooms: Map<string, RoomData> = new Map();
@@ -401,7 +400,7 @@ export class RoomRegistry {
           height: 776,
           scale: 0.4,
           imageKey: 'hallway_water',
-          actions: ['drink_water']
+          actions: ['drink_water', 'rummage_water']
         },
         {
           type: 'InteractiveObject',
@@ -492,7 +491,7 @@ export class RoomRegistry {
           height: 291,
           scale: 0.5,
           imageKey: 'living_room_east_dustbin',
-          actions: ['search_dustbin', 'knock_over_dustbin'],
+          actions: ['rummage'],
           outline: {
             color: '#FA6B35',
           }
@@ -539,7 +538,7 @@ export class RoomRegistry {
           height: 356,
           scale: 0.5,
           imageKey: 'living_room_east_cat_nest',
-          actions: ['sleep_in_nest', 'sniff_nest'],
+          actions: ['sleep_in_cat_bed'],
           outline: {
             color: '#FF6B30',
           },
