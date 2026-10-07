@@ -1,3 +1,4 @@
+import { isConditionMet } from '../../logic/achievements';
 import { IUIComponent } from './IUIComponent';
 import { AchievementRegistry } from '../../data/AchievementRegistry';
 
@@ -24,13 +25,16 @@ export class LogPage implements IUIComponent {
     ['chase_ball', '追球'],
     ['play_with_mouse', '和玩具老鼠玩耍'],
     ['carry_mouse', '叼走玩具老鼠'],
-    ['play_in_house', '在猫别墅里玩耍'],
+    ['play_in_house', '在猫别墅里玩耍（客厅西）'],
     ['sunbathing', '晒太阳'],
     ['sleep_on_bed', '床上睡觉'],
     ['eat_fish_treat', '吃鱼干'],
     
     // 破坏相关动作
-    ['sweep_table', '推倒桌子'],
+    ['sweep_table', '扫翻茶几上的东西（客厅东）'],
+    ['push_tv', '推倒电视（客厅东）'],
+    ['play_with_ball', '玩球（客厅东）'],
+    ['play_cat_tree', '玩猫爬架（客厅东）'],
     ['attack_tv', '攻击电视'],
     ['destroy_screen', '破坏显示屏'],
     ['attack_cage', '攻击笼子'],
@@ -38,8 +42,8 @@ export class LogPage implements IUIComponent {
     // 其他动作
     ['sleep_on_sofa', '沙发上睡觉'],
     ['eat_food_water', '吃食物喝水'],
-    ['rummage', '翻找'],
-    ['rummage_water', '翻找水'],
+    ['rummage', '翻垃圾桶找纸箱（客厅东）'],
+    ['rummage_water', '翻水桶找水瓶（过道）'],
     ['pounce', '扑击'],
     ['unlock', '解锁'],
     ['enter', '进入'],
@@ -54,15 +58,15 @@ export class LogPage implements IUIComponent {
     ['climb_wardrobe', '钻进衣柜'],
     ['sleep_hammock', '睡猫吊床'],
     ['escape', '逃跑'],
-    ['reinforce', '加固'],
+    ['reinforce', '加固堡垒（阳台）'],
     ['inspect', '检阅'],
     ['interact', '互动'],
     ['revenge', '报复'],
     ['ride', '骑上'],
-    ['play', '玩耍'],
+    ['play', '和发声玩具老鼠玩耍（主人房间）'],
     ['carry', '叼走'],
-    ['drink_carry', '叼走饮料'],
-    ['destroy', '破坏'],
+    ['drink_carry', '叼走饮料（主人房间）'],
+    ['destroy', '破坏显示屏（主人房间）'],
     ['hide', '钻进去'],
     ['pee', '尿床']
   ]);
@@ -95,6 +99,7 @@ export class LogPage implements IUIComponent {
   private storyFlagTextMap: Map<string, string> = new Map([
     ['no_destruction', '没有进行破坏'],
     ['greet_owner', '门口迎接主人'],
+    ['owner_returned', '等到两脚兽回家（21:00）'],
     ['escaped_through_balcony', '从阳台逃跑'],
     ['fought_neighbor_cat', '与邻居猫战斗'],
     ['escaped_through_neighbor', '通过邻居家逃跑'],
@@ -319,22 +324,7 @@ export class LogPage implements IUIComponent {
   }
 
   private checkConditionCompleted(condition: any): boolean {
-    if (!this.gameState) return false;
-
-    switch (condition.type) {
-      case 'action_completed':
-        return this.gameState.completedActions.has(condition.value);
-      case 'item_destroyed':
-        return this.gameState.destroyedItems.has(condition.value);
-      case 'room_visited':
-        return this.gameState.visitedRooms.has(condition.value);
-      case 'inventory_has':
-        return this.gameState.inventory.includes(condition.value);
-      case 'story_flag':
-        return this.gameState.storyFlags.get(condition.value) === condition.value;
-      default:
-        return false;
-    }
+    return this.gameState ? isConditionMet(condition, this.gameState) : false;
   }
 
   private getConditionDescription(condition: any): string {
@@ -351,6 +341,8 @@ export class LogPage implements IUIComponent {
       case 'inventory_has':
         const inventoryItemText = this.itemTextMap.get(condition.value) || `未知物品: ${condition.value}`;
         return `拥有物品: ${inventoryItemText}`;
+      case 'no_destruction':
+        return '一整天不搞任何破坏';
       case 'story_flag':
         const storyFlagText = this.storyFlagTextMap.get(condition.value) || `未知故事标记: ${condition.value}`;
         return `故事标记: ${storyFlagText}`;
