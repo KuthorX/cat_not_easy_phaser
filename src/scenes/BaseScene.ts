@@ -13,6 +13,8 @@ import { ConditionsFormatter } from '../utils/ConditionsFormatter';
 import { TextRenderer } from '../utils/TextRenderer';
 
 const ENDING_DELAY_MS = 2500;
+const OUTLINE_FLASH_MS = 1500;
+const INTRO_FLAG = 'intro_shown';
 
 export abstract class BaseScene extends Phaser.Scene {
   protected gameManager!: GameManager;
@@ -30,6 +32,7 @@ export abstract class BaseScene extends Phaser.Scene {
   }
 
   create(): void {
+    this.actionInProgress = false;
     // 初始化管理器
     const game = (window as any).game;
     this.gameManager = game.gameManager;
@@ -122,11 +125,37 @@ export abstract class BaseScene extends Phaser.Scene {
 
     // 设置点击外部处理
     this.setupClickOutsideHandler();
+
+    this.flashInteractiveOutlines();
+    this.showIntroHintOnce();
+  }
+
+  // 进入房间时短暂描出可交互物体的轮廓（触屏没有悬停，否则很难发现能点什么）
+  private flashInteractiveOutlines(): void {
+    const ids: string[] = [];
+    this.interactiveObjects.forEach(({ object }, id) => {
+      if (object.disableInteractive || !(object.actions?.length || (object as any).thought)) return;
+      if (!this.shouldShowInteractiveObject(object, this.gameManager?.getState())) return;
+      const scale = this.calculateObjectScale(object);
+      this.interactiveOutlineRenderer.createInteractiveOutline(id, object.x, object.y, object.width, object.height, 0x000000, 2, scale, object.outline);
+      ids.push(id);
+    });
+    this.time.delayedCall(OUTLINE_FLASH_MS, () => {
+      ids.forEach(id => this.interactiveOutlineRenderer?.removeInteractiveOutline(id));
+    });
+  }
+
+  // 新的一天第一次进入房间时，告诉玩家目标和规则
+  private showIntroHintOnce(): void {
+    if (!this.gameManager || this.gameManager.getStoryFlag(INTRO_FLAG)) return;
+    this.gameManager.setStoryFlag(INTRO_FLAG, true);
+    this.showHint('两脚兽出门了！21:00 他才回来。\n点家具来互动，每个动作都要花时间。\n右上角 📖 里有四个结局的条件。', 7000);
   }
 
   protected abstract initializeScene(): void;
 
   // 已注册到 GameManager 的监听器（场景关闭时统一移除，避免跨场景泄漏）
+  private actionInProgress = false;
   private registeredListeners: Array<[string, (...args: any[]) => void]> = [];
 
   protected listen(event: string, handler: (...args: any[]) => void): void {
@@ -335,7 +364,7 @@ export abstract class BaseScene extends Phaser.Scene {
     if (!action) return false;
 
     const gameState = this.gameManager.getState();
-    if (gameState.gameEnded) return false;
+    if (gameState.gameEnded || this.actionInProgress) return false;
 
     // 先检查特殊条件：它带有作者写好的、更具体的提示
     if (action.specialCondition && !this.checkSpecialCondition(action.specialCondition, gameState)) {
@@ -444,6 +473,13 @@ export abstract class BaseScene extends Phaser.Scene {
   protected handleActionAnimationAndThought(action: any, actionId: string, onAnimationComplete?: () => void): void {
     // 播放PNG序列动画
     if (action.playTweens && this.tweenManager) {
+      // 动画播放期间锁定交互，防止重复点击或中途离开房间导致效果丢失
+      this.actionInProgress = true;
+      const finish = onAnimationComplete;
+      onAnimationComplete = () => {
+        this.actionInProgress = false;
+        finish?.();
+      };
       this.tweenManager.playTween({
         tweenKey: action.playTweens.tweenKey,
         x: action.playTweens.x,
@@ -821,7 +857,7 @@ export abstract class BaseScene extends Phaser.Scene {
   }
 
   protected onObjectClicked(obj: any, pointer?: Phaser.Input.Pointer): void {
-    if (!this.gameManager || this.gameManager.isGameEnded()) return;
+    if (!this.gameManager || this.gameManager.isGameEnded() || this.actionInProgress) return;
 
     // 检查是否正在对话中，如果是则禁止点击
     if (this.gameManager.isInDialogueMode()) {
@@ -897,6 +933,16 @@ export abstract class BaseScene extends Phaser.Scene {
 
   }
 
+  // 房间名显示在左上角状态栏下方，不与顶部出口按钮重叠
+  protected addRoomTitle(title: string): void {
+    TextRenderer.createChineseText(this, 10, 70, title, {
+      fontSize: '16px',
+      color: '#ffffff',
+      backgroundColor: '#555555',
+      padding: { x: 5, y: 2 }
+    }).setDepth(1000);
+  }
+
   // 渲染房间背景
   protected renderBackground(backgroundKey: string, targetWidth?: number, targetHeight?: number): void {
     console.log('渲染房间背景:', backgroundKey);
@@ -943,6 +989,7 @@ export abstract class BaseScene extends Phaser.Scene {
     exitImage.setInteractive();
     
     exitImage.on('pointerdown', () => {
+      if (this.actionInProgress || this.gameManager?.isGameEnded()) return;
       this.switchToRoomWithTransition(exit.targetRoom, exit.name);
     });
 

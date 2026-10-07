@@ -24,11 +24,7 @@ export class LivingRoomWestHighScene extends BaseScene {
     }
     
     // 添加房间标题
-    TextRenderer.createCenteredText(this, 640, 50, '客厅 - 向西看（高处）', {
-      fontSize: '32px',
-      color: '#000000',
-      fontStyle: 'bold'
-    });
+    this.addRoomTitle('客厅 - 向西看（高处）');
     
     // 创建交互对象
     roomData.interactiveObjects.forEach((obj) => {

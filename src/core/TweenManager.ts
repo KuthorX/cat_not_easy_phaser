@@ -46,6 +46,8 @@ export class TweenManager {
     // 检查纹理是否存在
     if (!this.scene.textures.exists(tweenKey)) {
       console.warn(`PNG序列纹理未找到: ${tweenKey}`);
+      // 动画缺失时也要回调，否则动作效果会被悄悄吞掉
+      endCallback?.();
       return;
     }
 

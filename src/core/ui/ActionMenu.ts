@@ -1,10 +1,14 @@
 import { IUIComponent } from './IUIComponent';
 import { TextRenderer } from '../../utils/TextRenderer';
+import { clampMenuPosition, formatActionLabel, LabelledAction } from '../../logic/actionLabel';
 
-export interface Action {
+export interface Action extends LabelledAction {
   id: string;
   name: string;
 }
+
+const MENU_WIDTH = 300;
+const ROW_HEIGHT = 40;
 
 export class ActionMenu implements IUIComponent {
   private scene: Phaser.Scene | null = null;
@@ -33,50 +37,33 @@ export class ActionMenu implements IUIComponent {
 
     // 先隐藏并销毁旧的菜单
     this.hide();
-    
-    // 创建新的菜单容器
-    this.container = this.scene.add.container(x, y);
+
+    // 按钮以 x 为中心排列；最后一行是“算了”，用于关闭菜单
+    const rows: Array<{ label: string; onClick: () => void; color: number }> = [
+      ...actions.map(action => ({
+        label: formatActionLabel(action),
+        onClick: () => this.executeAction(action.id),
+        color: 0x4A4A4A
+      })),
+      { label: '算了', onClick: () => this.hide(), color: 0x7A7A7A }
+    ];
+    const pos = clampMenuPosition(x, y, MENU_WIDTH, rows.length * ROW_HEIGHT);
+    this.container = this.scene.add.container(pos.x, pos.y);
     this.container.setDepth(1000);
-    
-    // 确保菜单显示在屏幕内
-    const menuWidth = 280;
-    const menuHeight = actions.length * 40;
-    
-    // 调整 x 坐标，确保菜单不超出屏幕右边界
-    if (x + menuWidth > 1280) {
-      x = 1280 - menuWidth - 10;
-      this.container.setPosition(x, y);
-    }
-    
-    // 调整 y 坐标，确保菜单不超出屏幕下边界
-    if (y + menuHeight > 720) {
-      y = 720 - menuHeight - 10;
-      this.container.setPosition(x, y);
-    }
-    
-    // 确保坐标不为负数
-    if (x < 10) {
-      x = 10;
-      this.container.setPosition(x, y);
-    }
-    if (y < 10) {
-      y = 10;
-      this.container.setPosition(x, y);
-    }
-    
-    actions.forEach((action, index) => {
-      const button = this.scene!.add.rectangle(0, index * 40, 280, 35, 0x4A4A4A, 0.8);
+
+    rows.forEach((row, index) => {
+      const button = this.scene!.add.rectangle(0, index * ROW_HEIGHT, MENU_WIDTH, 35, row.color, 0.85);
       button.setStrokeStyle(1, 0xFFFFFF);
-      
-      const text = TextRenderer.createCenteredText(this.scene!, 0, index * 40, action.name, {
-        fontSize: '14px',
+
+      const text = TextRenderer.createCenteredText(this.scene!, 0, index * ROW_HEIGHT, row.label, {
+        fontSize: '15px',
         color: '#ffffff'
       });
 
-      button.setInteractive();
-      button.on('pointerdown', () => {
-        this.executeAction(action.id);
-      });
+      button.setInteractive({ useHandCursor: true });
+      button.on('pointerover', () => button.setFillStyle(0x2E6FD8, 0.9));
+      button.on('pointerout', () => button.setFillStyle(row.color, 0.85));
+      button.on('pointerdown', row.onClick);
 
       this.container!.add([button, text]);
     });

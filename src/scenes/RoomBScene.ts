@@ -19,11 +19,7 @@ export class RoomBScene extends BaseScene {
     super.renderBackground(roomData.background, roomData.background_target_width, roomData.background_target_height);
     
     // 添加房间标题
-    TextRenderer.createCenteredText(this, 640, 50, '主人房间', {
-      fontSize: '32px',
-      color: '#000000',
-      fontStyle: 'bold'
-    });
+    this.addRoomTitle('主人房间');
 
     // 创建交互对象
     roomData.interactiveObjects.forEach((obj) => {
@@ -73,23 +69,6 @@ export class RoomBScene extends BaseScene {
         this.uiManager.hideActionMenu();
         this.uiManager.hideInventoryPanel();
       }
-    });
-
-    // 数字键快速执行动作
-    this.input.keyboard?.on('keydown-ONE', () => {
-      this.executeAction('play_with_mouse');
-    });
-
-    this.input.keyboard?.on('keydown-TWO', () => {
-      this.executeAction('carry_mouse');
-    });
-
-    this.input.keyboard?.on('keydown-THREE', () => {
-      this.executeAction('destroy_screen');
-    });
-
-    this.input.keyboard?.on('keydown-FOUR', () => {
-      this.executeAction('sleep_on_bed');
     });
   }
 } 

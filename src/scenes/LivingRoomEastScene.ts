@@ -12,11 +12,7 @@ export class LivingRoomEastScene extends BaseScene {
   protected initializeScene(): void {
     
     // 添加房间标题
-    TextRenderer.createCenteredText(this, 640, 50, '客厅 - 向东看', {
-      fontSize: '32px',
-      color: '#000000',
-      fontStyle: 'bold'
-    });
+    this.addRoomTitle('客厅 - 向东看');
 
     // 获取房间数据
     const roomData = this.sceneManager?.getRoomData(RoomKeys.LIVING_ROOM_EAST);

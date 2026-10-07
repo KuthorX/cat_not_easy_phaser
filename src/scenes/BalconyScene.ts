@@ -12,11 +12,7 @@ export class BalconyScene extends BaseScene {
   protected initializeScene(): void {
 
     // 添加房间标题
-    TextRenderer.createCenteredText(this, 640, 50, '阳台', {
-      fontSize: '32px',
-      color: '#000000',
-      fontStyle: 'bold'
-    });
+    this.addRoomTitle('阳台');
 
     // 获取房间数据
     const roomData = this.sceneManager?.getRoomData(RoomKeys.BALCONY);
@@ -113,11 +109,6 @@ export class BalconyScene extends BaseScene {
         this.uiManager.hideActionMenu();
         this.uiManager.hideInventoryPanel();
       }
-    });
-
-    // 数字键快速执行动作
-    this.input.keyboard?.on('keydown-ONE', () => {
-      this.executeAction('house_parkour');
     });
   }
 }

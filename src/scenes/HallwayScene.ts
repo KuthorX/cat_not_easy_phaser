@@ -11,11 +11,7 @@ export class HallwayScene extends BaseScene {
 
   protected initializeScene(): void {
     // 添加房间标题
-    TextRenderer.createCenteredText(this, 640, 50, '过道', {
-      fontSize: '32px',
-      color: '#000000',
-      fontStyle: 'bold'
-    });
+    this.addRoomTitle('过道');
 
     // 获取房间数据
     const roomData = this.sceneManager?.getRoomData(RoomKeys.HALLWAY);

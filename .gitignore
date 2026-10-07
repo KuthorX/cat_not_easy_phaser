@@ -275,3 +275,6 @@ dist/**/*
 # ignore yarn.lock
 yarn.lock
 
+
+# oh-my-claudecode local state
+.omc/

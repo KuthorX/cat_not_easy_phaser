@@ -53,7 +53,7 @@ export class StatusBar implements IUIComponent {
       formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
     }
     
-    this.timeText.setText(`时间: ${formattedTime}`);
+    this.timeText.setText(`时间: ${formattedTime} / ${GameConstants.GAME_END_TIME}:00 主人回家`);
     this.energyText.setText(`精力: ${energy}/${GameConstants.MAX_ENERGY}`);
   }
 
