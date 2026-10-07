@@ -97,7 +97,11 @@ export class UIManager {
   }
 
   // 设置对话事件监听
+  private dialogueListenersReady = false;
+
+  // UIManager 是全局单例：对话监听只注册一次，否则每进一个房间就多一份
   private setupDialogueEventListeners(): void {
+    if (this.dialogueListenersReady) return;
     // 通过全局游戏实例获取GameManager
     const game = (window as any).game;
     if (!game || !game.gameManager) {
@@ -114,6 +118,7 @@ export class UIManager {
     game.gameManager.on(GameEvents.DIALOGUE_ENDED, () => {
       this.onDialogueEnded();
     });
+    this.dialogueListenersReady = true;
   }
 
   // 对话开始事件处理

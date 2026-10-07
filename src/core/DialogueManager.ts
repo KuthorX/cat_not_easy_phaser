@@ -11,7 +11,8 @@ import {
 import { DialogueRegistry } from '../data/DialogueRegistry';
 
 export class DialogueManager {
-  private dialogueRegistry: DialogueRegistry;
+  // 对话内容目前被禁用（未实例化注册表），所有查询安全地返回 null
+  private dialogueRegistry: DialogueRegistry | null = null;
   private currentDialogueState: DialogueState | null = null;
   private dialogueHistory: any[] = [];
 
@@ -28,11 +29,11 @@ export class DialogueManager {
   }
 
   public registerDialogue(dialogue: Dialogue): void {
-    this.dialogueRegistry.registerDialogue(dialogue);
+    this.dialogueRegistry?.registerDialogue(dialogue);
   }
 
   public getDialogue(dialogueId: string): Dialogue | null {
-    return this.dialogueRegistry.getDialogue(dialogueId);
+    return this.dialogueRegistry?.getDialogue(dialogueId) ?? null;
   }
 
   public startDialogue(dialogueId: string, objectId: string, objectName: string, objectPosition: { x: number; y: number }): boolean {

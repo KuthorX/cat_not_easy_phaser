@@ -104,7 +104,7 @@ export class SettingsPanel implements IUIComponent {
 
     this.scene.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
         if (!this.container) return;
-        const localPoint = this.scene.input.activePointer;
+        const localPoint = this.scene!.input.activePointer;
         const worldPoint = this.container.getWorldTransformMatrix().transformPoint(localPoint.x, localPoint.y);
 
         if (isMusic && this.isDraggingMusic) {

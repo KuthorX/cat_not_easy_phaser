@@ -8,7 +8,6 @@ export class SceneManager {
   private currentScene: Phaser.Scene | null = null;
   private roomRegistry: RoomRegistry;
   private actionRegistry: ActionRegistry;
-  private startedScenes: Set<string> = new Set(); // 记录已启动的场景
 
   constructor(game: Phaser.Game) {
     this.game = game;
@@ -22,22 +21,14 @@ export class SceneManager {
   }
 
   // 启动或切换场景（自动 stop 当前场景）
+  // 房间场景每次进入都会在 create() 中重建，所以总是用 start；
+  // 旧实现对已停止的场景调用 switch()，会把它置为 sleeping 并在之后错误地 wake。
   public startScene(sceneKey: string, data?: any): void {
-    console.log('SceneManager.startScene 被调用，场景键:', sceneKey);
-    // 1. stop 当前场景（如果有且不是目标场景）
-    if (this.currentScene && this.currentScene.scene.key !== sceneKey) {
-      console.log('停止当前场景:', this.currentScene.scene.key);
-      this.game.scene.stop(this.currentScene.scene.key);
+    const current = this.currentScene?.scene.key;
+    if (current && current !== sceneKey && this.game.scene.isActive(current)) {
+      this.game.scene.stop(current);
     }
-    // 2. 启动或切换目标场景
-    if (this.startedScenes.has(sceneKey)) {
-      console.log('场景已启动过，使用 switch:', sceneKey);
-      this.game.scene.switch(this.currentScene?.scene.key || '', sceneKey, data);
-    } else {
-      console.log('场景未启动过，使用 start:', sceneKey);
-      this.game.scene.start(sceneKey, data);
-      this.startedScenes.add(sceneKey);
-    }
+    this.game.scene.start(sceneKey, data);
   }
 
   // 切换到房间
@@ -56,17 +47,12 @@ export class SceneManager {
   // 获取房间对应的场景键
   public getSceneKeyForRoom(roomKey: string): string | null {
     const roomToSceneMap: Record<string, string> = {
-      [RoomKeys.LIVING_ROOM_NORTH]: SceneKeys.LIVING_ROOM_NORTH,
       [RoomKeys.LIVING_ROOM_EAST]: SceneKeys.LIVING_ROOM_EAST,
       [RoomKeys.LIVING_ROOM_WEST_LOW]: SceneKeys.LIVING_ROOM_WEST_LOW,
       [RoomKeys.LIVING_ROOM_WEST_HIGH]: SceneKeys.LIVING_ROOM_WEST_HIGH,
-      [RoomKeys.LIVING_ROOM_DOOR]: SceneKeys.LIVING_ROOM_DOOR,
       [RoomKeys.HALLWAY]: SceneKeys.HALLWAY,
       [RoomKeys.BALCONY]: SceneKeys.BALCONY,
-      [RoomKeys.ROOM_A]: SceneKeys.ROOM_A,
       [RoomKeys.ROOM_B]: SceneKeys.ROOM_B,
-      [RoomKeys.ROOM_C]: SceneKeys.ROOM_C,
-      [RoomKeys.DOORWAY]: SceneKeys.DOORWAY
     };
 
     console.log('roomToSceneMap', roomToSceneMap);
@@ -92,7 +78,7 @@ export class SceneManager {
     if (!room) return [];
 
     return room.interactiveObjects.flatMap(obj => 
-      obj.actions.map(actionId => this.actionRegistry.getAction(actionId))
+      (obj.actions ?? []).map(actionId => this.actionRegistry.getAction(actionId))
     ).filter(Boolean);
   }
 

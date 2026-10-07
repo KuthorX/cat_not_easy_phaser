@@ -12,6 +12,8 @@ import { TransitionHelper } from '../utils/TransitionHelper';
 import { ConditionsFormatter } from '../utils/ConditionsFormatter';
 import { TextRenderer } from '../utils/TextRenderer';
 
+const ENDING_DELAY_MS = 2500;
+
 export abstract class BaseScene extends Phaser.Scene {
   protected gameManager!: GameManager;
   protected sceneManager!: SceneManager;
@@ -124,20 +126,34 @@ export abstract class BaseScene extends Phaser.Scene {
 
   protected abstract initializeScene(): void;
 
+  // 已注册到 GameManager 的监听器（场景关闭时统一移除，避免跨场景泄漏）
+  private registeredListeners: Array<[string, (...args: any[]) => void]> = [];
+
+  protected listen(event: string, handler: (...args: any[]) => void): void {
+    const bound = handler.bind(this);
+    this.gameManager.on(event, bound);
+    this.registeredListeners.push([event, bound]);
+  }
+
   protected setupEventListeners(): void {
-    // 监听游戏状态变化
-    if (this.gameManager) {
-      this.gameManager.on(GameEvents.TIME_CHANGED, this.onTimeChanged.bind(this));
-      this.gameManager.on(GameEvents.ENERGY_CHANGED, this.onEnergyChanged.bind(this));
-      this.gameManager.on(GameEvents.INVENTORY_CHANGED, this.onInventoryChanged.bind(this));
-      this.gameManager.on(GameEvents.ACHIEVEMENT_UNLOCKED, this.onAchievementUnlocked.bind(this));
-      this.gameManager.on(GameEvents.GAME_ENDED, this.onGameEnded.bind(this));
-      
-      // 监听状态变化事件，用于更新交互对象显示
-      this.gameManager.on(GameEvents.STORY_FLAG_SET, this.onStateChanged.bind(this));
-      this.gameManager.on(GameEvents.ACTION_COMPLETED, this.onStateChanged.bind(this));
-      this.gameManager.on(GameEvents.INVENTORY_CHANGED, this.onStateChanged.bind(this));
-    }
+    if (!this.gameManager) return;
+    this.removeGameListeners();
+    this.listen(GameEvents.TIME_CHANGED, this.onTimeChanged);
+    this.listen(GameEvents.ENERGY_CHANGED, this.onEnergyChanged);
+    this.listen(GameEvents.INVENTORY_CHANGED, this.onInventoryChanged);
+    this.listen(GameEvents.ACHIEVEMENT_UNLOCKED, this.onAchievementUnlocked);
+    this.listen(GameEvents.GAME_ENDED, this.onGameEnded);
+    this.listen(GameEvents.OWNER_RETURN, this.onOwnerReturning);
+    // 监听状态变化事件，用于更新交互对象显示
+    this.listen(GameEvents.STORY_FLAG_SET, this.onStateChanged);
+    this.listen(GameEvents.ACTION_COMPLETED, this.onStateChanged);
+    this.listen(GameEvents.INVENTORY_CHANGED, this.onStateChanged);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.shutdown, this);
+  }
+
+  private removeGameListeners(): void {
+    this.registeredListeners.forEach(([event, handler]) => this.gameManager?.off(event, handler));
+    this.registeredListeners = [];
   }
 
   // 事件处理方法
@@ -168,17 +184,27 @@ export abstract class BaseScene extends Phaser.Scene {
     if (this.audioManager) {
       this.audioManager.playAchievementSound();
     }
-    
-    // 延迟2秒后显示成就结束场景
-    this.time.delayedCall(2000, () => {
-      this.scene.start(SceneKeys.ACHIEVEMENT_ENDING, { achievementId: data.achievement });
+  }
+
+  // 一天结束：锁定输入，短暂停留后进入结局画面
+  protected onGameEnded(data: { endingType: string; reason?: string }): void {
+    this.uiManager?.hideActionMenu();
+    this.input.enabled = false;
+    if (data.reason === 'time_up') {
+      this.showHint('21:00 了，两脚兽回家了！', 2000);
+    }
+    this.time.delayedCall(ENDING_DELAY_MS, () => {
+      this.scene.start(SceneKeys.ACHIEVEMENT_ENDING, { achievementId: data.endingType, reason: data.reason });
     });
   }
 
-  protected onGameEnded(data: { endingType: string }): void {
-    if (this.uiManager) {
-      this.uiManager.showGameEndScreen(data.endingType);
-    }
+  protected onOwnerReturning(): void {
+    this.showHint('已经 18:00 了，两脚兽 21:00 就要回家了……', 3500);
+  }
+
+  // 右下角的猫猫想法气泡，用于各种提示反馈
+  protected showHint(text: string, duration: number = 3000): void {
+    this.uiManager?.showThought(`hint_${Date.now()}`, text, 1280 - 200, 720 - 100, duration);
   }
 
   /**
@@ -309,17 +335,27 @@ export abstract class BaseScene extends Phaser.Scene {
     if (!action) return false;
 
     const gameState = this.gameManager.getState();
-    
+    if (gameState.gameEnded) return false;
+
+    // 先检查特殊条件：它带有作者写好的、更具体的提示
+    if (action.specialCondition && !this.checkSpecialCondition(action.specialCondition, gameState)) {
+      this.showHint(action.specialCondition.failureMessage);
+      return false;
+    }
+
     // 使用ConditionsFormatter检查动作条件
     const conditionCheck = ConditionsFormatter.checkActionConditions(action, gameState);
     
     if (!conditionCheck.canExecute) {
-      // 条件不满足，显示提示信息
-      if (this.uiManager && conditionCheck.message) {
-        const x = 1280 - 200; // 右下角位置
-        const y = 720 - 100;
-        this.uiManager.showThought(`condition_failed_${actionId}`, conditionCheck.message, x, y, 3000);
+      if (conditionCheck.message) {
+        this.showHint(conditionCheck.message);
       }
+      return false;
+    }
+
+    // 精力消耗必须付得起，否则提示去休息
+    if (action.energyCost && gameState.energy < action.energyCost) {
+      this.showHint(`精力不够（需要 ${action.energyCost} 点），先去睡一觉或喝点水吧。`);
       return false;
     }
     
@@ -330,15 +366,6 @@ export abstract class BaseScene extends Phaser.Scene {
 
     // 检查动作要求
     if (!this.checkActionRequirements(action, gameState)) {
-      return false;
-    }
-
-    // 检查特殊条件
-    if (action.specialCondition && !this.checkSpecialCondition(action.specialCondition, gameState)) {
-      // 显示失败消息
-      if (this.uiManager) {
-        this.uiManager.showDialogue(action.specialCondition.failureMessage, 2000);
-      }
       return false;
     }
 
@@ -355,7 +382,7 @@ export abstract class BaseScene extends Phaser.Scene {
     });
 
     // 处理对话或显示描述
-    if (action.triggerDialogue && action.dialogueId && this.uiManager) {
+    if (this.isDialogueAction(action) && this.uiManager) {
       console.log('BaseScene.executeAction: 触发对话', { actionId, dialogueId: action.dialogueId });
       
       // 获取物体位置：优先使用传入的位置，然后尝试从当前场景的交互对象中查找，最后使用默认位置
@@ -482,9 +509,15 @@ export abstract class BaseScene extends Phaser.Scene {
     return true;
   }
 
+  // 只有对话内容确实存在时才走对话流程（对话注册表目前被禁用）
+  protected isDialogueAction(action: any): boolean {
+    return Boolean(action?.triggerDialogue && action.dialogueId &&
+      this.gameManager?.getDialogueManager().getDialogue(action.dialogueId));
+  }
+
   protected applyActionEffects(action: any, gameState: any): void {
     // 如果是对话动作，不立即应用效果，让效果在对话选项中选择后执行
-    if (action.triggerDialogue && action.dialogueId) {
+    if (this.isDialogueAction(action)) {
       // 只应用消耗，不应用效果
       if (action.energyCost) {
         this.gameManager.modifyEnergy(-action.energyCost);
@@ -788,7 +821,7 @@ export abstract class BaseScene extends Phaser.Scene {
   }
 
   protected onObjectClicked(obj: any, pointer?: Phaser.Input.Pointer): void {
-    if (!this.gameManager) return;
+    if (!this.gameManager || this.gameManager.isGameEnded()) return;
 
     // 检查是否正在对话中，如果是则禁止点击
     if (this.gameManager.isInDialogueMode()) {
@@ -806,7 +839,7 @@ export abstract class BaseScene extends Phaser.Scene {
     // 检查是否有对话动作
     const dialogueActions = obj.actions
       .map((actionId: string) => this.sceneManager.getAction(actionId))
-      .filter((action: any) => action && action.triggerDialogue && action.dialogueId);
+      .filter((action: any) => this.isDialogueAction(action));
     
     if (dialogueActions.length > 0) {
       // 如果有对话动作，直接触发第一个对话
@@ -840,17 +873,10 @@ export abstract class BaseScene extends Phaser.Scene {
     }
   }
 
-  // 清理事件监听
+  // 清理事件监听（由 Phaser 的 SHUTDOWN 事件触发）
   shutdown(): void {
-    if (this.gameManager) {
-      this.gameManager.off(GameEvents.TIME_CHANGED, this.onTimeChanged.bind(this));
-      this.gameManager.off(GameEvents.ENERGY_CHANGED, this.onEnergyChanged.bind(this));
-      this.gameManager.off(GameEvents.INVENTORY_CHANGED, this.onInventoryChanged.bind(this));
-      this.gameManager.off(GameEvents.ACHIEVEMENT_UNLOCKED, this.onAchievementUnlocked.bind(this));
-      this.gameManager.off(GameEvents.GAME_ENDED, this.onGameEnded.bind(this));
-      this.gameManager.off(GameEvents.STORY_FLAG_SET, this.onStateChanged.bind(this));
-      this.gameManager.off(GameEvents.ACTION_COMPLETED, this.onStateChanged.bind(this));
-    }
+    this.removeGameListeners();
+    this.input.enabled = true;
 
     // 清理TweenManager
     if (this.tweenManager) {
